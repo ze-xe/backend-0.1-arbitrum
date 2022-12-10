@@ -1,0 +1,39 @@
+version: "3"
+services:
+  # Mongo DB for scorer
+  mongo:
+    image: mongo:6.0
+    restart: always
+    ports:
+      - 27016:27017
+    volumes:
+      - ./data/mongo:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+  # Scorer Node
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mongo
+    ports:
+      - "7878:3030"
+    environment:
+        - MONGO_URL=mongodb://root:password@mongo:27017/?authMechanism=DEFAULT
+  #     - PORT=${PORT}
+  #     - ANALYSER_PORT=${ANALYSER_PORT}
+  #     - ANALYSER_SERVER_STRING=analyser
+  #     - COVALENT_API=${COVALENT_API}
+  #     - MONGO_USER=${MONGO_USER}
+  #     - MONGO_PWD=${MONGO_PWD}
+  #     - MONGO_PORT=${MONGO_PORT}
+  #     - DB_SERVER_STRING=mongo
+  #     - DB_NAME=${DB_NAME}
+  #     - TOKENS_COLLECTION_NAME=${TOKENS_COLLECTION_NAME}
+  #     - SYNCS_COLLECTION_NAME=${SYNCS_COLLECTION_NAME}
+  #     - HOLDINGS_COLLECTION_NAME=${HOLDINGS_COLLECTION_NAME}
+  #     - CREDIT_COLLECTION_NAME=${CREDIT_COLLECTION_NAME}
+  #     - MASTER_API_KEY=${MASTER_API_KEY}
+    command: npm run prod

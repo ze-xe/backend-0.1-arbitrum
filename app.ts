@@ -1,0 +1,42 @@
+import express from "express";
+import { connect, backupConnection } from "./src/db";
+import cors from "cors";
+const app = express();
+import orderRoute from "./src/routes/orderRoute";
+import pairRoutes from "./src/routes/pairRoutes";
+import userRoute from "./src/routes/userRoute";
+import helmet from "helmet";
+import { start } from "./src/appUtil";
+
+
+require("dotenv").config();
+
+
+backupConnection;
+connect();
+app.use(cors(
+    {
+        origin: ["https://zexe.io", "http://localhost:3000"]
+    }
+));
+app.use(helmet());
+app.use(express.json());
+app.use("/pair", pairRoutes);
+app.use("/user", userRoute);
+app.use(orderRoute);
+
+
+async function run(chainId: string) {
+    try {
+        start(chainId);
+    }
+    catch (error) {
+        console.log("Error @ run", error);
+    }
+}
+run("421613");
+
+
+app.listen(process.env.PORT || 3010, function () {
+    console.log("app running on port " + (process.env.PORT || 3010));
+});
