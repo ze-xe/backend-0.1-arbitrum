@@ -61,7 +61,7 @@ function fetchOrders(req, res) {
             for (let i in buyEntries) {
                 let temp = {
                     exchangeRate: buyEntries[i][0],
-                    amount: buyEntries[i][1]
+                    amount: (buyEntries[i][1]).toString()
                 };
                 buyOrders.push(temp);
             }
@@ -152,7 +152,7 @@ function getPairPriceTrend(req, res) {
             }
             let exchangeRatesTrend = [];
             let volumeTrend = [];
-            let min = (0, big_js_1.default)(Infinity).toString();
+            let min = (0, big_js_1.default)(Number.MAX_VALUE).toString();
             let max = (0, big_js_1.default)(0).toString();
             let open = data[0].exchangeRate;
             let close = data[0].exchangeRate;

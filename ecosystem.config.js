@@ -1,7 +1,7 @@
 module.exports = {
   apps : [{
-    script: 'app.js',
-    watch: './app.js',
+    script: 'app.ts',
+    watch: './app.ts',
     instances: '-1',
     cron_restart: '0 0 * * *',
    

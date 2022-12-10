@@ -67,13 +67,13 @@ function handleOrderCreated(req, res) {
                 console.log(errorMessage_1.errorMessage.signature);
                 return res.status(400).send({ status: false, error: errorMessage_1.errorMessage.signature });
             }
-            const isOrderPresent = yield db_1.OrderCreated.findOne({ id: id });
+            const isOrderPresent = yield db_1.OrderCreated.findOne({ id: id, chainId: chainId }).lean();
             if (isOrderPresent) {
                 return res.status(201).send({ status: true, message: "Order Already Created" });
             }
             let amount = (0, big_js_1.default)(data.amount);
             if (data.buy == false) {
-                const findUserPosition = yield db_1.UserPosition.findOne({ id: data.maker, token: data.token0, chainId: chainId });
+                const findUserPosition = yield db_1.UserPosition.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
                 let multicallData;
                 let userToken0Balance = 0;
                 let allowance = 0;
@@ -86,30 +86,30 @@ function handleOrderCreated(req, res) {
                 }
                 if (findUserPosition) {
                     let _id = findUserPosition._id.toString();
-                    let currentInOrderBalance = (0, big_js_1.default)(findUserPosition.inOrderBalance).plus(amount);
-                    if (!ipfs && (0, big_js_1.default)(allowance) < currentInOrderBalance) {
+                    let currentInOrderBalance = (0, big_js_1.default)(findUserPosition.inOrderBalance).plus(amount).toString();
+                    if (!ipfs && Number(allowance) < Number(currentInOrderBalance)) {
                         console.log(`${errorMessage_1.errorMessage.allowance} token0`);
                         return res.status(400).send({ status: false, error: errorMessage_1.errorMessage.allowance });
                     }
-                    if (!ipfs && (0, big_js_1.default)(userToken0Balance) < currentInOrderBalance) {
+                    if (!ipfs && Number(userToken0Balance) < Number(currentInOrderBalance)) {
                         console.log(`${errorMessage_1.errorMessage.balance} token0`);
                         return res.status(400).send({ status: false, error: errorMessage_1.errorMessage.balance });
                     }
                     yield db_1.UserPosition.findOneAndUpdate({ _id: _id }, { $set: { inOrderBalance: currentInOrderBalance } });
                 }
                 else {
-                    if (!ipfs && (0, big_js_1.default)(allowance) < amount) {
+                    if (!ipfs && Number(allowance) < Number(amount)) {
                         console.log(`${errorMessage_1.errorMessage.allowance} token0`);
                         return res.status(400).send({ status: false, error: errorMessage_1.errorMessage.allowance });
                     }
-                    if (!ipfs && (0, big_js_1.default)(userToken0Balance) < amount) {
+                    if (!ipfs && Number(userToken0Balance) < Number(amount)) {
                         console.log(`${errorMessage_1.errorMessage.balance} token0`);
                         return res.status(400).send({ status: false, error: errorMessage_1.errorMessage.balance });
                     }
                     db_1.UserPosition.create({
                         token: data.token0,
                         chainId: chainId,
-                        inOrderBalance: amount,
+                        inOrderBalance: amount.toString(),
                         // balance: userToken0Balance,
                         id: data.maker
                     });
@@ -121,7 +121,7 @@ function handleOrderCreated(req, res) {
                 let userToken1Balance = 0;
                 let allowance = 0;
                 if (!ipfs) {
-                    multicallData = yield (0, syncBalance_1.multicall)(data.token0, data.maker, chainId);
+                    multicallData = yield (0, syncBalance_1.multicall)(data.token1, data.maker, chainId);
                     if (multicallData) {
                         userToken1Balance = multicallData[0];
                         allowance = multicallData[1];
@@ -130,30 +130,30 @@ function handleOrderCreated(req, res) {
                 amount = (0, big_js_1.default)(amount).times(data.exchangeRate).div((0, big_js_1.default)(10).pow(18));
                 if (findUserPosition) {
                     let _id = findUserPosition._id.toString();
-                    let currentInOrderBalance = (0, big_js_1.default)(findUserPosition.inOrderBalance).plus(amount);
-                    if (!ipfs && (0, big_js_1.default)(allowance) < currentInOrderBalance) {
+                    let currentInOrderBalance = (0, big_js_1.default)(findUserPosition.inOrderBalance).plus(amount).toString();
+                    if (!ipfs && Number(allowance) < Number(currentInOrderBalance)) {
                         console.log(`${errorMessage_1.errorMessage.allowance} token1`);
                         return res.status(400).send({ status: false, error: errorMessage_1.errorMessage.allowance });
                     }
-                    if (!ipfs && (0, big_js_1.default)(userToken1Balance) < currentInOrderBalance) {
+                    if (!ipfs && Number(userToken1Balance) < Number(currentInOrderBalance)) {
                         console.log(`${errorMessage_1.errorMessage.balance} token1`);
                         return res.status(400).send({ status: false, error: errorMessage_1.errorMessage.balance });
                     }
                     yield db_1.UserPosition.findOneAndUpdate({ _id: _id }, { $set: { inOrderBalance: currentInOrderBalance } });
                 }
                 else {
-                    if (!ipfs && (0, big_js_1.default)(allowance) < amount) {
+                    if (!ipfs && Number(allowance) < Number(amount)) {
                         console.log(`${errorMessage_1.errorMessage.allowance} token1`);
                         return res.status(400).send({ status: false, error: errorMessage_1.errorMessage.allowance });
                     }
-                    if (!ipfs && (0, big_js_1.default)(userToken1Balance) < amount) {
+                    if (!ipfs && Number(userToken1Balance) < Number(amount)) {
                         console.log(`${errorMessage_1.errorMessage.balance} token1`);
                         return res.status(400).send({ status: false, error: errorMessage_1.errorMessage.balance });
                     }
                     db_1.UserPosition.create({
                         token: data.token1,
                         chainId: chainId,
-                        inOrderBalance: amount,
+                        inOrderBalance: amount.toString(),
                         // balance: userToken1Balance,
                         id: data.maker
                     });

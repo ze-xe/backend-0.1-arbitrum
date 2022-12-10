@@ -32,11 +32,14 @@ function handleOrderExecuted(data, argument) {
             argument.id = id;
             argument.taker = taker;
             argument.fillAmount = fillAmount;
-            let getOrderDetails = yield db_1.OrderCreated.findOne({ id: id }).lean();
+            let getOrderDetails = yield db_1.OrderCreated.findOne({ id: id, chainId: argument.chainId }).lean();
             if (!getOrderDetails) {
                 return console.log("OrderId not found @ execute", id);
             }
             let getPairDetails = yield db_1.PairCreated.findOne({ id: getOrderDetails.pair, chainId: getOrderDetails.chainId }).lean();
+            if (!getPairDetails) {
+                return console.log(`Pair Id not found in order Executed`);
+            }
             argument.exchangeRate = getOrderDetails.exchangeRate;
             argument.pair = getOrderDetails.pair;
             // argument.exchangeRateDecimals = Number(getPairDetails.exchangeRateDecimals);
@@ -53,8 +56,8 @@ function handleOrderExecuted(data, argument) {
                 }
                 let currentInOrderBalance0 = new big_js_1.default(getUserPosition0.inOrderBalance).minus(fillAmount).toString();
                 yield db_1.UserPosition.findOneAndUpdate({ id: getOrderDetails.maker, token: token0 }, { $set: { inOrderBalance: currentInOrderBalance0 } });
-                let currentFillAmount = new big_js_1.default(getOrderDetails.balanceAmount).minus(fillAmount).toString();
-                if (Number(currentFillAmount) <= Number(getPairDetails.minToken0Order)) {
+                let currentFillAmount = new big_js_1.default(getOrderDetails.balanceAmount).minus(fillAmount);
+                if (currentFillAmount <= (0, big_js_1.default)(getPairDetails.minToken0Order)) {
                     yield db_1.OrderCreated.findOneAndUpdate({ _id: getOrderDetails._id.toString() }, { $set: { balanceAmount: currentFillAmount, deleted: true, active: false } });
                 }
                 else {
@@ -65,10 +68,13 @@ function handleOrderExecuted(data, argument) {
                 // for maker
                 let token1 = getPairDetails.token1;
                 let getUserPosition1 = yield db_1.UserPosition.findOne({ id: getOrderDetails.maker, token: token1 });
-                let currentBalance1 = (0, big_js_1.default)(getUserPosition1.inOrderBalance).minus((0, big_js_1.default)(fillAmount).times(getOrderDetails.exchangeRate).div((0, big_js_1.default)(10).pow(18)));
+                if (!getUserPosition1) {
+                    return console.log(`User Position not found ${getOrderDetails.maker}, ${token1}`);
+                }
+                let currentBalance1 = (0, big_js_1.default)(getUserPosition1.inOrderBalance).minus((0, big_js_1.default)(fillAmount).times(getOrderDetails.exchangeRate).div((0, big_js_1.default)(10).pow(18))).toString();
                 yield db_1.UserPosition.findOneAndUpdate({ id: getOrderDetails.maker, token: token1 }, { $set: { inOrderBalance: currentBalance1 } });
-                let currentFillAmount = new big_js_1.default(getOrderDetails.amount).minus(fillAmount).toString();
-                if (Number(currentFillAmount) <= Number(getPairDetails.minToken0Order)) {
+                let currentFillAmount = new big_js_1.default(getOrderDetails.amount).minus(fillAmount);
+                if (currentFillAmount <= (0, big_js_1.default)(getPairDetails.minToken0Order)) {
                     yield db_1.OrderCreated.findOneAndUpdate({ _id: getOrderDetails._id.toString() }, { $set: { deleted: true, active: false, balanceAmount: currentFillAmount } });
                 }
                 else {
@@ -86,7 +92,7 @@ exports.handleOrderExecuted = handleOrderExecuted;
 function handleOrderCancelled(data) {
     return __awaiter(this, void 0, void 0, function* () {
         let id = data[0];
-        let orderDetails = yield db_1.OrderCreated.findOne({ id: id });
+        let orderDetails = yield db_1.OrderCreated.findOne({ id: id }).lean();
         if (!orderDetails) {
             return console.log(`Order cancelled OrderId not found ${data[0]}`);
         }
@@ -95,11 +101,18 @@ function handleOrderCancelled(data) {
         }
         // update user inOrder
         if (orderDetails.buy == false) {
-            yield db_1.UserPosition.findOneAndUpdate({ id: orderDetails.maker, token: orderDetails.token0, chainId: orderDetails.chainId }, { $inc: { inOrderBalance: -orderDetails.balanceAmount } });
+            let getUser = yield db_1.UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token0, chainId: orderDetails.chainId }).lean();
+            if (getUser) {
+                let currentInOrderBalance = (0, big_js_1.default)(getUser.inOrderBalance).minus(orderDetails.balanceAmount).toString();
+                yield db_1.UserPosition.findOneAndUpdate({ id: orderDetails.maker, token: orderDetails.token0, chainId: orderDetails.chainId }, { $set: { inOrderBalance: currentInOrderBalance } });
+            }
         }
         else if (orderDetails.buy == true) {
-            let token1Amount = (0, big_js_1.default)(orderDetails.balanceAmount).times(orderDetails.exchangeRate).div((0, big_js_1.default)(10).pow(18)).toNumber();
-            yield db_1.UserPosition.findOneAndUpdate({ id: orderDetails.maker, token: orderDetails.token1, chainId: orderDetails.chainId }, { $inc: { inOrderBalance: -token1Amount } });
+            let getUser = yield db_1.UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token1, chainId: orderDetails.chainId }).lean();
+            if (getUser) {
+                let token1Amount = (0, big_js_1.default)(getUser.inOrderBalance).minus((0, big_js_1.default)(orderDetails.balanceAmount).times(orderDetails.exchangeRate).div((0, big_js_1.default)(10).pow(18))).toString();
+                yield db_1.UserPosition.findOneAndUpdate({ id: orderDetails.maker, token: orderDetails.token1, chainId: orderDetails.chainId }, { $set: { inOrderBalance: token1Amount } });
+            }
         }
         yield db_1.OrderCreated.findOneAndUpdate({ _id: orderDetails._id }, { $set: { cancelled: true, active: false } });
         console.log(`order Cancelled, orderId : ${data[0]}`);

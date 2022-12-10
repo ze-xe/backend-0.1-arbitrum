@@ -8,7 +8,7 @@ const UserPositionSchema = new mongoose_1.default.Schema({
     id: String,
     token: String,
     // balance: Number,
-    inOrderBalance: Number,
+    inOrderBalance: String,
     chainId: String
 }, { timestamps: true });
 exports.default = UserPositionSchema;
