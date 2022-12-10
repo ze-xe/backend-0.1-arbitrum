@@ -2,7 +2,7 @@
   "name": "ze-xe",
   "version": "0.0.0",
   "main": "app.js",
-  "repository": "https://github.com/ze-xe/backend.git",
+  "repository": "https://github.com/ze-xe/backend-0.1-arbitrum.git",
   "author": "mubashirzebi <mubashshirzebi@gmail.com>",
   "license": "MIT",
   "private": true,
@@ -10,7 +10,7 @@
     "start": "node app.js",
     "build": "tsc -p .",
     "dev": "nodemon  app.ts",
-    "prod": "pm2-runtime  app.js -i -1",
+    "prod": "pm2-runtime  app.ts -i -1",
     "prod2": "pm2 start ecosystem.config.js",
     "test": "mocha -r ts-node/register --timeout 60000 ./src/test/mocha_test.ts"
   },
