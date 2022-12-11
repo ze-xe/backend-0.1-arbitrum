@@ -66,7 +66,7 @@ async function fetchOrders(req: any, res: any) {
 
         let buyOrders = [];
 
-        let buyEntries : [string, string][]= Object.entries(mapBuy);
+        let buyEntries: [string, string][] = Object.entries(mapBuy);
 
         for (let i in buyEntries) {
             let temp = {
@@ -160,11 +160,11 @@ async function getAllPairDetails(req: any, res: any) {
 
 
 
-async function getPairPriceTrend(req: any, res: any) {
+async function _getPairPriceTrend(req: any, res: any) {
 
     try {
 
-        let pairId : string= req.params.pairId;
+        let pairId: string = req.params.pairId;
         let interval: number = Number(req.query.interval);
         let chainId: string = req.query.chainId;
 
@@ -180,7 +180,7 @@ async function getPairPriceTrend(req: any, res: any) {
         }
 
         let data = await OrderExecuted.find({ pair: pairId, chainId: chainId }).sort({ blockTimestamp: 1, createdAt: 1 }).lean();
-
+        console.log(data.length)
         if (data.length == 0) {
 
             let isPairExist = await PairCreated.findOne({ id: pairId, chainId }).lean();
@@ -194,16 +194,21 @@ async function getPairPriceTrend(req: any, res: any) {
         let exchangeRatesTrend = [];
         let volumeTrend = [];
 
-        let min: string = Big(Number. MAX_VALUE ).toString();
+        let min: string = Big(Number.MAX_VALUE).toString();
         let max: string = Big(0).toString();
         let open: string = data[0].exchangeRate;
         let close: string = data[0].exchangeRate;
         let currTimestamp = data[0].blockTimestamp;
+        let closeTimeStamp = data[0].blockTimestamp;
         let volume: string | number = 0;
 
         for (let i = 0; i < data.length; i++) {
+            if (data[i].blockTimestamp > currTimestamp + interval) {
+
+            }
 
             if (data[i].blockTimestamp <= currTimestamp + interval) {
+                // this block will mainly update the min max, open close value
 
                 if (Number(data[i].exchangeRate) > Number(max)) {
                     max = data[i].exchangeRate;
@@ -232,6 +237,7 @@ async function getPairPriceTrend(req: any, res: any) {
             }
             else {
 
+                //if value exceed it will  genrate object regarding upper if block
                 let temp = {
                     time: currTimestamp / 1000,
                     open: Big(open).div(Big(10).pow(18)).toString(),
@@ -243,6 +249,7 @@ async function getPairPriceTrend(req: any, res: any) {
                 exchangeRatesTrend.push(temp);
                 volumeTrend.push({ time: currTimestamp / 1000, value: Big(volume).div(Big(10).pow(18)).toString() });
 
+                // here now we are updating value as per the current itration
                 min = data[i].exchangeRate;
                 max = data[i].exchangeRate;
                 open = data[i].exchangeRate;
@@ -250,6 +257,155 @@ async function getPairPriceTrend(req: any, res: any) {
                 currTimestamp = data[i].blockTimestamp;
                 volume = data[i].fillAmount;
 
+                if (i == data.length - 1) {
+
+                    let temp = {
+                        time: currTimestamp / 1000,
+                        open: Big(open).div(Big(10).pow(18)).toString(),
+                        high: Big(max).div(Big(10).pow(18)).toString(),
+                        close: Big(close).div(Big(10).pow(18)).toString(),
+                        low: Big(min).div(Big(10).pow(18)).toString(),
+                    };
+                    exchangeRatesTrend.push(temp);
+                    volumeTrend.push({ time: currTimestamp / 1000, value: Big(volume).div(Big(10).pow(18)).toString() });
+
+                }
+
+            }
+        }
+
+        let result = {
+            exchangeRate: exchangeRatesTrend,
+            volume: volumeTrend
+        };
+        return res.status(200).send({ status: true, data: result });
+    }
+
+    catch (error: any) {
+        console.log("Error @ getPriceDetails", error);
+        return res.status(500).send({ status: false, error: error.message });
+    }
+}
+
+async function getPairPriceTrend(req: any, res: any) {
+
+    try {
+
+        let pairId: string = req.params.pairId;
+        let interval: number = Number(req.query.interval);
+        let chainId: string = req.query.chainId;
+
+        if (isNaN(interval) == true || interval < 300000) {
+            return res.status(400).send({ status: false, error: errorMessage.interval });
+        }
+
+        if (!pairId) {
+            return res.status(400).send({ status: false, error: errorMessage.pairId });
+        }
+        if (!chainId) {
+            return res.status(400).send({ status: false, error: errorMessage.chainId });
+        }
+
+        let data = await OrderExecuted.find({ pair: pairId, chainId: chainId }).sort({ blockTimestamp: 1, createdAt: 1 }).lean();
+        console.log(data.length)
+        if (data.length == 0) {
+
+            let isPairExist = await PairCreated.findOne({ id: pairId, chainId }).lean();
+
+            if (!isPairExist) {
+                return res.status(404).send({ status: false, error: errorMessage.pairId });
+            }
+            return res.status(200).send({ status: true, data: [] });
+        }
+
+        let exchangeRatesTrend = [];
+        let volumeTrend = [];
+
+        let min: string = Big(Number.MAX_VALUE).toString();
+        let max: string = Big(0).toString();
+        let open: string = data[0].exchangeRate;
+        let close: string = data[0].exchangeRate;
+        let currTimestamp = data[0].blockTimestamp;
+        let closeTimeStamp = data[0].blockTimestamp;
+        let volume: string | number = 0;
+
+        for (let i = 0; i < data.length; i++) {
+
+
+
+            if (data[i].blockTimestamp <= currTimestamp + interval) {
+                // this block will mainly update the min max, open close value
+
+                if (Number(data[i].exchangeRate) > Number(max)) {
+                    max = data[i].exchangeRate;
+                }
+
+                if (Number(data[i].exchangeRate) < Number(min)) {
+                    min = data[i].exchangeRate;
+                }
+
+                close = data[i].exchangeRate;
+                volume = Big(volume).plus(data[i].fillAmount).toString();
+
+                if (i == data.length - 1) {
+
+                    let temp = {
+                        time: currTimestamp / 1000,
+                        open: Big(open).div(Big(10).pow(18)).toString(),
+                        high: Big(max).div(Big(10).pow(18)).toString(),
+                        close: Big(close).div(Big(10).pow(18)).toString(),
+                        low: Big(min).div(Big(10).pow(18)).toString(),
+
+                    };
+                    exchangeRatesTrend.push(temp);
+                    volumeTrend.push({ time: currTimestamp / 1000, value: Big(volume).div(Big(10).pow(18)).toString() });
+                }
+            }
+            else {
+
+                //if value exceed it will  genrate object regarding upper if block
+                let temp = {
+                    time: currTimestamp / 1000,
+                    open: Big(open).div(Big(10).pow(18)).toString(),
+                    high: Big(max).div(Big(10).pow(18)).toString(),
+                    close: Big(close).div(Big(10).pow(18)).toString(),
+                    low: Big(min).div(Big(10).pow(18)).toString(),
+
+                };
+                exchangeRatesTrend.push(temp);
+                volumeTrend.push({ time: currTimestamp / 1000, value: Big(volume).div(Big(10).pow(18)).toString() });
+
+
+                currTimestamp = currTimestamp + interval;
+                // checking next block lays in next interval
+                if (data[i].blockTimestamp > currTimestamp + interval ) {
+                    let temp = {
+                        time: (currTimestamp ) / 1000,
+                        open: Big(close).div(Big(10).pow(18)).toString(),
+                        high: Big(close).div(Big(10).pow(18)).toString(),
+                        close: Big(close).div(Big(10).pow(18)).toString(),
+                        low: Big(close).div(Big(10).pow(18)).toString(),
+                    };
+                    exchangeRatesTrend.push(temp);
+                    volumeTrend.push({ time: (currTimestamp) / 1000, value: '0' });
+                    min = close;
+                    max = close;
+                    open = close;
+                    close = close;
+                    currTimestamp = currTimestamp + interval;
+                    volume = '0';
+                    i--;
+                }
+                else {
+                    // block fall in that interval
+                    min = data[i].exchangeRate;
+                    max = data[i].exchangeRate;
+                    open = close;
+                    close = data[i].exchangeRate;
+                    // currTimestamp = currTimestamp + interval;
+                    volume = data[i].fillAmount;
+                }
+    
                 if (i == data.length - 1) {
 
                     let temp = {
