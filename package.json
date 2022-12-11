@@ -7,10 +7,10 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "node app.js",
+    "start": "node build",
     "build": "tsc -p .",
     "dev": "nodemon  app.ts",
-    "prod": "pm2 start  app.ts -i -1",
+    "prod": "pm2 start app.ts -i -1",
     "prod2": "pm2 start ecosystem.config.js",
     "test": "mocha -r ts-node/register --timeout 60000 ./src/test/mocha_test.ts"
   },

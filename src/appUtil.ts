@@ -21,7 +21,7 @@ async function start(chainId: string) {
 
         if (getCreateRecords.length == 0) {
 
-            await mongoose.createConnection(process.env.MONGO_URL).dropDatabase();
+            await mongoose.createConnection(process.env.MONGO_URL! as string).dropDatabase();
 
             let page: number = 0;
 

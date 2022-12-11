@@ -7,7 +7,7 @@ require("dotenv").config();
 
 const get = axios.get;
 function makeStorageClient() {
-    const token = env.WEB_3_TOKEN;
+    const token = env.WEB_3_TOKEN as string;
     return new Web3Storage({ token });
 }
 
@@ -74,7 +74,7 @@ async function getIPFSData() {
  */
 async function mainIPFS(data: any[], id: string) {
 
-    const token = env.WEB_3_TOKEN;
+    const token = env.WEB_3_TOKEN as string;
 
     const storage = new Web3Storage({ token });
 

@@ -5,7 +5,7 @@ require("dotenv").config();
 
 
 
-let backupConnection = mongoose.createConnection(process.env.MONGO_URL1);
+let backupConnection = mongoose.createConnection(process.env.MONGO_URL1! as string);
 
 import SyncSchema from "./schemas/Sync";
 import PairCreatedSchema from "./schemas/PairCreated";
@@ -30,7 +30,7 @@ const UserPosition = mongoose.model("UserPosition", UserPositionSchema);
 
 async function connect() {
 
-    mongoose.connect(process.env.MONGO_URL)
+    mongoose.connect(process.env.MONGO_URL! as string)
         .then(() => console.log("MongoDb is connected"))
         .catch(err => console.log(err));
 }
