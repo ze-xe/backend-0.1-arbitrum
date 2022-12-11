@@ -89,7 +89,7 @@ async function getMultiBalance(token: string, addresses: string[], ids: string[]
                 let userPosition: ifUserPosition = await UserPosition.findOne({ token: token, id: addresses[i], chainId: chainId }).lean();
                 let inOrderBalance = Big(userPosition.inOrderBalance);
 
-                if (Big(balance) < inOrderBalance) {
+                if (Number(balance) < Number(inOrderBalance)) {
                     inActiveIds.push(ids[i]);
                     let currentInOrderBalance = Big(inOrderBalance).minus(amounts[i]).toString();
 
@@ -208,8 +208,8 @@ async function orderStatus(chainId: string) {
                     let inOrderBalance = Big(getUserPos.inOrderBalance);
 
 
-                    if (inOrderBalance > Big(balance)) {
-                        let currentInOrderBalance = Big(inOrderBalance).minus(amount);
+                    if (Number(inOrderBalance) > Number(balance)) {
+                        let currentInOrderBalance = Big(inOrderBalance).minus(amount).toString();
                         // updating inOrderBalance and active
                         await Promise.all([OrderCreated.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: false } }),
                         UserPosition.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: currentInOrderBalance } })]);
@@ -221,9 +221,9 @@ async function orderStatus(chainId: string) {
 
                     const getUserPos: ifUserPosition = await UserPosition.findOne({ token: token, id: getOrderCreated[i].maker, chainId: getOrderCreated[i].chainId }).lean();
 
-                    let inOrderBalance: Big = Big(getUserPos.inOrderBalance).plus(amount);
+                    let inOrderBalance = Big(getUserPos.inOrderBalance).plus(amount).toString();
 
-                    if (inOrderBalance < Big(balance)) {
+                    if (Number(inOrderBalance) < Number(balance)) {
 
                         await Promise.all([OrderCreated.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: true } }),
                         UserPosition.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: inOrderBalance } })]);
