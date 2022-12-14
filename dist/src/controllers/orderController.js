@@ -354,7 +354,7 @@ function getLimitMatchedOrders(req, res) {
             else {
                 token = data[0].token1;
             }
-            const response = yield (0, syncBalance_1.getMultiBalance)(token, addresses, ids, data, chainId, amounts);
+            let response = yield (0, syncBalance_1.getMultiBalance)(token, addresses, ids, data, chainId, amounts);
             if (!response) {
                 return res.status(200).send({ status: true, data: [] });
             }
@@ -431,7 +431,7 @@ function getMatchedMarketOrders(req, res) {
             if (!result) {
                 return res.status(200).send({ status: true, data: [] });
             }
-            return res.status(200).send({ status: true, data: data });
+            return res.status(200).send({ status: true, data: result });
         }
         catch (error) {
             console.log("Error @ getMatchedMarketOrders", error);

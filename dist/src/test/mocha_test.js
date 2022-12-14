@@ -33,8 +33,8 @@ describe("zexe order creation", () => __awaiter(void 0, void 0, void 0, function
     let orders = [];
     let exchangeRate = (0, big_js_1.default)(25000 - Math.floor(Math.random() * 10000)).times((0, big_js_1.default)(10).pow(18)).toFixed(0);
     let salt = Math.floor(Math.random() * 9000000);
-    let amount = ethers_1.ethers.utils.parseEther(`${Math.random()}`).toString();
-    let buy = true;
+    let amount = ethers_1.ethers.utils.parseEther(`${Math.random() * 5}`).toString();
+    let buy = false;
     /*
     it('mint 10 btc to user1, 2000000 usdt to user2', async () => {
         let user1BtcBalancePre = await btc.balanceOf(user1.address);
@@ -94,7 +94,7 @@ describe("zexe order creation", () => __awaiter(void 0, void 0, void 0, function
         console.log([
             value, storedSignature
         ]);
-        let res = yield (0, chai_1.request)("http://localhost:3010")
+        let res = yield (0, chai_1.request)("http://65.20.81.124:8090")
             .post("/order/create")
             .send({
             "data": {
@@ -112,64 +112,58 @@ describe("zexe order creation", () => __awaiter(void 0, void 0, void 0, function
         console.log(res.text);
         (0, chai_2.expect)(res).to.have.status(201);
     }));
-    /*
-    it(`user2 buy user1s btc order @ ${exchangeRate / 10 ** 18}`, async () => {
-        let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
-        let user2BtcBalancePre = (await btc.balanceOf(user2.address)).toString();
-        let user2UsdcBalancePre = (await usdc.balanceOf(user2.address)).toString();
-        let user1UsdcBalancePre = (await usdc.balanceOf(user1.address)).toString();
+    it(`user2 buy user1s btc order @ ${+exchangeRate / 10 ** 18}`, () => __awaiter(void 0, void 0, void 0, function* () {
+        let user1BtcBalancePre = (yield btc.balanceOf(user1.address)).toString();
+        let user2BtcBalancePre = (yield btc.balanceOf(user2.address)).toString();
+        let user2UsdcBalancePre = (yield usdc.balanceOf(user2.address)).toString();
+        let user1UsdcBalancePre = (yield usdc.balanceOf(user1.address)).toString();
         console.log("1PreBtc", user1BtcBalancePre);
         console.log("1Preusdc", user1UsdcBalancePre);
         console.log("2PreUsdc", user2UsdcBalancePre);
         console.log("2PreBtc", user2BtcBalancePre);
         // console.log(signatures[0])
         // console.log(orders[0])
-        const btcAmount = ethers.utils.parseEther(`${Math.random()*0.5}`);
-        console.log("btcAmount---", (btcAmount/10**18).toString());
-        let exTxn = await exchange.connect(user2).executeLimitOrder(
-            signatures[0],
-            orders[0],
-            btcAmount,
-            { gasLimit: "100000000" }
-        );
+        const btcAmount = ethers_1.ethers.utils.parseEther(`${Math.random() * 4}`);
+        console.log("btcAmount---", (+btcAmount / 10 ** 18).toString());
+        let exTxn = yield exchange.connect(user2).executeLimitOrder(signatures[0], orders[0], btcAmount, { gasLimit: "100000000" });
         let user1BtcBalancePost;
         let user1UsdcBalancePost;
         let user2UsdcBalancePost;
         let user2BtcBalancePost;
         // console.log(await exTxn.wait(1))
-        exTxn.wait(1).then(async (resp) => {
-            user1BtcBalancePost = (await btc.balanceOf(user1.address)).toString();
-            user1UsdcBalancePost = (await usdc.balanceOf(user1.address)).toString();
-            user2UsdcBalancePost = (await usdc.balanceOf(user2.address)).toString();
-            user2BtcBalancePost = (await btc.balanceOf(user2.address)).toString();
-
+        exTxn.wait(1).then((resp) => __awaiter(void 0, void 0, void 0, function* () {
+            user1BtcBalancePost = (yield btc.balanceOf(user1.address)).toString();
+            user1UsdcBalancePost = (yield usdc.balanceOf(user1.address)).toString();
+            user2UsdcBalancePost = (yield usdc.balanceOf(user2.address)).toString();
+            user2BtcBalancePost = (yield btc.balanceOf(user2.address)).toString();
             console.log("1PostB", user1BtcBalancePost);
             console.log("1PostU", user1UsdcBalancePost);
             console.log("2PostU", user2UsdcBalancePost);
             console.log("2PostB", user2BtcBalancePost);
             // console.log(resp)
-
             // expect(user1BtcBalancePost).to.equal(Big(user1BtcBalancePre).minus(btcAmount).toString());
             // expect(user1UsdcBalancePost).to.equal(Big(user1BtcBalancePre).plus(Big(btcAmount).times(exchangeRate).div(Big(10).pow(18))).toString());
+        }));
+    }));
+    /*
+    it(`cancelled  order `, async () => {
+
+        try{
+
+            let exTxn = await exchange.connect(user1).cancelOrder(
+                signatures[0],
+                orders[0],
+                { gasLimit: "100000000" }
+            )
+            exTxn.wait(1).then(async (resp: any) => {
+                // console.log(resp)
+            })
+        }
+        catch(error){
+            console.log(error)
+        }
 
 
-        });
-
-    });
+    })
     */
-    // it(`cancelled  order `, async () => {
-    //     try{
-    //         let exTxn = await exchange.connect(user1).cancelOrder(
-    //             signatures[0],
-    //             orders[0],
-    //             { gasLimit: "100000000" }
-    //         )
-    //         exTxn.wait(1).then(async (resp) => {
-    //             // console.log(resp)
-    //         })
-    //     }
-    //     catch(error){
-    //         console.log(error)
-    //     }
-    // })
 }));

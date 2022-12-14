@@ -27,6 +27,7 @@
     "minimist": "^1.2.7",
     "mongoose": "^6.7.0",
     "pm2": "^5.2.2",
+    "socket.io": "^4.5.4",
     "typescript": "^4.9.4",
     "web3.storage": "^4.4.0"
   },
@@ -35,6 +36,7 @@
     "@types/chai": "^4.3.4",
     "@types/cors": "^2.8.13",
     "@types/mocha": "^10.0.1",
+    "@types/socket.io": "^3.0.2",
     "chai": "^4.3.7",
     "chai-http": "^4.3.0",
     "eslint": "^8.29.0",

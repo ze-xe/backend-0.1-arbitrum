@@ -75,7 +75,7 @@ function getMultiBalance(token, addresses, ids, data, chainId, amounts) {
                     let balance = ethers_1.BigNumber.from(resp[1][i]).toString();
                     let userPosition = yield db_1.UserPosition.findOne({ token: token, id: addresses[i], chainId: chainId }).lean();
                     let inOrderBalance = (0, big_js_1.default)(userPosition.inOrderBalance);
-                    if ((0, big_js_1.default)(balance) < inOrderBalance) {
+                    if (Number(balance) < Number(inOrderBalance)) {
                         inActiveIds.push(ids[i]);
                         let currentInOrderBalance = (0, big_js_1.default)(inOrderBalance).minus(amounts[i]).toString();
                         let updateUserPosition = db_1.UserPosition.findOneAndUpdate({ token: token, id: addresses[i], chainId: chainId }, { $set: { inOrderBalance: currentInOrderBalance } });
@@ -161,8 +161,8 @@ function orderStatus(chainId) {
                     if (getOrderCreated[i].active == true) {
                         const getUserPos = yield db_1.UserPosition.findOne({ token: token, id: id, chainId: chainId }).lean();
                         let inOrderBalance = (0, big_js_1.default)(getUserPos.inOrderBalance);
-                        if (inOrderBalance > (0, big_js_1.default)(balance)) {
-                            let currentInOrderBalance = (0, big_js_1.default)(inOrderBalance).minus(amount);
+                        if (Number(inOrderBalance) > Number(balance)) {
+                            let currentInOrderBalance = (0, big_js_1.default)(inOrderBalance).minus(amount).toString();
                             // updating inOrderBalance and active
                             yield Promise.all([db_1.OrderCreated.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: false } }),
                                 db_1.UserPosition.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: currentInOrderBalance } })]);
@@ -171,8 +171,8 @@ function orderStatus(chainId) {
                     }
                     else if (getOrderCreated[i].active == false) {
                         const getUserPos = yield db_1.UserPosition.findOne({ token: token, id: getOrderCreated[i].maker, chainId: getOrderCreated[i].chainId }).lean();
-                        let inOrderBalance = (0, big_js_1.default)(getUserPos.inOrderBalance).plus(amount);
-                        if (inOrderBalance < (0, big_js_1.default)(balance)) {
+                        let inOrderBalance = (0, big_js_1.default)(getUserPos.inOrderBalance).plus(amount).toString();
+                        if (Number(inOrderBalance) < Number(balance)) {
                             yield Promise.all([db_1.OrderCreated.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: true } }),
                                 db_1.UserPosition.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: inOrderBalance } })]);
                             console.log("active", getOrderCreated[i].id, getUserPos.id);

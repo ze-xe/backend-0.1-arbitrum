@@ -8,6 +8,7 @@ import { getMultiBalance, multicall } from "../sync/syncBalance";
 import { mainIPFS } from "../IPFS/putFiles";
 import { errorMessage } from "../helper/errorMessage";
 import { ifOrderCreated, ifPairCreated, ifUserPosition, orderSignature } from "../helper/interface";
+import { socketService } from "../socketIo/socket.io";
 
 /**
  * 
@@ -286,7 +287,12 @@ async function handleOrderCreated(req: any, res: any) {
                 cid: cid
             }
         );
-
+        // socket io data
+        socketService.emit(`orders,${pair}`,{
+            amount: data.amount,
+            exchangeRate: data.exchangeRate,
+            buy: data.buy
+        });
         console.log("Order Created ", "maker ", data.maker, "amount ", data.amount.toString(), id);
 
         return res.status(201).send({ status: true, message: "Order created successfully" });
