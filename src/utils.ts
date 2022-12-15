@@ -2,6 +2,7 @@ import fs from "fs";
 import { ethers } from "ethers";
 import Big from "big.js";
 import { ExchangeAddress } from "./helper/constant";
+import { getExchangeAddress, getRpcLink } from "./helper/chain";
 
 const exchangeDeployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Exchange.json")).toString());
 
@@ -156,26 +157,10 @@ function validateSignature(maker: string, signature: string, value: object, chai
 
 // }
 
-function getRpcLink(chainId: string): string {
-
-    let map: any = {
-        "1666700000": "https://api.s0.b.hmny.io/",
-        "421613": "https://arbitrum-goerli.infura.io/v3/bb621c9372d048979f8677ba78fe41d7"
-    };
-
-    return map[chainId];
-}
 
 
 
 
-function getExchangeAddress(chainId: string): string {
-    let map: any = {
-        "421613": ExchangeAddress
-    }
 
-    return map[chainId]
 
-}
-
-export { getExchangeABI, getExchangeAddress, getERC20ABI, validateSignature, getRpcLink, parseEther, getInterface, getProvider, MulticallAbi };
+export { getExchangeABI, getERC20ABI, validateSignature, parseEther, getInterface, getProvider, MulticallAbi };

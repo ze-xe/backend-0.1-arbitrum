@@ -1,7 +1,8 @@
-import { getExchangeAddress } from "../../utils";
+
 import { getExchangeABI } from "../../utils";
 
 import { handleOrderExecuted, handleOrderCancelled } from "../../handlers/exchange";
+import { getExchangeAddress } from "../../helper/chain";
 
 
 

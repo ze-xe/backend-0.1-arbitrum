@@ -1,6 +1,8 @@
 import { PairCreated, OrderCreated, OrderExecuted, UserPosition } from "../db";
 import Big from "big.js";
 import { ifOrderCreated, ifPairCreated, ifUserPosition } from "../helper/interface";
+import { EVENT_NAME, socketService } from "../socketIo/socket.io";
+import { number } from "joi";
 
 
 
@@ -43,8 +45,26 @@ async function handleOrderExecuted(data: any, argument: any) {
         // argument.exchangeRateDecimals = Number(getPairDetails.exchangeRateDecimals);
         argument.buy = getOrderDetails.buy;
 
-        OrderExecuted.create(argument);
 
+
+        // updating pair orders
+
+        socketService.emit(EVENT_NAME.PAIR_ORDER, {
+            amount: `-${fillAmount}`,
+            exchangeRate: getOrderDetails.exchangeRate,
+            buy: getOrderDetails.buy,
+            pair: getOrderDetails.pair
+        });
+
+        // updating pair history
+        socketService.emit(EVENT_NAME.PAIR_HISTORY, {
+            amount: fillAmount,
+            exchangeRate: getOrderDetails.exchangeRate,
+            buy: getOrderDetails.buy,
+            pair: getOrderDetails.pair
+        })
+
+        OrderExecuted.create(argument);
         let priceDiff = new Big(getOrderDetails.exchangeRate).minus(getPairDetails.exchangeRate).toString();
 
         await PairCreated.findOneAndUpdate(
@@ -72,7 +92,7 @@ async function handleOrderExecuted(data: any, argument: any) {
 
             let currentFillAmount = new Big(getOrderDetails.balanceAmount).minus(fillAmount);
 
-            if (currentFillAmount <= Big(getPairDetails.minToken0Order)) {
+            if (Number(currentFillAmount) <= Number(getPairDetails.minToken0Order)) {
                 await OrderCreated.findOneAndUpdate({ _id: getOrderDetails._id.toString() },
                     { $set: { balanceAmount: currentFillAmount, deleted: true, active: false } });
             }
@@ -91,7 +111,7 @@ async function handleOrderExecuted(data: any, argument: any) {
 
             let getUserPosition1: ifUserPosition | null = await UserPosition.findOne({ id: getOrderDetails.maker, token: token1 });
 
-            if(!getUserPosition1){
+            if (!getUserPosition1) {
                 return console.log(`User Position not found ${getOrderDetails.maker}, ${token1}`)
             }
 
@@ -104,7 +124,7 @@ async function handleOrderExecuted(data: any, argument: any) {
 
             let currentFillAmount = new Big(getOrderDetails.amount).minus(fillAmount);
 
-            if (currentFillAmount <= Big(getPairDetails.minToken0Order)) {
+            if (Number(currentFillAmount) <= Number(getPairDetails.minToken0Order)) {
                 await OrderCreated.findOneAndUpdate({ _id: getOrderDetails._id.toString() },
                     { $set: { deleted: true, active: false, balanceAmount: currentFillAmount } });
             }
@@ -114,8 +134,6 @@ async function handleOrderExecuted(data: any, argument: any) {
                     { $set: { balanceAmount: currentFillAmount } }
                 );
             }
-
-
         }
 
         console.log("Order Executed", taker, fillAmount, id);
@@ -132,7 +150,7 @@ async function handleOrderCancelled(data: any) {
 
     let id = data[0];
 
-    let orderDetails = await OrderCreated.findOne({ id: id }).lean();
+    let orderDetails: ifOrderCreated | null = await OrderCreated.findOne({ id: id }).lean();
 
     if (!orderDetails) {
         return console.log(`Order cancelled OrderId not found ${data[0]}`);
@@ -141,9 +159,15 @@ async function handleOrderCancelled(data: any) {
     if (orderDetails.cancelled == true) {
         return console.log("Order is already cancelled");
     }
+    // cancel order 
 
+    socketService.emit(EVENT_NAME.PAIR_ORDER, {
+        amount: `-${orderDetails.balanceAmount}`,
+        exchangeRate: orderDetails.exchangeRate,
+        buy: orderDetails.buy,
+        pair: orderDetails.pair
+    });
     // update user inOrder
-
     if (orderDetails.buy == false) {
         let getUser: ifUserPosition | null = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token0, chainId: orderDetails.chainId }).lean();
         if (getUser) {

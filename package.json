@@ -37,11 +37,13 @@
     "@types/cors": "^2.8.13",
     "@types/mocha": "^10.0.1",
     "@types/socket.io": "^3.0.2",
+    "@types/socket.io-client": "^3.0.0",
     "chai": "^4.3.7",
     "chai-http": "^4.3.0",
     "eslint": "^8.29.0",
     "mocha": "^10.1.0",
     "nodemon": "^2.0.20",
+    "socket.io-client": "^4.5.4",
     "ts-node": "^10.9.1"
   }
 }

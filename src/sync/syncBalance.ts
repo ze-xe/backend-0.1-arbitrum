@@ -1,9 +1,9 @@
 import { BigNumber, ethers } from "ethers";
 import { UserPosition, OrderCreated } from "../db";
 import Big from "big.js";
-import { getERC20ABI, getRpcLink, getProvider, getInterface, MulticallAbi, getExchangeAddress } from "../utils";
-import { MulticallAddress } from "../helper/constant";
+import { getERC20ABI, getProvider, getInterface, MulticallAbi } from "../utils";
 import { ifOrderCreated, ifUserPosition, orderSignature } from "../helper/interface";
+import { getExchangeAddress, MulticallAddress } from "../helper/chain";
 
 /**
  * @dev this function is use to get onchain data for create order api, i.e balance and allowance

@@ -8,7 +8,7 @@ import { getMultiBalance, multicall } from "../sync/syncBalance";
 import { mainIPFS } from "../IPFS/putFiles";
 import { errorMessage } from "../helper/errorMessage";
 import { ifOrderCreated, ifPairCreated, ifUserPosition, orderSignature } from "../helper/interface";
-import { socketService } from "../socketIo/socket.io";
+import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 
 /**
  * 
@@ -226,7 +226,7 @@ async function handleOrderCreated(req: any, res: any) {
             console.log("Pair Created ", "T0 ", data.token0, "T1 ", data.token1, "CId ", chainId);
 
         }
-        let pair;
+        let pair: string;
         if (isPairExist) {
             pair = isPairExist.id?.toString();
         }
@@ -287,12 +287,19 @@ async function handleOrderCreated(req: any, res: any) {
                 cid: cid
             }
         );
+
+
+
         // socket io data
-        socketService.emit(`orders,${pair}`,{
-            amount: data.amount,
-            exchangeRate: data.exchangeRate,
-            buy: data.buy
-        });
+        if (!ipfs) {
+            socketService.emit(EVENT_NAME.PAIR_ORDER, {
+                amount: data.amount,
+                exchangeRate: data.exchangeRate,
+                buy: data.buy,
+                pair: pair
+            });
+        }
+
         console.log("Order Created ", "maker ", data.maker, "amount ", data.amount.toString(), id);
 
         return res.status(201).send({ status: true, message: "Order created successfully" });

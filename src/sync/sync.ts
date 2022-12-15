@@ -94,7 +94,7 @@ async function eventListner({ contractAddress, abi, handlers, chainId }: ifEvent
 async function historicEventListner({ contractAddress, abi, handlers, chainId }: ifEventListner) {
 
 
-    eventSync();
+    await eventSync();
     async function eventSync(): Promise<any> {
         let fromBlock: number = 0;
         try {

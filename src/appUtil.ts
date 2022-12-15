@@ -8,6 +8,8 @@ import { historicEventListner } from "./sync/sync";
 import mongoose from "mongoose";
 import { startOrderStatus } from "./sync/syncBalance";
 import { ifOrderCreated} from "./helper/interface";
+import { socketService } from "./socketIo/socket.io";
+import { httpServer } from "../app";
 require("dotenv").config();
 
 
@@ -67,7 +69,8 @@ async function start(chainId: string) {
 
 
         }
-        historicEventListner(ExchangeConfig(chainId));
+        await historicEventListner(ExchangeConfig(chainId));
+        socketService.init(httpServer)
         startOrderStatus(chainId)
     }
     catch (error) {

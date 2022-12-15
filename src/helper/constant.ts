@@ -2,10 +2,7 @@
 
 
 
-const MulticallAddress: any = {
-    aurora: "0x266CCfe718EAac46ABF8589Dc8833f3A73a0Bd1c",
-    "421613": "0x7dc45EEe67CE15a32ea4ea28e5b2392Ad20F5D6d"
-};
+
 
 const Decimals = {
     token: 18,
@@ -21,4 +18,4 @@ const UsdcAddress = "0xF74256A5E41ada2B81BdBacfdCF7B3b3252b4625";
 
 
 
-export  { MulticallAddress, Decimals, ExchangeAddress, BtcAddress, UsdcAddress };
+export  { Decimals, ExchangeAddress, BtcAddress, UsdcAddress };

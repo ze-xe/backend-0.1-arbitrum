@@ -27,6 +27,16 @@ class SocketService{
     }
 }
 
+// export namespace EVENT_NAME {
+//     'PAIR_ORDER';
+//     'PAIR_HISTORY';
+// }
+
+export const  EVENT_NAME  = {
+    PAIR_ORDER: "PAIR_ORDER",
+    PAIR_HISTORY: "PAIR_HISTORY",
+}
+
 export const socketService = new SocketService();
 
 

@@ -7,7 +7,9 @@ import pairRoutes from "./src/routes/pairRoutes";
 import userRoute from "./src/routes/userRoute";
 import helmet from "helmet";
 import { start } from "./src/appUtil";
-
+import { socketService } from "./src/socketIo/socket.io";
+import { createServer } from "http";
+export const httpServer = createServer(app);
 
 require("dotenv").config();
 
@@ -37,6 +39,6 @@ async function run(chainId: string) {
 run("421613");
 
 
-app.listen(process.env.PORT || 3010, function () {
+httpServer.listen(process.env.PORT || 3010, function () {
     console.log("app running on port " + (process.env.PORT || 3010));
 });

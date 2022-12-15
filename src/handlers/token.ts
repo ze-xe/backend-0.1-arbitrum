@@ -1,5 +1,5 @@
 import { Token } from "../db";
-import { getERC20ABI, getProvider, getRpcLink } from "../utils";
+import { getERC20ABI, getProvider} from "../utils";
 import {ethers} from "ethers";
 
 
