@@ -124,10 +124,10 @@ export async function getBar(req: any, res: any) {
                 if (data[i].blockTimestamp > currTimestamp + intervalInMSec) {
                     let temp = {
                         time: currTimestamp,
-                        open: Big(open).div(Big(10).pow(18)).toString(),
-                        high: Big(max).div(Big(10).pow(18)).toString(),
+                        open: Big(close).div(Big(10).pow(18)).toString(),
+                        high: Big(close).div(Big(10).pow(18)).toString(),
                         close: Big(close).div(Big(10).pow(18)).toString(),
-                        low: Big(min).div(Big(10).pow(18)).toString(),
+                        low: Big(close).div(Big(10).pow(18)).toString(),
                         volume: '0'
                     };
                     exchangeRatesTrend.push(temp);
