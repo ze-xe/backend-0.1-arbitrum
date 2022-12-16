@@ -9,7 +9,7 @@ async function handleToken(token: string, chainId: string) {
         const isTokenExist = await Token.findOne({ id: token });
 
         if (isTokenExist) {
-            return;
+            return isTokenExist.symbol;
         }
 
         let provider = getProvider(chainId);

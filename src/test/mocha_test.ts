@@ -45,10 +45,10 @@ describe("zexe order creation", async () => {
     let user2 = new ethers.Wallet("0xcdb7f4e35a4443b45b8316666caa396b7a9f4686fcff1901c008b15a2fa2e904").connect(provider); //2
     let signatures: any[] = [];
     let orders: any[] = [];
-    let exchangeRate = Big(25000 - Math.floor(Math.random() * 10000)).times(Big(10).pow(18)).toFixed(0);
+    let exchangeRate = Big(22000 - Math.floor(Math.random() * 5000)).times(Big(10).pow(18)).toFixed(0);
     let salt = Math.floor(Math.random() * 9000000);
     let amount = ethers.utils.parseEther(`${Math.random() * 5}`).toString();
-    let buy = true;
+    let buy = false;
 
     /*
     it('mint 10 btc to user1, 2000000 usdt to user2', async () => {
