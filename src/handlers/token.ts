@@ -33,6 +33,7 @@ async function handleToken(token: string, chainId: string) {
         };
 
         Token.create(temp);
+        return symbol
         console.log("Token Added", token, chainId);
     }
     catch (error) {

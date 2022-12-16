@@ -209,8 +209,8 @@ async function handleOrderCreated(req: any, res: any) {
         if (!isPairExist) {
             let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token0, data.token1]);
             let id = ethers.utils.keccak256(encoder);
-            await handleToken(data.token0, chainId);
-            await handleToken(data.token1, chainId);
+            let token0 = await handleToken(data.token0, chainId);
+            let token1 = await handleToken(data.token1, chainId);
             let temp = {
                 id: id,
                 // exchangeRateDecimals: exchangeRateDecimals,
@@ -219,7 +219,8 @@ async function handleOrderCreated(req: any, res: any) {
                 priceDiff: '0',
                 token0: data.token0,
                 token1: data.token1,
-                chainId: chainId
+                chainId: chainId,
+                symbol: `${token0}_${token1}`
             }
             createPair = await PairCreated.create(temp);
 

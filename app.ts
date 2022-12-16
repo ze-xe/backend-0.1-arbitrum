@@ -5,6 +5,7 @@ const app = express();
 import orderRoute from "./src/routes/orderRoute";
 import pairRoutes from "./src/routes/pairRoutes";
 import userRoute from "./src/routes/userRoute";
+import chartRoute from "./src/routes/chartRoute"
 import helmet from "helmet";
 import { start } from "./src/appUtil";
 import { socketService } from "./src/socketIo/socket.io";
@@ -25,7 +26,9 @@ app.use(helmet());
 app.use(express.json());
 app.use("/pair", pairRoutes);
 app.use("/user", userRoute);
+app.use("/chart", chartRoute)
 app.use(orderRoute);
+
 
 
 async function run(chainId: string) {

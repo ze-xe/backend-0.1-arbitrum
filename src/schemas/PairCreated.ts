@@ -8,7 +8,8 @@ const PairCreatedSchema = new mongoose.Schema({
     minToken0Order: { type: String, required: true },
     exchangeRate: { type: String, required: true },
     priceDiff: String,
-    chainId: String
+    chainId: String,
+    symbol: String
 
 },
     { timestamps: true }
