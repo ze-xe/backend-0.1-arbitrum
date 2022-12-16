@@ -14,22 +14,23 @@ import { Interval } from "../helper/interface";
 
 
 
-export async function getBar(req: any, res: any) {
+export async function _getBar(req: any, res: any) {
 
     try {
 
         let pairId: string = req.params.ticker;
         let interval: Interval = req.query.interval;
         let chainId: string = "421613";
-        let from: number = Number(req.query.from)*1000;
+        let from: number = Number(req.query.from) * 1000;
         // let from: number = 1671193631367;
-        let to: number = Number(req.query.to)*1000;
+        let to: number = Number(req.query.to) * 1000;
+        let firstDataRequest = req.query.firstDataRequest;
 
         let intervalFromReq = ["5", "15", "30", "1H", "4H", "1D", "1W"]
         if (!intervalFromReq.includes(interval)) {
             return res.status(400).send({ status: false, error: errorMessage.interval })
         }
-        if(isNaN(to) == true || to == 0){
+        if (isNaN(to) == true || to == 0) {
             to = Date.now();
         }
 
@@ -43,7 +44,7 @@ export async function getBar(req: any, res: any) {
             "1W": 604800000
         };
 
-       let intervalInMSec: number = intervalMap[`${interval}`]
+        let intervalInMSec: number = intervalMap[`${interval}`]
 
         if (!pairId) {
             return res.status(400).send({ status: false, error: errorMessage.ticker });
@@ -53,7 +54,7 @@ export async function getBar(req: any, res: any) {
         }
 
         let data = await OrderExecuted.find({ pair: pairId, chainId: chainId, blockTimestamp: { $gte: Number(from), $lte: Number(to) } }).sort({ blockTimestamp: 1, createdAt: 1 }).lean();
-        
+
         if (data.length == 0) {
 
             let isPairExist = await PairCreated.findOne({ id: pairId, chainId }).lean();
@@ -71,7 +72,7 @@ export async function getBar(req: any, res: any) {
         let open: string = data[0].exchangeRate;
         let close: string = data[0].exchangeRate;
         let currTimestamp = data[0].blockTimestamp;
-        let closeTimeStamp = data[0].blockTimestamp;
+        // let closeTimeStamp = from;
         let volume: string | number = 0;
 
         for (let i = 0; i < data.length; i++) {
@@ -143,11 +144,11 @@ export async function getBar(req: any, res: any) {
                 else {
                     // block fall in that interval
                     max = close
-                    if( data[i].exchangeRate > close){
+                    if (data[i].exchangeRate > close) {
                         max = data[i].exchangeRate
                     }
                     min = close;
-                    if( data[i].exchangeRate < close){
+                    if (data[i].exchangeRate < close) {
                         min = data[i].exchangeRate
                     }
                     open = close;
@@ -185,21 +186,23 @@ export async function getBar(req: any, res: any) {
     }
 }
 
-export async function _getBar(req: any, res: any) {
+export async function getBar(req: any, res: any) {
 
     try {
 
         let pairId: string = req.params.ticker;
         let interval: Interval = req.query.interval;
         let chainId: string = "421613";
-        let from: number = Number(req.query.from)*1000;
-        let to: number = Number(req.query.to)*1000;
+        let from: number = Number(req.query.from) * 1000;
+        // let from: number = 1671193631367;
+        let to: number = Number(req.query.to) * 1000;
+        let firstDataRequest = req.query.firstDataRequest;
 
         let intervalFromReq = ["5", "15", "30", "1H", "4H", "1D", "1W"]
         if (!intervalFromReq.includes(interval)) {
             return res.status(400).send({ status: false, error: errorMessage.interval })
         }
-        if(isNaN(to) == true || to == 0){
+        if (isNaN(to) == true || to == 0) {
             to = Date.now();
         }
 
@@ -213,7 +216,7 @@ export async function _getBar(req: any, res: any) {
             "1W": 604800000
         };
 
-       let intervalInMSec: number = intervalMap[`${interval}`]
+        let intervalInMSec: number = intervalMap[`${interval}`]
 
         if (!pairId) {
             return res.status(400).send({ status: false, error: errorMessage.ticker });
@@ -222,8 +225,8 @@ export async function _getBar(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
 
-        let data = await OrderExecuted.find({ pair: pairId, chainId: chainId, blockTimestamp: { $gte: Number(from), $lte: Number(to) } }).sort({ blockTimestamp: 1, createdAt: 1 }).limit(10).lean();
-        
+        let data = await OrderExecuted.find({ pair: pairId, chainId: chainId, blockTimestamp: { $gte: Number(from), $lte: Number(to) } }).sort({ blockTimestamp: 1, createdAt: 1 }).lean();
+
         if (data.length == 0) {
 
             let isPairExist = await PairCreated.findOne({ id: pairId, chainId }).lean();
@@ -235,15 +238,27 @@ export async function _getBar(req: any, res: any) {
         }
 
         let exchangeRatesTrend = [];
-
         let min: string = Big(Number.MAX_VALUE).toString();
         let max: string = Big(0).toString();
         let open: string = data[0].exchangeRate;
         let close: string = data[0].exchangeRate;
-        let currTimestamp = data[0].blockTimestamp;
-        let closeTimeStamp = data[0].blockTimestamp;
+        let currTimestamp: number = data[0].blockTimestamp;
+
+        if (firstDataRequest == "false") {
+            let lastOrder = await OrderExecuted.findOne({ pair: pairId, chainId: chainId, blockTimestamp: { $lt: Number(from) } }).sort({ createdAt: -1 }).lean();
+
+            if (lastOrder) {
+                min = lastOrder.exchangeRate;
+                max = lastOrder.exchangeRate;
+                open = lastOrder.exchangeRate;
+                close = lastOrder.exchangeRate;
+                currTimestamp = from;
+            }
+        }
+
+        // let closeTimeStamp = from;
         let volume: string | number = 0;
-        let flag = false;
+
         for (let i = 0; i < data.length; i++) {
 
 
@@ -261,7 +276,7 @@ export async function _getBar(req: any, res: any) {
 
                 close = data[i].exchangeRate;
                 volume = Big(volume).plus(data[i].fillAmount).toString();
-                flag = true
+
                 if (i == data.length - 1) {
 
                     let temp = {
@@ -279,20 +294,16 @@ export async function _getBar(req: any, res: any) {
             else {
 
                 //if value exceed it will  genrate object regarding upper if block
-                if(flag == true){
-                    let temp = {
-                        time: currTimestamp,
-                        open: Big(open).div(Big(10).pow(18)).toString(),
-                        high: Big(max).div(Big(10).pow(18)).toString(),
-                        close: Big(close).div(Big(10).pow(18)).toString(),
-                        low: Big(min).div(Big(10).pow(18)).toString(),
-                        volume: Big(volume).div(Big(10).pow(18)).toString()
-    
-                    };
-                    exchangeRatesTrend.push(temp);
-                    flag = false;
-                }
-                
+                let temp = {
+                    time: currTimestamp,
+                    open: Big(open).div(Big(10).pow(18)).toString(),
+                    high: Big(max).div(Big(10).pow(18)).toString(),
+                    close: Big(close).div(Big(10).pow(18)).toString(),
+                    low: Big(min).div(Big(10).pow(18)).toString(),
+                    volume: Big(volume).div(Big(10).pow(18)).toString()
+
+                };
+                exchangeRatesTrend.push(temp);
 
                 currTimestamp = currTimestamp + intervalInMSec;
                 // checking next block lays in next interval
@@ -316,8 +327,14 @@ export async function _getBar(req: any, res: any) {
                 }
                 else {
                     // block fall in that interval
-                    min = data[i].exchangeRate;
-                    max = data[i].exchangeRate;
+                    max = close
+                    if (data[i].exchangeRate > close) {
+                        max = data[i].exchangeRate
+                    }
+                    min = close;
+                    if (data[i].exchangeRate < close) {
+                        min = data[i].exchangeRate
+                    }
                     open = close;
                     close = data[i].exchangeRate;
                     // currTimestamp = currTimestamp + interval;
@@ -355,15 +372,16 @@ export async function _getBar(req: any, res: any) {
 
 
 
-export async function getSymbol(req: any, res: any){
-    try{
+
+export async function getSymbol(req: any, res: any) {
+    try {
 
         let symbol = req.query.symbol;
 
-        let symbolDetails = await PairCreated.findOne({symbol: symbol}).lean();
+        let symbolDetails = await PairCreated.findOne({ symbol: symbol }).lean();
 
-        if(!symbolDetails){
-            return res.status(404).send({status: false, data: errorMessage.symbol})
+        if (!symbolDetails) {
+            return res.status(404).send({ status: false, data: errorMessage.symbol })
         }
 
         let data = {
@@ -371,7 +389,7 @@ export async function getSymbol(req: any, res: any){
             ticker: symbolDetails.id
         }
 
-        return res.status(200).send({status: true, data: data})
+        return res.status(200).send({ status: true, data: data })
     }
     catch (error: any) {
         console.log("Error @ getSymbol", error);
