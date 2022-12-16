@@ -24,7 +24,7 @@ export async function getBar(req: any, res: any) {
         let from: number = Number(req.query.from)*1000;
         let to: number = Number(req.query.to)*1000;
 
-        let intervalFromReq = ["5m", "15m", "30m", "1h", "4h", "1d", "1w"]
+        let intervalFromReq = ["5", "15", "30", "1H", "4H", "1D", "1W"]
         if (!intervalFromReq.includes(interval)) {
             return res.status(400).send({ status: false, error: errorMessage.interval })
         }
@@ -33,13 +33,13 @@ export async function getBar(req: any, res: any) {
         }
 
         let intervalMap = {
-            "5m": 300000,
-            "15m": 900000,
-            "30m": 1800000,
-            "1h": 3600000,
-            "4h": 14400000,
-            "1d": 86400000,
-            "1w": 604800000
+            "5": 300000,
+            "15": 900000,
+            "30": 1800000,
+            "1H": 3600000,
+            "4H": 14400000,
+            "1D": 86400000,
+            "1W": 604800000
         };
 
        let intervalInMSec: number = intervalMap[`${interval}`]
@@ -94,7 +94,7 @@ export async function getBar(req: any, res: any) {
                 if (i == data.length - 1) {
 
                     let temp = {
-                        time: currTimestamp / 1000,
+                        time: currTimestamp,
                         open: Big(open).div(Big(10).pow(18)).toString(),
                         high: Big(max).div(Big(10).pow(18)).toString(),
                         close: Big(close).div(Big(10).pow(18)).toString(),
