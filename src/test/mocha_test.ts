@@ -6,7 +6,7 @@ use(chaiHttp);
 import { ethers } from "ethers";
 import { getExchangeABI, getERC20ABI, getProvider } from "../utils";
 import Big from "big.js";
-import { BtcAddress, UsdcAddress, ExchangeAddress } from "../helper/constant";
+import { BtcAddress, UsdcAddress, ExchangeAddress, EthAddress } from '../helper/constant';
 import { clinetSocketService } from "./socket-client";
 import { io, connect } from "socket.io-client";
 import { getExchangeAddress } from "../helper/chain";
@@ -38,19 +38,24 @@ describe("zexe order creation", async () => {
     let provider = getProvider(chainId);
    
     let exchange = new ethers.Contract(ExchangeAddress, getExchangeABI(), provider);
-    let btc = new ethers.Contract(BtcAddress, getERC20ABI(), provider);
+    let btc = new ethers.Contract(
+        // BtcAddress,
+        EthAddress, 
+        getERC20ABI(), provider);
     let usdc = new ethers.Contract(UsdcAddress, getERC20ABI(), provider);
 
     let user1 = new ethers.Wallet("0x7cf03fae45cb10d4e3ba00a10deeacfc8cea1be0eebcfb7277a7df2e5074a405").connect(provider); //1
     let user2 = new ethers.Wallet("0xcdb7f4e35a4443b45b8316666caa396b7a9f4686fcff1901c008b15a2fa2e904").connect(provider); //2
     let signatures: any[] = [];
     let orders: any[] = [];
-    let exchangeRate = Big(22000 - Math.floor(Math.random() * 5000)).times(Big(10).pow(18)).toFixed(0);
+    // let exchangeRate = Big(22000 - Math.floor(Math.random() * 5000)).times(Big(10).pow(18)).toFixed(0);
+    let exchangeRate = Big(1000 - Math.floor(Math.random() * 500)).times(Big(10).pow(18)).toFixed(0);
+
     let salt = Math.floor(Math.random() * 9000000);
     let amount = ethers.utils.parseEther(`${Math.random() * 5}`).toString();
     let buy = false;
 
-   /* 
+   
     it('mint 10 btc to user1, 2000000 usdt to user2', async () => {
         let user1BtcBalancePre = await btc.balanceOf(user1.address);
         let user2UsdcBalancePre = await usdc.balanceOf(user2.address);
@@ -72,7 +77,7 @@ describe("zexe order creation", async () => {
         // expect(user2UsdcBalancePost.toString()).to.equal(ethers.utils.parseEther(`${Big(usdcAmount).plus(user2UsdcBalancePre).div(Big(10).pow(18))}`).toString());
 
     });
-    */
+    
 
     it(`user1 creates limit order to sell ${+amount / 10 ** 18} btc @ ${+exchangeRate / 10 ** 18}`, async () => {
         const domain = {
