@@ -35,7 +35,7 @@ export interface ifPairCreated {
     id: string
     token0: string
     token1: string
-    // exchangeRateDecimals: string
+    exchangeRateDecimals: string
     minToken0Order: string
     exchangeRate: string
     priceDiff: string

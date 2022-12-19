@@ -139,8 +139,8 @@ async function getAllPairDetails(req: any, res: any) {
 
                 id: allPairs[i].id,
                 exchangeRate: allPairs[i].exchangeRate,
-                // exchangeRateDecimals: allPairs[i].exchangeRateDecimals,
-                priceDiff: parseEther(allPairs[i].priceDiff),
+                exchangeRateDecimals: allPairs[i].exchangeRateDecimals,
+                priceDiff: allPairs[i].priceDiff,
                 minToken0Order: allPairs[i].minToken0Order,
                 tokens: [token0, token1]
             };

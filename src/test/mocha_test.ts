@@ -22,12 +22,12 @@ const socket = io("http://localhost:3010");
 //     console.log("socket connected @ client side",socket.connected);
 // });
 
-socket.on(EVENT_NAME.PAIR_ORDER, (data)=>{
-    console.log("pairOrders",data)
+socket.on(EVENT_NAME.PAIR_ORDER, (data) => {
+    console.log("pairOrders", data)
 });
 
-socket.on(EVENT_NAME.PAIR_HISTORY,(data)=>{
-    console.log("pairHistory",data)
+socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
+    console.log("pairHistory", data)
 })
 
 
@@ -36,11 +36,11 @@ describe("zexe order creation", async () => {
     // requirements
     let chainId = "421613"
     let provider = getProvider(chainId);
-   
+
     let exchange = new ethers.Contract(ExchangeAddress, getExchangeABI(), provider);
     let btc = new ethers.Contract(
-        // BtcAddress,
-        EthAddress, 
+        BtcAddress,
+        // EthAddress, 
         getERC20ABI(), provider);
     let usdc = new ethers.Contract(UsdcAddress, getERC20ABI(), provider);
 
@@ -48,14 +48,14 @@ describe("zexe order creation", async () => {
     let user2 = new ethers.Wallet("0xcdb7f4e35a4443b45b8316666caa396b7a9f4686fcff1901c008b15a2fa2e904").connect(provider); //2
     let signatures: any[] = [];
     let orders: any[] = [];
-    // let exchangeRate = Big(22000 - Math.floor(Math.random() * 5000)).times(Big(10).pow(18)).toFixed(0);
-    let exchangeRate = Big(1000 - Math.floor(Math.random() * 500)).times(Big(10).pow(18)).toFixed(0);
+    let exchangeRate = Big(22000 - Math.floor(Math.random() * 5000)).times(Big(10).pow(18)).toFixed(0);
+    // let exchangeRate = Big(1000 - Math.floor(Math.random() * 500)).times(Big(10).pow(18)).toFixed(0);
 
     let salt = Math.floor(Math.random() * 9000000);
     let amount = ethers.utils.parseEther(`${Math.random() * 5}`).toString();
     let buy = false;
 
-   
+
     it('mint 10 btc to user1, 2000000 usdt to user2', async () => {
         let user1BtcBalancePre = await btc.balanceOf(user1.address);
         let user2UsdcBalancePre = await usdc.balanceOf(user2.address);
@@ -77,7 +77,7 @@ describe("zexe order creation", async () => {
         // expect(user2UsdcBalancePost.toString()).to.equal(ethers.utils.parseEther(`${Big(usdcAmount).plus(user2UsdcBalancePre).div(Big(10).pow(18))}`).toString());
 
     });
-    
+
 
     it(`user1 creates limit order to sell ${+amount / 10 ** 18} btc @ ${+exchangeRate / 10 ** 18}`, async () => {
         const domain = {
@@ -143,13 +143,13 @@ describe("zexe order creation", async () => {
 
         console.log(res.text);
 
-        
+
 
         expect(res).to.have.status(201);
 
     });
 
-    
+    /*
     it(`user2 buy user1s btc order @ ${+exchangeRate / 10 ** 18}`, async () => {
         // let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
         // let user2BtcBalancePre = (await btc.balanceOf(user2.address)).toString();
@@ -193,10 +193,11 @@ describe("zexe order creation", async () => {
         });
 
     });
-    
+    */
 
 
-    
+
+
     // it(`cancelled  order `, async () => {
 
     //     try{
@@ -216,7 +217,7 @@ describe("zexe order creation", async () => {
 
 
     // })
-    
+
 
 
 

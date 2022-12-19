@@ -1,6 +1,6 @@
 import { PairCreated, OrderCreated, UserPosition, OrderCreatedBackup } from "../db";
 import { handleToken } from "../handlers/token";
-import { validateSignature } from "../utils";
+import { getDecimals, validateSignature } from "../utils";
 import Big from "big.js";
 import { ethers } from "ethers";
 import { createOrderSchema } from "../helper/validateRequest";
@@ -52,11 +52,11 @@ async function handleOrderCreated(req: any, res: any) {
             }
         }
 
-        // let exchangeRateDecimals = Number(getDecimals(data.exchangeRate));
+        let exchangeRateDecimals: number | string = Number(getDecimals(data.exchangeRate));
 
-        // if (isNaN(exchangeRateDecimals) == true) {
-        //     return res.status(400).send({ status: false, error: exchangeRateDecimals });
-        // }
+        if (isNaN(exchangeRateDecimals) == true) {
+            return res.status(400).send({ status: false, error: exchangeRateDecimals });
+        }
 
 
         let id: string | null = validateSignature(data.maker, signature, data, chainId);
@@ -213,7 +213,7 @@ async function handleOrderCreated(req: any, res: any) {
             let token1 = await handleToken(data.token1, chainId);
             let temp = {
                 id: id,
-                // exchangeRateDecimals: exchangeRateDecimals,
+                exchangeRateDecimals: exchangeRateDecimals,
                 minToken0Order: (10 ** 10).toString(),
                 exchangeRate: '0',
                 priceDiff: '0',

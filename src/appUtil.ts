@@ -46,10 +46,10 @@ async function start(chainId: string) {
                                 maker: copyOrder[i].maker,
                                 token0: copyOrder[i].token0,
                                 token1: copyOrder[i].token1,
-                                amount: ethers.utils.parseEther(`${Big(copyOrder[i].amount).div(Big(10).pow(18))}`).toString(),
+                                amount: copyOrder[i].amount,
                                 buy: copyOrder[i].buy,
                                 salt: Number(copyOrder[i].salt),
-                                exchangeRate: ethers.utils.parseEther(`${Big(copyOrder[i].exchangeRate).div(Big(10).pow(18))}`).toString(),
+                                exchangeRate:copyOrder[i].exchangeRate,
 
                             }
                         }
