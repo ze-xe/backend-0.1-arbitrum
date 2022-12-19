@@ -9,7 +9,7 @@ const OrderExecutedSchema = new mongoose.Schema({
     fillAmount: { type: String, required: true, trim: true },
     pair: { type: String, required: true, trim: true },
     exchangeRate: { type: String, required: true, trim: true },
-    // exchangeRateDecimals: { type: Number, required: true, trim: true },
+    exchangeRateDecimals: { type: Number, required: true, trim: true },
     buy: { type: Boolean, required: true },
     chainId: String,
 

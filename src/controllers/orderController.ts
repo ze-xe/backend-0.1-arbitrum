@@ -51,7 +51,7 @@ async function handleOrderCreated(req: any, res: any) {
                 return res.status(400).send({ status: false, error: errorMessage.address });
             }
         }
-
+        // geting exchangeRate decimal
         let exchangeRateDecimals: number | string = Number(getDecimals(data.exchangeRate));
 
         if (isNaN(exchangeRateDecimals) == true) {
@@ -257,7 +257,7 @@ async function handleOrderCreated(req: any, res: any) {
                     exchangeRate: data.exchangeRate,
                     buy: data.buy,
                     chainId: chainId,
-                    // exchangeRateDecimals: exchangeRateDecimals,
+                    exchangeRateDecimals: exchangeRateDecimals,
                     balanceAmount: data.amount,
                     active: true,
                     deleted: false,
@@ -281,7 +281,7 @@ async function handleOrderCreated(req: any, res: any) {
                 exchangeRate: data.exchangeRate,
                 buy: data.buy,
                 chainId: chainId,
-                // exchangeRateDecimals: exchangeRateDecimals,
+                exchangeRateDecimals: exchangeRateDecimals,
                 balanceAmount: data.amount,
                 active: true,
                 deleted: false,

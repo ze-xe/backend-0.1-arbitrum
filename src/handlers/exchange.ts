@@ -3,6 +3,7 @@ import Big from "big.js";
 import { ifOrderCreated, ifPairCreated, ifUserPosition } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 import { number } from "joi";
+import { getDecimals } from "../utils";
 
 
 
@@ -42,9 +43,15 @@ async function handleOrderExecuted(data: any, argument: any) {
         }
         argument.exchangeRate = getOrderDetails.exchangeRate;
         argument.pair = getOrderDetails.pair;
-        // argument.exchangeRateDecimals = Number(getPairDetails.exchangeRateDecimals);
+        argument.exchangeRateDecimals = Number(getPairDetails.exchangeRateDecimals);
         argument.buy = getOrderDetails.buy;
 
+        // updating ExchangeRateDecimal
+        let exchangeRateDecimals: number | string = Number(getDecimals(getOrderDetails.exchangeRate));
+
+        if (isNaN(exchangeRateDecimals) == false) {
+            argument.exchangeRateDecimals = exchangeRateDecimals;
+        }
 
 
         // updating pair orders
@@ -69,7 +76,7 @@ async function handleOrderExecuted(data: any, argument: any) {
 
         await PairCreated.findOneAndUpdate(
             { _id: getPairDetails._id.toString() },
-            { $set: { exchangeRate: getOrderDetails.exchangeRate, priceDiff: priceDiff } }
+            { $set: { exchangeRate: getOrderDetails.exchangeRate, priceDiff: priceDiff, exchangeRateDecimals: argument.exchangeRateDecimals } }
         );
 
         if (getOrderDetails.buy == false) {

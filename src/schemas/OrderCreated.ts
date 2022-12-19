@@ -11,7 +11,7 @@ const OrderCreatedSchema = new mongoose.Schema({
     amount: { type: String, required: true, trim: true },
     exchangeRate: { type: String, required: true, trim: true },
     buy: { type: Boolean, required: true, trim: true },
-    // exchangeRateDecimals: { type: String, required: true, trim: true },
+    exchangeRateDecimals: { type: String, required: true, trim: true },
     balanceAmount: { type: String, required: true, trim: true },
     deleted: { type: Boolean, required: true },
     active: { type: Boolean, required: true },
