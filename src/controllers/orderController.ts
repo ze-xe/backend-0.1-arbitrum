@@ -383,7 +383,13 @@ async function getLimitMatchedOrders(req: any, res: any) {
                     {
                         $sort: { exchangeRate: 1, balanceAmount: 1 }
                     }
-                ]
+                ],
+                {
+                    collation: {
+                        locale: "en_US",
+                        numericOrdering: true
+                    }
+                }
             );
         }
         else if (buy == "false") {
@@ -405,7 +411,13 @@ async function getLimitMatchedOrders(req: any, res: any) {
                     {
                         $sort: { exchangeRate: -1, balanceAmount: 1 }
                     }
-                ]
+                ],
+                {
+                    collation: {
+                        locale: "en_US",
+                        numericOrdering: true
+                    }
+                }
             );
         }
 
@@ -485,10 +497,10 @@ async function getMatchedMarketOrders(req: any, res: any) {
 
         let getMatchedDoc: ifOrderCreated[] = [];
         if (buy == "true") {
-            getMatchedDoc = await OrderCreated.find({ pair: pairId, buy: false, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).lean();
+            getMatchedDoc = await OrderCreated.find({ pair: pairId, buy: false, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).collation({locale: "en_US", numericOrdering: true}).lean();
         }
         else if (buy == "false") {
-            getMatchedDoc = await OrderCreated.find({ pair: pairId, buy: true, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).lean();
+            getMatchedDoc = await OrderCreated.find({ pair: pairId, buy: true, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).collation({locale: "en_US", numericOrdering: true}).lean();
         }
 
         let data: ifOrderCreated[] = [];
