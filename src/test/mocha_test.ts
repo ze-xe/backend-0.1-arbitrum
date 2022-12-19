@@ -50,7 +50,7 @@ describe("zexe order creation", async () => {
     let amount = ethers.utils.parseEther(`${Math.random() * 5}`).toString();
     let buy = false;
 
-    
+   /* 
     it('mint 10 btc to user1, 2000000 usdt to user2', async () => {
         let user1BtcBalancePre = await btc.balanceOf(user1.address);
         let user2UsdcBalancePre = await usdc.balanceOf(user2.address);
@@ -72,7 +72,7 @@ describe("zexe order creation", async () => {
         // expect(user2UsdcBalancePost.toString()).to.equal(ethers.utils.parseEther(`${Big(usdcAmount).plus(user2UsdcBalancePre).div(Big(10).pow(18))}`).toString());
 
     });
-    
+    */
 
     it(`user1 creates limit order to sell ${+amount / 10 ** 18} btc @ ${+exchangeRate / 10 ** 18}`, async () => {
         const domain = {
@@ -170,16 +170,16 @@ describe("zexe order creation", async () => {
         let user2BtcBalancePost;
         // console.log(await exTxn.wait(1))
         exTxn.wait(1).then(async (resp: any) => {
-            // user1BtcBalancePost = (await btc.balanceOf(user1.address)).toString();
-            // user1UsdcBalancePost = (await usdc.balanceOf(user1.address)).toString();
-            // user2UsdcBalancePost = (await usdc.balanceOf(user2.address)).toString();
-            // user2BtcBalancePost = (await btc.balanceOf(user2.address)).toString();
+            user1BtcBalancePost = (await btc.balanceOf(user1.address)).toString();
+            user1UsdcBalancePost = (await usdc.balanceOf(user1.address)).toString();
+            user2UsdcBalancePost = (await usdc.balanceOf(user2.address)).toString();
+            user2BtcBalancePost = (await btc.balanceOf(user2.address)).toString();
 
-            // console.log("1PostB", user1BtcBalancePost);
-            // console.log("1PostU", user1UsdcBalancePost);
-            // console.log("2PostU", user2UsdcBalancePost);
-            // console.log("2PostB", user2BtcBalancePost);
-            // console.log(resp)
+            console.log("1PostB", user1BtcBalancePost);
+            console.log("1PostU", user1UsdcBalancePost);
+            console.log("2PostU", user2UsdcBalancePost);
+            console.log("2PostB", user2BtcBalancePost);
+            console.log(resp)
 
             // expect(user1BtcBalancePost).to.equal(Big(user1BtcBalancePre).minus(btcAmount).toString());
             // expect(user1UsdcBalancePost).to.equal(Big(user1BtcBalancePre).plus(Big(btcAmount).times(exchangeRate).div(Big(10).pow(18))).toString());

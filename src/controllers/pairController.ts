@@ -29,8 +29,8 @@ async function fetchOrders(req: any, res: any) {
             return res.status(404).send({ status: false, error: errorMessage.pairId });
         }
 
-        let buyOrder: any | ifOrderCreated[] = OrderCreated.find({ pair: pairId, chainId: chainId, buy: true, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 });
-        let sellOrder: any | ifOrderCreated[] = OrderCreated.find({ pair: pairId, chainId: chainId, buy: false, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).lean();
+        let buyOrder: any | ifOrderCreated[] = OrderCreated.find({ pair: pairId, chainId: chainId, buy: true, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).collation({locale:"en_US", numericOrdering:true}).lean();
+        let sellOrder: any | ifOrderCreated[] = OrderCreated.find({ pair: pairId, chainId: chainId, buy: false, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).collation({locale:"en_US", numericOrdering:true}).lean();
 
         let promise = await Promise.all([buyOrder, sellOrder]);
         buyOrder = promise[0];
@@ -306,8 +306,8 @@ async function getPairPriceTrend(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
 
-        let data = await OrderExecuted.find({ pair: pairId, chainId: chainId }).sort({ blockTimestamp: 1, createdAt: 1 }).lean();
-        console.log(data.length)
+        let data = await OrderExecuted.find({ pair: pairId, chainId: chainId }).sort({ blockTimestamp: 1, createdAt: 1 }).collation({locale:"en_US", numericOrdering:true}).lean().lean();
+        // console.log(data.length)
         if (data.length == 0) {
 
             let isPairExist = await PairCreated.findOne({ id: pairId, chainId }).lean();
@@ -378,9 +378,9 @@ async function getPairPriceTrend(req: any, res: any) {
 
                 currTimestamp = currTimestamp + interval;
                 // checking next block lays in next interval
-                if (data[i].blockTimestamp > currTimestamp + interval ) {
+                if (data[i].blockTimestamp > currTimestamp + interval) {
                     let temp = {
-                        time: (currTimestamp ) / 1000,
+                        time: (currTimestamp) / 1000,
                         open: Big(close).div(Big(10).pow(18)).toString(),
                         high: Big(close).div(Big(10).pow(18)).toString(),
                         close: Big(close).div(Big(10).pow(18)).toString(),
@@ -405,7 +405,7 @@ async function getPairPriceTrend(req: any, res: any) {
                     // currTimestamp = currTimestamp + interval;
                     volume = data[i].fillAmount;
                 }
-    
+
                 if (i == data.length - 1) {
 
                     let temp = {
