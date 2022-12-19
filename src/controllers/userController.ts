@@ -27,9 +27,27 @@ async function getUserPlacedOrders(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
 
-        const getMakerOrders = await OrderCreated.find({ maker: maker, pair: pairId, deleted: false, cancelled: false, active: true, chainId: chainId }).sort({ blockTimestamp: -1, createdAt: -1 }).select({ buy: 1, exchangeRate: 1, amount: 1, _id: 0, id: 1 }).lean();
+        const getMakerOrders = await OrderCreated.find({ maker: maker, pair: pairId, deleted: false, cancelled: false, active: true, chainId: chainId }).sort({ blockTimestamp: -1, createdAt: -1 }).lean();
 
-        return res.status(200).send({ status: true, data: getMakerOrders });
+        let data = getMakerOrders.map((order) => {
+            return {
+                signature: order.signature,
+                id: order.id,
+                value: {
+                    maker: order.maker,
+                    token0: order.token0,
+                    token1: order.token1,
+                    amount: order.amount,
+                    buy: order.buy,
+                    salt: order.salt,
+                    exchangeRate: order.exchangeRate,
+                }
+            }
+        });
+
+        
+
+        return res.status(200).send({ status: true, data: data });
     }
     catch (error: any) {
         console.log("Error @ getUserPlacedOrders", error);
