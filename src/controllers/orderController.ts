@@ -371,11 +371,7 @@ async function getLimitMatchedOrders(req: any, res: any) {
                         $match: {
                             $and: [
                                 { pair: pairId },
-                                {
-                                    exchangeRate: {
-                                        $lte: exchangeRate
-                                    }
-                                },
+                                {"$expr" : {"$lte" : [{"$toDouble" :"$exchangeRate"} , Number(exchangeRate)]}},
                                 { buy: false },
                                 { chainId: chainId },
                                 { deleted: false },
@@ -397,11 +393,7 @@ async function getLimitMatchedOrders(req: any, res: any) {
                         $match: {
                             $and: [
                                 { pair: pairId },
-                                {
-                                    exchangeRate: {
-                                        $gte: exchangeRate
-                                    }
-                                },
+                                {"$expr" : {"$gte" : [{"$toDouble" :"$exchangeRate"} , Number(exchangeRate)]}},
                                 { buy: true },
                                 { chainId: chainId },
                                 { deleted: false },
