@@ -111,6 +111,7 @@ async function getMultiBalance(token: string, addresses: string[], ids: string[]
                 else {
                     res.push({
                         signature: data[i].signature,
+                        id: data[i].id,
                         value: {
                             maker: data[i].maker,
                             token0: data[i].token0,

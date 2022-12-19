@@ -44,7 +44,7 @@ export interface ifPairCreated {
 }
 
 export interface orderSignature {
-
+    id: string
     signature: string
     value: {
         maker: string
