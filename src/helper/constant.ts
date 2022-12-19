@@ -10,10 +10,10 @@ const Decimals = {
 };
 
 
-const ExchangeAddress = "0xD3D3A8146Cb6E5045eFb4739Ae88592744aE81BA";
-const BtcAddress = "0x8f2d5bc5CbD3ED03722964b8Ab24eF829c6e9b6e";
+const ExchangeAddress = "0x46C9Ad9bA79783017790fc4Bed4364aBB98c22Dd";
+const BtcAddress = "0xf79Af8d59C208e526cF33E4b37b8Eca379Aced0F";
 // const BtcAddress = "0xD9458532E2c4e9646ec68040F0Cb6bdD7B911038"; // ethereum
-const UsdcAddress = "0xF74256A5E41ada2B81BdBacfdCF7B3b3252b4625";
+const UsdcAddress = "0x6405a05e1f83B1849b0F8B720ac844C1dDd59863";
 
 
 

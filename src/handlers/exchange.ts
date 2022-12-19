@@ -122,9 +122,9 @@ async function handleOrderExecuted(data: any, argument: any) {
                 { $set: { inOrderBalance: currentBalance1 } }
             );
 
-            let currentFillAmount = new Big(getOrderDetails.amount).minus(fillAmount);
+            let currentFillAmount = new Big(getOrderDetails.balanceAmount).minus(fillAmount);
 
-            if (Number(currentFillAmount) <= Number(getPairDetails.minToken0Order)) {
+            if (Number(currentFillAmount) < Number(getPairDetails.minToken0Order)) {
                 await OrderCreated.findOneAndUpdate({ _id: getOrderDetails._id.toString() },
                     { $set: { deleted: true, active: false, balanceAmount: currentFillAmount } });
             }
