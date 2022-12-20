@@ -73,7 +73,7 @@ async function handleOrderExecuted(data: any, argument: any) {
             pair: getOrderDetails.pair
         })
 
-        OrderExecuted.create(argument);
+        await OrderExecuted.create(argument);
         let priceDiff = new Big(getOrderDetails.exchangeRate).minus(getPairDetails.exchangeRate).toString();
 
         await PairCreated.findOneAndUpdate(
