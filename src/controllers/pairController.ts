@@ -306,7 +306,7 @@ async function getPairPriceTrend(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
 
-        let data = await OrderExecuted.find({ pair: pairId, chainId: chainId }).sort({ blockTimestamp: 1, createdAt: 1 }).collation({locale:"en_US", numericOrdering:true}).lean().lean();
+        let data = await OrderExecuted.find({ pair: pairId, chainId: chainId }).sort({ blockTimestamp: 1, logIndex: 1 }).collation({locale:"en_US", numericOrdering:true}).lean().lean();
         // console.log(data.length)
         if (data.length == 0) {
 
@@ -451,7 +451,7 @@ async function getPairOrderExecutedHistory(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
 
-        let getPairOrderHistory = await OrderExecuted.find({ pair: pairId, chainId }).sort({ blockTimestamp: -1, createdAt: -1 }).select({ fillAmount: 1, exchangeRate: 1, buy: 1, _id: 0 }).limit(50).lean();
+        let getPairOrderHistory = await OrderExecuted.find({ pair: pairId, chainId }).sort({ blockTimestamp: -1, logIndex: -1 }).select({ fillAmount: 1, exchangeRate: 1, buy: 1, _id: 0 }).limit(50).lean();
 
         return res.status(200).send({ status: true, data: getPairOrderHistory });
 
@@ -493,7 +493,7 @@ async function getPairTradingStatus(req: any, res: any) {
                         }
                     },
                     {
-                        $sort: { blockTimestamp: -1, createdAt: -1 }
+                        $sort: { blockTimestamp: -1, logIndex: -1 }
                     },
                     {
                         $addFields: {
