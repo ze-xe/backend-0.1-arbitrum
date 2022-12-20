@@ -60,7 +60,7 @@ describe("zexe order creation", async () => {
         let user1BtcBalancePre = await btc.balanceOf(user1.address);
         let user2UsdcBalancePre = await usdc.balanceOf(user2.address);
 
-        const btcAmount = ethers.utils.parseEther('100');
+        const btcAmount = ethers.utils.parseEther('100000');
         let tx1 = await btc.connect(user1).mint(user1.address, btcAmount);
         // approve for exchange
         let approve = await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);

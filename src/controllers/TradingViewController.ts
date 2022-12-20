@@ -377,7 +377,6 @@ export async function getBar(req: any, res: any) {
         let interval: Interval = req.query.interval;
         let chainId: string = "421613";
         let from: number = Number(req.query.from) * 1000;
-        // let from: number = 1671193631367;
         let to: number = Number(req.query.to) * 1000;
         let firstDataRequest = req.query.firstDataRequest;
         console.log(firstDataRequest);
@@ -438,7 +437,7 @@ export async function getBar(req: any, res: any) {
                     high: Big(max).div(Big(10).pow(18)).toString(),
                     close: Big(close).div(Big(10).pow(18)).toString(),
                     low: Big(min).div(Big(10).pow(18)).toString(),
-                    volume: Big(0).div(Big(10).pow(18)).toString()
+                    volume: '0'
                 };
                 exchangeRatesTrend.push(temp);
                 currTimestamp = currTimestamp + intervalInMSec;
@@ -461,6 +460,10 @@ export async function getBar(req: any, res: any) {
 
         // if (firstDataRequest == "false") {
         let lastOrder = await OrderExecuted.findOne({ pair: pairId, chainId: chainId, blockTimestamp: { $lt: Number(from) } }).sort({ createdAt: -1 }).lean();
+
+        // if (!lastOrder) {
+        //     return res.status(200).send({ status: true, data: [] });
+        // }
 
         if (lastOrder) {
             // console.log("inside false")
@@ -517,6 +520,7 @@ export async function getBar(req: any, res: any) {
                     };
                     exchangeRatesTrend.push(temp);
 
+
                 }
                 else if (firstDataRequest == 'false' && i == data.length - 1 && currTimestamp < to) {
 
@@ -536,8 +540,6 @@ export async function getBar(req: any, res: any) {
                     currTimestamp = currTimestamp + intervalInMSec;
                     volume = '0'
                     i--;
-                    currTimestamp = currTimestamp + intervalInMSec
-
                 }
             }
             else {
@@ -577,11 +579,11 @@ export async function getBar(req: any, res: any) {
                 else {
                     // block fall in that interval
                     max = close
-                    if (data[i].exchangeRate > close) {
+                    if (Number(data[i].exchangeRate) > Number(close)) {
                         max = data[i].exchangeRate
                     }
                     min = close;
-                    if (data[i].exchangeRate < close) {
+                    if (Number(data[i].exchangeRate) < Number(close)) {
                         min = data[i].exchangeRate
                     }
                     open = close;
@@ -635,7 +637,7 @@ export async function getBar(req: any, res: any) {
                     currTimestamp = currTimestamp + intervalInMSec;
                     volume = '0'
                     i--;
-                    currTimestamp = currTimestamp + intervalInMSec
+                    // currTimestamp = currTimestamp + intervalInMSec
 
                 }
 
