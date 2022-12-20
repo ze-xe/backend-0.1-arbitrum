@@ -12,6 +12,7 @@ const OrderExecutedSchema = new mongoose.Schema({
     exchangeRateDecimals: { type: Number, required: true, trim: true },
     buy: { type: Boolean, required: true },
     chainId: String,
+    logIndex: Number
 
 },
     { timestamps: true }

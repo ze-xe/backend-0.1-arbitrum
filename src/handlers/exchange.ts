@@ -17,9 +17,11 @@ async function handleOrderExecuted(data: any, argument: any) {
             txnId: argument.txnId,
             blockNumber: argument.blockNumber,
             blockTimestamp: argument.blockTimestamp,
+            logIndex: argument.logIndex
         });
 
         if (isDuplicateTxn) {
+            console.log("Execute duplicate",data,argument)
             return;
         }
 
