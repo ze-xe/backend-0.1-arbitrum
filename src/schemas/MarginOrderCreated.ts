@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const OrderCreatedSchema = new mongoose.Schema({
+export const MarginOrderCreatedSchema = new mongoose.Schema({
     id: { type: String, required: true, trim: true },
     signature: { type: String, required: true, trim: true },
     pair: { type: String, required: true, trim: true },
@@ -10,7 +10,7 @@ const OrderCreatedSchema = new mongoose.Schema({
     salt: { type: String, required: true, trim: true },
     amount: { type: String, required: true, trim: true },
     exchangeRate: { type: String, required: true, trim: true },
-    buy: { type: Boolean, required: true, trim: true },
+    long: { type: Boolean, required: true, trim: true },
     exchangeRateDecimals: { type: String, required: true, trim: true },
     balanceAmount: { type: String, required: true, trim: true },
     deleted: { type: Boolean, required: true },
@@ -18,15 +18,10 @@ const OrderCreatedSchema = new mongoose.Schema({
     chainId: String,
     cid: String,
     cancelled: { type: Boolean, default: false },
-    margin:{type: Boolean, default: false},
-    long: Boolean,
     borrowLimit: String,
     loops: String,
-    currentLoop : String
+    currentLoop: String
 
 },
     { timestamps: true }
 );
-
-
-export default OrderCreatedSchema;

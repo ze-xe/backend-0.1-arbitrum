@@ -26,6 +26,7 @@ app.use(helmet());
 app.use(express.json());
 app.use("/pair", pairRoutes);
 app.use("/user", userRoute);
+
 app.use("/chart", chartRoute)
 app.use(orderRoute);
 
