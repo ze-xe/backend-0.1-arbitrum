@@ -17,11 +17,9 @@ require("dotenv").config();
 
 backupConnection;
 connect();
-app.use(cors(
-    {
-        origin: ["https://zexe.io", "http://localhost:3000"]
-    }
-));
+app.use(cors({
+    origin: '*'
+}));
 app.use(helmet());
 app.use(express.json());
 app.use("/pair", pairRoutes);
