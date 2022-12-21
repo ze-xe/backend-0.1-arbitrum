@@ -20,7 +20,7 @@ export const MarginOrderCreatedSchema = new mongoose.Schema({
     cancelled: { type: Boolean, default: false },
     borrowLimit: String,
     loops: String,
-    currentLoop: String
+
 
 },
     { timestamps: true }

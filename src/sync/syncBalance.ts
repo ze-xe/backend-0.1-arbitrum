@@ -114,6 +114,7 @@ async function getMultiBalance(token: string, addresses: string[], ids: string[]
                         res.push({
                             signature: data[i].signature,
                             id: data[i].id,
+                            margin: false,
                             value: {
                                 maker: data[i].maker,
                                 token0: data[i].token0,
@@ -129,6 +130,7 @@ async function getMultiBalance(token: string, addresses: string[], ids: string[]
                         res.push({
                             signature: data[i].signature,
                             id: data[i].id,
+                            margin: true,
                             value: {
                                 maker: data[i].maker,
                                 token0: data[i].token0,

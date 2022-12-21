@@ -4,9 +4,9 @@ import { expect, assert } from "chai";
 import chaiHttp from "chai-http";
 use(chaiHttp);
 import { ethers } from "ethers";
-import { getExchangeABI, getERC20ABI, getProvider } from "../utils";
+import { getExchangeABI, getERC20ABI, getProvider, leverageAbi } from "../utils";
 import Big from "big.js";
-import { BtcAddress, UsdcAddress, ExchangeAddress, EthAddress } from '../helper/constant';
+import { BtcAddress, UsdcAddress, ExchangeAddress, EthAddress, leverAddress } from '../helper/constant';
 import { clinetSocketService } from "./socket-client";
 import { io, connect } from "socket.io-client";
 import { getExchangeAddress } from "../helper/chain";
@@ -43,7 +43,7 @@ describe("zexe order creation", async () => {
         // EthAddress, 
         getERC20ABI(), provider);
     let usdc = new ethers.Contract(UsdcAddress, getERC20ABI(), provider);
-
+    let lever = new ethers.Contract(leverAddress, leverageAbi, provider);
     let user1 = new ethers.Wallet("0x7cf03fae45cb10d4e3ba00a10deeacfc8cea1be0eebcfb7277a7df2e5074a405").connect(provider); //1
     let user2 = new ethers.Wallet("0xcdb7f4e35a4443b45b8316666caa396b7a9f4686fcff1901c008b15a2fa2e904").connect(provider); //2
     let signatures: any[] = [];
@@ -112,7 +112,7 @@ describe("zexe order creation", async () => {
             salt: salt,
             exchangeRate: exchangeRate,
             borrowLimit: Big(0.75).times(Big(10).pow(6)).toNumber(),
-            loops: 5
+            loops: 4
         };
 
         orders.push(value);
@@ -139,7 +139,7 @@ describe("zexe order creation", async () => {
                         "salt": salt,
                         "exchangeRate": exchangeRate,
                         borrowLimit: Big(0.75).times(Big(10).pow(6)).toNumber(),
-                        loops: 5
+                        loops: 4
 
                     },
                     "signature": storedSignature,
@@ -155,21 +155,25 @@ describe("zexe order creation", async () => {
 
     });
 
-    /*
+    
     it(`user2 buy user1s btc order @ ${+exchangeRate / 10 ** 18}`, async () => {
-        // let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
-        // let user2BtcBalancePre = (await btc.balanceOf(user2.address)).toString();
-        // let user2UsdcBalancePre = (await usdc.balanceOf(user2.address)).toString();
-        // let user1UsdcBalancePre = (await usdc.balanceOf(user1.address)).toString();
-        // console.log("1PreBtc", user1BtcBalancePre);
-        // console.log("1Preusdc", user1UsdcBalancePre);
-        // console.log("2PreUsdc", user2UsdcBalancePre);
-        // console.log("2PreBtc", user2BtcBalancePre);
-        // console.log(signatures[0])
-        // console.log(orders[0])
+        let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
+        let user2BtcBalancePre = (await btc.balanceOf(user2.address)).toString();
+        let user2UsdcBalancePre = (await usdc.balanceOf(user2.address)).toString();
+        let user1UsdcBalancePre = (await usdc.balanceOf(user1.address)).toString();
+        console.log("1PreBtc", user1BtcBalancePre);
+        console.log("1Preusdc", user1UsdcBalancePre);
+        console.log("2PreUsdc", user2UsdcBalancePre);
+        console.log("2PreBtc", user2BtcBalancePre);
+        console.log(signatures[0])
+        console.log(orders[0])
         const btcAmount = ethers.utils.parseEther(`${Math.random() * 4}`);
+        // const btcAmount = ethers.utils.parseEther(Big(amount).times(((Big(0.75).pow(6)).minus(1)).div(Big(0.75).minus(1))).minus(amount).div(Big(10).pow(18)).toString());
+        // const btcAmount =  Big(amount).times(((Big(0.75).pow(6)).minus(1)).div(Big(0.75).minus(1))).minus(amount).toString()
+        await lever.connect(user1).enterMarkets([btc.address, usdc.address]);
+        
         console.log("btcAmount---", (+btcAmount / 10 ** 18).toString());
-        let exTxn = await exchange.connect(user2).executeLimitOrder(
+        let exTxn = await exchange.connect(user2).executeLeverageOrder(
             signatures[0],
             orders[0],
             btcAmount,
@@ -179,7 +183,7 @@ describe("zexe order creation", async () => {
         let user1UsdcBalancePost;
         let user2UsdcBalancePost;
         let user2BtcBalancePost;
-        // console.log(await exTxn.wait(1))
+        console.log(await exTxn.wait(1))
         exTxn.wait(1).then(async (resp: any) => {
             user1BtcBalancePost = (await btc.balanceOf(user1.address)).toString();
             user1UsdcBalancePost = (await usdc.balanceOf(user1.address)).toString();
@@ -190,7 +194,7 @@ describe("zexe order creation", async () => {
             console.log("1PostU", user1UsdcBalancePost);
             console.log("2PostU", user2UsdcBalancePost);
             console.log("2PostB", user2BtcBalancePost);
-            console.log(resp)
+            // console.log(resp)
 
             // expect(user1BtcBalancePost).to.equal(Big(user1BtcBalancePre).minus(btcAmount).toString());
             // expect(user1UsdcBalancePost).to.equal(Big(user1BtcBalancePre).plus(Big(btcAmount).times(exchangeRate).div(Big(10).pow(18))).toString());
@@ -199,7 +203,7 @@ describe("zexe order creation", async () => {
         });
 
     });
-    */
+    
 
 
 

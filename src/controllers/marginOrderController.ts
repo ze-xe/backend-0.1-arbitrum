@@ -59,8 +59,12 @@ export async function handleMarginOrderCreated(req: any, res: any) {
 
         let amount = Big(data.amount);
 
-        const balanceAmount = Big(data.amount).times(Big(data.borrowLimit).div(Big(10).pow(6)));
 
+        let a = Big(data.amount);
+        let x = Big(data.borrowLimit).div(Big(10).pow(6));
+        let n = Number(data.loops)+2;
+        let balanceAmount = Big(a).times(((Big(x).pow(n)).minus(1)).div(Big(x).minus(1))).minus(a).toString()
+      
         if (data.long == true) {
 
             const findUserPosition: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
@@ -239,9 +243,7 @@ export async function handleMarginOrderCreated(req: any, res: any) {
 
         let isPairExist: ifPairCreated = await PairCreated.findOne({ token0: data.token0, token1: data.token1, chainId: chainId }).lean();
         let createPair: ifPairCreated | any;
-        const currentLoop = "0";
-        const orderId = id + "_0";
-
+        
         if (!isPairExist) {
             let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token0, data.token1]);
             let id = ethers.utils.keccak256(encoder);
@@ -281,34 +283,34 @@ export async function handleMarginOrderCreated(req: any, res: any) {
                 id
             );
 
-            MarginOrderCreatedBackup.create(
+            // MarginOrderCreatedBackup.create(
 
-                {
-                    id: id,
-                    signature: signature,
-                    pair: pair,
-                    token0: data.token0,
-                    token1: data.token1,
-                    maker: data.maker,
-                    amount: data.amount,
-                    salt: data.salt,
-                    exchangeRate: data.exchangeRate,
-                    long: data.long,
-                    chainId: chainId,
-                    exchangeRateDecimals: exchangeRateDecimals,
-                    balanceAmount: balanceAmount,
-                    active: true,
-                    deleted: false,
-                    cid: cid,
-                    borrowLimit: data.borrowLimit,
-                    loops: data.loops,
-                    currentLoop: currentLoop
-                }
-            );
+            //     {
+            //         id: id,
+            //         signature: signature,
+            //         pair: pair,
+            //         token0: data.token0,
+            //         token1: data.token1,
+            //         maker: data.maker,
+            //         amount: data.amount,
+            //         salt: data.salt,
+            //         exchangeRate: data.exchangeRate,
+            //         long: data.long,
+            //         chainId: chainId,
+            //         exchangeRateDecimals: exchangeRateDecimals,
+            //         balanceAmount: balanceAmount,
+            //         active: true,
+            //         deleted: false,
+            //         cid: cid,
+            //         borrowLimit: data.borrowLimit,
+            //         loops: data.loops,
+            //         currentLoop: currentLoop
+            //     }
+            // );
 
             OrderCreatedBackup.create(
                 {
-                    id: orderId,
+                    id: id,
                     signature: signature,
                     pair: pair,
                     token0: data.token0,
@@ -326,7 +328,6 @@ export async function handleMarginOrderCreated(req: any, res: any) {
                     cid: cid,
                     borrowLimit: data.borrowLimit,
                     loops: data.loops,
-                    currentLoop: currentLoop,
                     long: data.long,
                     margin: true
                 }
@@ -337,7 +338,7 @@ export async function handleMarginOrderCreated(req: any, res: any) {
         OrderCreated.create(
 
             {
-                id: orderId,
+                id: id,
                 signature: signature,
                 pair: pair,
                 token0: data.token0,
@@ -355,36 +356,35 @@ export async function handleMarginOrderCreated(req: any, res: any) {
                 cid: cid,
                 borrowLimit: data.borrowLimit,
                 loops: data.loops,
-                currentLoop: currentLoop,
                 long: data.long,
                 margin: true
             }
         );
 
-        MarginOrderCreated.create(
+        // MarginOrderCreated.create(
 
-            {
-                id: id,
-                signature: signature,
-                pair: pair,
-                token0: data.token0,
-                token1: data.token1,
-                maker: data.maker,
-                amount: data.amount,
-                salt: data.salt,
-                exchangeRate: data.exchangeRate,
-                long: data.long,
-                chainId: chainId,
-                exchangeRateDecimals: exchangeRateDecimals,
-                balanceAmount: balanceAmount,
-                active: true,
-                deleted: false,
-                cid: cid,
-                borrowLimit: data.borrowLimit,
-                loops: data.loops,
-                currentLoop: currentLoop
-            }
-        );
+        //     {
+        //         id: id,
+        //         signature: signature,
+        //         pair: pair,
+        //         token0: data.token0,
+        //         token1: data.token1,
+        //         maker: data.maker,
+        //         amount: data.amount,
+        //         salt: data.salt,
+        //         exchangeRate: data.exchangeRate,
+        //         long: data.long,
+        //         chainId: chainId,
+        //         exchangeRateDecimals: exchangeRateDecimals,
+        //         balanceAmount: balanceAmount,
+        //         active: true,
+        //         deleted: false,
+        //         cid: cid,
+        //         borrowLimit: data.borrowLimit,
+        //         loops: data.loops,
+        //         currentLoop: currentLoop
+        //     }
+        // );
 
         // socket io data
         if (!ipfs) {

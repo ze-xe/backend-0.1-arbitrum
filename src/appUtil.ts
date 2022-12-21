@@ -1,5 +1,5 @@
 
-import {ethers} from "ethers";
+import { ethers } from "ethers";
 import Big from "big.js";
 import { OrderCreated, OrderCreatedBackup } from "./db";
 import axios, { AxiosResponse } from "axios";
@@ -7,7 +7,7 @@ import { ExchangeConfig } from "./sync/configs/exchange";
 import { historicEventListner } from "./sync/sync";
 import mongoose from "mongoose";
 import { startOrderStatus } from "./sync/syncBalance";
-import { ifOrderCreated} from "./helper/interface";
+import { ifOrderCreated } from "./helper/interface";
 import { socketService } from "./socketIo/socket.io";
 import { httpServer } from "../app";
 require("dotenv").config();
@@ -19,7 +19,7 @@ require("dotenv").config();
  */
 async function start(chainId: string) {
     try {
-        let getCreateRecords : ifOrderCreated []= await OrderCreated.find();
+        let getCreateRecords: ifOrderCreated[] = await OrderCreated.find();
 
         if (getCreateRecords.length == 0) {
 
@@ -35,27 +35,54 @@ async function start(chainId: string) {
 
                 for (let i in copyOrder) {
 
-                    let result: AxiosResponse = await axios({
-                        method: "post",
-                        url: "http://localhost:3010/order/create",
-                        data: {
-                            signature: copyOrder[i].signature,
-                            chainId: copyOrder[i].chainId.toString(),
-                            ipfs: true,
+                    if (copyOrder[i].margin == true) {
+                        let result: AxiosResponse = await axios({
+                            method: "post",
+                            url: "http://localhost:3010/order/margin/create",
                             data: {
-                                maker: copyOrder[i].maker,
-                                token0: copyOrder[i].token0,
-                                token1: copyOrder[i].token1,
-                                amount: copyOrder[i].amount,
-                                buy: copyOrder[i].buy,
-                                salt: Number(copyOrder[i].salt),
-                                exchangeRate:copyOrder[i].exchangeRate,
-
+                                signature: copyOrder[i].signature,
+                                chainId: copyOrder[i].chainId.toString(),
+                                ipfs: true,
+                                data: {
+                                    maker: copyOrder[i].maker,
+                                    token0: copyOrder[i].token0,
+                                    token1: copyOrder[i].token1,
+                                    amount: copyOrder[i].amount,
+                                    long: copyOrder[i].long,
+                                    salt: Number(copyOrder[i].salt),
+                                    exchangeRate: copyOrder[i].exchangeRate,
+                                    borrowLimit: copyOrder[i].borrowLimit,
+                                    loops: copyOrder[i].loops
+                                }
                             }
-                        }
-                    });
+                        });
 
-                    console.log("backup Create Request", result.data);
+                        console.log("backup margin Create Request", result.data);
+                    }
+                    else {
+                        let result: AxiosResponse = await axios({
+                            method: "post",
+                            url: "http://localhost:3010/order/create",
+                            data: {
+                                signature: copyOrder[i].signature,
+                                chainId: copyOrder[i].chainId.toString(),
+                                ipfs: true,
+                                data: {
+                                    maker: copyOrder[i].maker,
+                                    token0: copyOrder[i].token0,
+                                    token1: copyOrder[i].token1,
+                                    amount: copyOrder[i].amount,
+                                    buy: copyOrder[i].buy,
+                                    salt: Number(copyOrder[i].salt),
+                                    exchangeRate: copyOrder[i].exchangeRate,
+
+                                }
+                            }
+                        });
+
+                        console.log("backup Create Request", result.data);
+                    }
+
 
                 }
                 page++;

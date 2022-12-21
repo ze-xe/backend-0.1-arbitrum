@@ -22,7 +22,7 @@ const OrderCreatedSchema = new mongoose.Schema({
     long: Boolean,
     borrowLimit: String,
     loops: String,
-    currentLoop : String
+    
 
 },
     { timestamps: true }

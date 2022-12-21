@@ -10,7 +10,7 @@ const erc20Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/ERC20
 
 const MulticallAbi = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Multical.json")).toString());
 
-
+export const leverageAbi = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Leverage.json")).toString());
 
 function getExchangeABI() {
     return exchangeDeployments["abi"];
