@@ -456,7 +456,7 @@ async function getLimitMatchedOrders(req: any, res: any) {
             token = data[0].token1;
         }
 
-        let response: orderSignature[] | null = await getMultiBalance(token, addresses, ids, data, chainId, amounts);
+        let response = await getMultiBalance(token, addresses, ids, data, chainId, amounts);
 
         if (!response) {
             return res.status(200).send({ status: true, data: [] });
@@ -542,7 +542,7 @@ async function getMatchedMarketOrders(req: any, res: any) {
             token = data[0].token1;
         }
 
-        let result: orderSignature[] | null = await getMultiBalance(token, addresses, ids, data, chainId, amounts);
+        let result = await getMultiBalance(token, addresses, ids, data, chainId, amounts);
 
         if (!result) {
             return res.status(200).send({ status: true, data: [] });

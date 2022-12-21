@@ -59,9 +59,36 @@ export async function handleMarginOrderCreated(req: any, res: any) {
 
         let amount = Big(data.amount);
 
+        const balanceAmount = Big(data.amount).times(Big(data.borrowLimit).div(Big(10).pow(6)));
+
         if (data.long == true) {
 
             const findUserPosition: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
+            // for new order
+            const findUserPosition1: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token1, chainId: chainId }).lean();
+
+            const token1Amount = Big(balanceAmount).times(data.exchangeRate).div(Big(10).pow(18));
+
+            if (findUserPosition1) {
+                const _id = findUserPosition1._id.toString();
+                const currentInOrderBalance = Big(findUserPosition1.inOrderBalance).plus(token1Amount).toString();
+                await UserPosition.findOneAndUpdate(
+                    { _id: _id },
+                    { $set: { inOrderBalance: currentInOrderBalance } }
+                );
+            }
+            else {
+
+                UserPosition.create(
+                    {
+                        token: data.token1,
+                        chainId: chainId,
+                        inOrderBalance: token1Amount,
+                        // balance: userToken0Balance,
+                        id: data.maker
+                    }
+                );
+            }
 
             let multicallData: number[] | null;
             let userToken0Balance = 0;
@@ -125,6 +152,29 @@ export async function handleMarginOrderCreated(req: any, res: any) {
         else if (data.long == false) {
 
             let findUserPosition: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token1, chainId: chainId });
+            // for creating new order
+            let findUserPosition1: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token0, chainId: chainId });
+
+            if (findUserPosition1) {
+                let _id = findUserPosition1._id.toString();
+                let currentInOrderBalance = Big(findUserPosition1.inOrderBalance).plus(balanceAmount).toString();
+                await UserPosition.findOneAndUpdate(
+                    { _id: _id },
+                    { $set: { inOrderBalance: currentInOrderBalance } }
+                );
+            }
+            else {
+
+                UserPosition.create(
+                    {
+                        token: data.token0,
+                        chainId: chainId,
+                        inOrderBalance: balanceAmount,
+                        // balance: userToken0Balance,
+                        id: data.maker
+                    }
+                );
+            }
 
             let multicallData: number[] | null
             let userToken1Balance = 0
@@ -190,8 +240,8 @@ export async function handleMarginOrderCreated(req: any, res: any) {
         let isPairExist: ifPairCreated = await PairCreated.findOne({ token0: data.token0, token1: data.token1, chainId: chainId }).lean();
         let createPair: ifPairCreated | any;
         const currentLoop = "0";
-        const orderId = id+"_0";
-        const balanceAmount = Big(data.amount).times(Big(data.borrowLimit).div(Big(10).pow(6)));
+        const orderId = id + "_0";
+
         if (!isPairExist) {
             let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token0, data.token1]);
             let id = ethers.utils.keccak256(encoder);
