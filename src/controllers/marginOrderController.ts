@@ -62,9 +62,10 @@ export async function handleMarginOrderCreated(req: any, res: any) {
 
         let a = Big(data.amount);
         let x = Big(data.borrowLimit).div(Big(10).pow(6));
-        let n = Number(data.loops)+2;
-        let balanceAmount = Big(a).times(((Big(x).pow(n)).minus(1)).div(Big(x).minus(1))).minus(a).toString()
-      
+        let n = Number(data.loops) + 2;
+        let balanceAmount: string | string[]= Big(a).times(((Big(x).pow(n)).minus(1)).div(Big(x).minus(1))).minus(a).toString().split(".");
+        balanceAmount = balanceAmount[0];
+
         if (data.long == true) {
 
             const findUserPosition: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
@@ -243,7 +244,7 @@ export async function handleMarginOrderCreated(req: any, res: any) {
 
         let isPairExist: ifPairCreated = await PairCreated.findOne({ token0: data.token0, token1: data.token1, chainId: chainId }).lean();
         let createPair: ifPairCreated | any;
-        
+
         if (!isPairExist) {
             let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token0, data.token1]);
             let id = ethers.utils.keccak256(encoder);

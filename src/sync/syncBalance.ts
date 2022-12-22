@@ -94,7 +94,7 @@ async function getMultiBalance(token: string, addresses: string[], ids: string[]
                     let currentInOrderBalance = Big(inOrderBalance).minus(amounts[i]).toString();
 
                     let updateUserPosition = UserPosition.findOneAndUpdate({ token: token, id: addresses[i], chainId: chainId }, { $set: { inOrderBalance: currentInOrderBalance } });
-
+                    console.log("Order Deactivate", data[i].id)
                     let deleteOrder = OrderCreated.findOneAndUpdate({ _id: ids[i] }, { $set: { active: false } });
                     await Promise.all([updateUserPosition, deleteOrder]);
                 }
