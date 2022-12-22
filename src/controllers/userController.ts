@@ -138,7 +138,7 @@ async function getUserInOrderBalance(req: any, res: any) {
         let userInOrder: any[] = await UserPosition.find({ token: token, id: maker, chainId: chainId }).select({ _id: 0, __v: 0, createdAt: 0, updatedAt: 0, balance: 0 }).lean();
         if (userInOrder.length > 0) {
 
-            userInOrder[0].inOrderBalance = parseEther(userInOrder[0].inOrderBalance);
+            userInOrder[0].inOrderBalance = userInOrder[0].inOrderBalance;
         }
         return res.status(200).send({ status: true, data: userInOrder });
 
