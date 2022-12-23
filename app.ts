@@ -11,6 +11,19 @@ import { start } from "./src/appUtil";
 import { socketService } from "./src/socketIo/socket.io";
 import { createServer } from "http";
 export const httpServer = createServer(app);
+import morgan from 'morgan';
+import { expressMonitorConfig } from "./src/utils";
+
+
+app.use(require('express-status-monitor')(
+expressMonitorConfig
+));
+
+
+app.use(morgan('dev'))
+
+
+
 
 require("dotenv").config();
 

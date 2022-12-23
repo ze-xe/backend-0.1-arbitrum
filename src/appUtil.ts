@@ -35,55 +35,45 @@ async function start(chainId: string) {
 
                 for (let i in copyOrder) {
 
+                    let input: any = {
+                        maker: copyOrder[i].maker,
+                        token0: copyOrder[i].token0,
+                        token1: copyOrder[i].token1,
+                        amount: copyOrder[i].amount,
+                        buy: copyOrder[i].buy,
+                        salt: Number(copyOrder[i].salt),
+                        exchangeRate: copyOrder[i].exchangeRate,
+                    }
+
                     if (copyOrder[i].margin == true) {
-                        let result: AxiosResponse = await axios({
-                            method: "post",
-                            url: "http://localhost:3010/order/margin/create",
-                            data: {
-                                signature: copyOrder[i].signature,
-                                chainId: copyOrder[i].chainId.toString(),
-                                ipfs: true,
-                                data: {
-                                    maker: copyOrder[i].maker,
-                                    token0: copyOrder[i].token0,
-                                    token1: copyOrder[i].token1,
-                                    amount: copyOrder[i].amount,
-                                    long: copyOrder[i].long,
-                                    salt: Number(copyOrder[i].salt),
-                                    exchangeRate: copyOrder[i].exchangeRate,
-                                    borrowLimit: copyOrder[i].borrowLimit,
-                                    loops: copyOrder[i].loops
-                                }
-                            }
-                        });
 
-                        console.log("backup margin Create Request", result.data);
-                    }
-                    else {
-                        let result: AxiosResponse = await axios({
-                            method: "post",
-                            url: "http://localhost:3010/order/create",
-                            data: {
-                                signature: copyOrder[i].signature,
-                                chainId: copyOrder[i].chainId.toString(),
-                                ipfs: true,
-                                data: {
-                                    maker: copyOrder[i].maker,
-                                    token0: copyOrder[i].token0,
-                                    token1: copyOrder[i].token1,
-                                    amount: copyOrder[i].amount,
-                                    buy: copyOrder[i].buy,
-                                    salt: Number(copyOrder[i].salt),
-                                    exchangeRate: copyOrder[i].exchangeRate,
+                        input = {
+                            maker: copyOrder[i].maker,
+                            token0: copyOrder[i].token0,
+                            token1: copyOrder[i].token1,
+                            amount: copyOrder[i].amount,
+                            long: copyOrder[i].long,
+                            salt: Number(copyOrder[i].salt),
+                            exchangeRate: copyOrder[i].exchangeRate,
+                            borrowLimit: copyOrder[i].borrowLimit,
+                            loops: copyOrder[i].loops
+                        }
 
-                                }
-                            }
-                        });
-
-                        console.log("backup Create Request", result.data);
                     }
 
+                    let result: AxiosResponse = await axios({
+                        method: "post",
+                        url: "http://localhost:3010/order/create",
+                        data: {
+                            signature: copyOrder[i].signature,
+                            chainId: copyOrder[i].chainId.toString(),
+                            ipfs: true,
+                            margin: copyOrder[i].margin,
+                            data: input
+                        }
+                    });
 
+                    console.log("backup Create Request", result.data);
                 }
                 page++;
 
@@ -92,9 +82,6 @@ async function start(chainId: string) {
                 }
 
             }
-
-
-
         }
         await historicEventListner(ExchangeConfig(chainId));
         socketService.init(httpServer)

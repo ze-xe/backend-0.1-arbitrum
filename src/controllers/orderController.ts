@@ -7,8 +7,10 @@ import { createOrderSchema } from "../helper/validateRequest";
 import { getMultiBalance, multicall } from "../sync/syncBalance";
 import { mainIPFS } from "../IPFS/putFiles";
 import { errorMessage } from "../helper/errorMessage";
-import { ifOrderCreated, ifPairCreated, ifUserPosition, orderSignature } from "../helper/interface";
+import { ifOrderCreated, ifPairCreated, ifUserPosition, marginOrderSignature, orderSignature } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
+import { _handleMarginOrderCreated } from "./marginOrderController";
+
 
 /**
  * 
@@ -36,14 +38,26 @@ async function handleOrderCreated(req: any, res: any) {
     try {
 
         let signature: string = req.body.signature;
-        let data: orderSignature["value"] = req.body.data;
+        let data = req.body.data;
         let chainId: string = req.body.chainId;
         let ipfs: boolean = req.body.ipfs;
-
+        let margin: boolean = req.body.margin;
         let addresses = [data.maker, data.token0, data.token1];
 
-        await createOrderSchema.validateAsync({ createOrderSchemaData: req.body.data, signature: signature, chainId: chainId });
 
+        // if margin Order
+        if (margin == true) {
+            let response = await _handleMarginOrderCreated(signature, data, chainId, ipfs)
+
+            if (response.status == false) {
+                return res.status(response.statusCode).send({ status: false, error: response.error })
+            }
+            else if (response.status == true) {
+                return res.status(response.statusCode).send({ status: true, message: response.message })
+            }
+        }
+
+        await createOrderSchema.validateAsync({ createOrderSchemaData: req.body.data, signature: signature, chainId: chainId });
         for (let i in addresses) {
 
             if (!ethers.utils.isAddress(addresses[i])) {
@@ -199,9 +213,7 @@ async function handleOrderCreated(req: any, res: any) {
                 );
 
             }
-
         }
-
 
         let isPairExist: ifPairCreated = await PairCreated.findOne({ token0: data.token0, token1: data.token1, chainId: chainId }).lean();
         let createPair: ifPairCreated | any;
@@ -266,7 +278,6 @@ async function handleOrderCreated(req: any, res: any) {
             );
         }
 
-
         OrderCreated.create(
 
             {
@@ -288,8 +299,6 @@ async function handleOrderCreated(req: any, res: any) {
                 cid: cid
             }
         );
-
-
 
         // socket io data
         if (!ipfs) {
@@ -371,7 +380,7 @@ async function getLimitMatchedOrders(req: any, res: any) {
                         $match: {
                             $and: [
                                 { pair: pairId },
-                                {"$expr" : {"$lte" : [{"$toDouble" :"$exchangeRate"} , Number(exchangeRate)]}},
+                                { "$expr": { "$lte": [{ "$toDouble": "$exchangeRate" }, Number(exchangeRate)] } },
                                 { buy: false },
                                 { chainId: chainId },
                                 { deleted: false },
@@ -399,7 +408,7 @@ async function getLimitMatchedOrders(req: any, res: any) {
                         $match: {
                             $and: [
                                 { pair: pairId },
-                                {"$expr" : {"$gte" : [{"$toDouble" :"$exchangeRate"} , Number(exchangeRate)]}},
+                                { "$expr": { "$gte": [{ "$toDouble": "$exchangeRate" }, Number(exchangeRate)] } },
                                 { buy: true },
                                 { chainId: chainId },
                                 { deleted: false },
@@ -497,10 +506,10 @@ async function getMatchedMarketOrders(req: any, res: any) {
 
         let getMatchedDoc: ifOrderCreated[] = [];
         if (buy == "true") {
-            getMatchedDoc = await OrderCreated.find({ pair: pairId, buy: false, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).collation({locale: "en_US", numericOrdering: true}).lean();
+            getMatchedDoc = await OrderCreated.find({ pair: pairId, buy: false, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
         }
         else if (buy == "false") {
-            getMatchedDoc = await OrderCreated.find({ pair: pairId, buy: true, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).collation({locale: "en_US", numericOrdering: true}).lean();
+            getMatchedDoc = await OrderCreated.find({ pair: pairId, buy: true, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
         }
 
         let data: ifOrderCreated[] = [];

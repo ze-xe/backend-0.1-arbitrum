@@ -103,4 +103,4 @@ export interface ifEventListner {
     chainId: string
 }
 
-export type Interval = "5"| "15"| "30"| "1H"| "4H"| "1D"| "1W";
+export type Interval = "5"| "15"| "30"| "60"| "240"| "1D"| "1W";
