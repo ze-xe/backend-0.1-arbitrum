@@ -5,7 +5,7 @@ require("dotenv").config();
 
 
 
-let backupConnection = mongoose.createConnection(process.env.MONGO_URL1! as string);
+export const backupConnection = mongoose.createConnection(process.env.MONGO_URL1! as string);
 
 import SyncSchema from "./schemas/Sync";
 import PairCreatedSchema from "./schemas/PairCreated";
@@ -16,7 +16,7 @@ import UserPositionSchema from "./schemas/UserPosition";
 // import { MarginOrderCreatedSchema } from "./schemas/MarginOrderCreated"
 
 
-const OrderCreatedBackup = backupConnection.model("OrderCreated", OrderCreatedSchema);
+const OrderCreatedBackup: any = backupConnection.model("OrderCreated", OrderCreatedSchema);
 // const MarginOrderCreatedBackup = backupConnection.model("MarginOrderCreated", MarginOrderCreatedSchema);
 const Sync = mongoose.model("Sync", SyncSchema);
 const PairCreated = mongoose.model("PairCreated", PairCreatedSchema);
@@ -32,8 +32,13 @@ const UserPosition = mongoose.model("UserPosition", UserPositionSchema);
 async function connect() {
 
     mongoose.connect(process.env.MONGO_URL! as string)
-        .then(() => console.log("MongoDb is connected"))
-        .catch(err => console.log(err));
+        .then(() => {
+            console.log("MongoDb is connected")
+        })
+        .catch(err => {
+            console.log(err)
+        }
+        );
 }
 
 
@@ -41,4 +46,4 @@ async function connect() {
 
 
 
-export { Sync, connect, PairCreated, OrderCreated, OrderExecuted, Token, UserPosition, backupConnection, OrderCreatedBackup};
+export { Sync, connect, PairCreated, OrderCreated, OrderExecuted, Token, UserPosition,  OrderCreatedBackup };
