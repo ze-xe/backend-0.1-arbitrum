@@ -11,7 +11,6 @@ export interface ifOrderCreated {
     salt: string
     amount: string
     exchangeRate: string
-    buy: boolean
     exchangeRateDecimals: string
     balanceAmount: string
     deleted: boolean
@@ -22,9 +21,8 @@ export interface ifOrderCreated {
     _id: string
     borrowLimit: string,
     loops: string,
-    currentLoop: string,
-    long: boolean,
-    margin: boolean
+    orderType: number
+    
 }
 
 export interface ifUserPosition {
@@ -56,22 +54,7 @@ export interface orderSignature {
         token0: string
         token1: string
         amount: string
-        buy: boolean
-        salt: string
-        exchangeRate: string,
-    }
-
-}
-
-export interface marginOrderSignature {
-    id: string
-    signature: string
-    value: {
-        maker: string
-        token0: string
-        token1: string
-        amount: string
-        long: boolean
+        orderType: number
         salt: string
         exchangeRate: string
         borrowLimit: string

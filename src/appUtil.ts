@@ -35,30 +35,16 @@ async function start(chainId: string) {
 
                 for (let i in copyOrder) {
 
-                    let input: any = {
+                    const input = {
                         maker: copyOrder[i].maker,
                         token0: copyOrder[i].token0,
                         token1: copyOrder[i].token1,
                         amount: copyOrder[i].amount,
-                        buy: copyOrder[i].buy,
+                        orderType: copyOrder[i].orderType,
                         salt: Number(copyOrder[i].salt),
                         exchangeRate: copyOrder[i].exchangeRate,
-                    }
-
-                    if (copyOrder[i].margin == true) {
-
-                        input = {
-                            maker: copyOrder[i].maker,
-                            token0: copyOrder[i].token0,
-                            token1: copyOrder[i].token1,
-                            amount: copyOrder[i].amount,
-                            long: copyOrder[i].long,
-                            salt: Number(copyOrder[i].salt),
-                            exchangeRate: copyOrder[i].exchangeRate,
-                            borrowLimit: copyOrder[i].borrowLimit,
-                            loops: copyOrder[i].loops
-                        }
-
+                        borrowLimit: copyOrder[i].borrowLimit,
+                        loops: copyOrder[i].loops
                     }
 
                     let result: AxiosResponse = await axios({
@@ -68,7 +54,6 @@ async function start(chainId: string) {
                             signature: copyOrder[i].signature,
                             chainId: copyOrder[i].chainId.toString(),
                             ipfs: true,
-                            margin: copyOrder[i].margin,
                             data: input
                         }
                     });

@@ -51,10 +51,10 @@ async function eventListner({ contractAddress, abi, handlers, chainId }: ifEvent
                 const blockTimestamp: number = (await provider.getBlock(result.blockNumber)).timestamp * 1000;
                 fromBlock = result.blockNumber;
                 let argument = {
-                    txnId: result.transactionHash,
+                    txnId: result.transactionHash.toLowerCase(),
                     blockTimestamp: blockTimestamp,
                     blockNumber: result.blockNumber,
-                    address: result.address,
+                    address: result.address.toLowerCase(),
                     chainId: chainId,
                     logIndex: result.logIndex
                 };
@@ -123,10 +123,10 @@ async function historicEventListner({ contractAddress, abi, handlers, chainId }:
                 let logIndex: number = logs[i].logIndex;
                 const blockTimestamp: number = promiseTimestamp[i].timestamp * 1000;
                 let argument = {
-                    txnId: txnId,
+                    txnId: txnId.toLowerCase(),
                     blockNumber: blockNumber,
                     blockTimestamp: blockTimestamp,
-                    address: logs[i].address,
+                    address: logs[i].address.toLowerCase(),
                     chainId: chainId,
                     logIndex: logIndex
                 };

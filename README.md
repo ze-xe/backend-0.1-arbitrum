@@ -160,17 +160,17 @@ Url : http://localhost:3010/pair/orders/history/:pairId?chainId=421613
         {
             "fillAmount": "326049896735370200",
             "exchangeRate": "20297000000000000000000",
-            "buy": false
+            "orderType": 1
         },
         {
             "fillAmount": "338506571519004000",
             "exchangeRate": "22972000000000000000000",
-            "buy": true
+            "orderType": 0
         },
         {
             "fillAmount": "87199584212942720",
             "exchangeRate": "20827000000000000000000",
-            "buy": true
+            "buyorderType": 0
         },
         ...
     ]
@@ -231,9 +231,9 @@ Url : http://localhost:3010/pair/trading/status/:pairId?chainId=421613
 
 ```
 Method : Get
-Url : http://localhost:3010/order/limit/matched/:pairId?exchangeRate=19097000000000000000000&buy=true&amount=1000000000000000000&chainId=421613
+Url : http://localhost:3010/order/limit/matched/:pairId?exchangeRate=19097000000000000000000&orderType=0&amount=1000000000000000000&chainId=421613
 all fields are mandatory
-buy = false for sell, true for buy
+orderType = 0 for buy, 1 for sell, 2 for long, 3 for short
 amount = value * 10**decimals , i.e 18
 exchangeRate = value * 10**18
 
@@ -252,7 +252,7 @@ exchangeRate = value * 10**18
                 "token0": "0x2F123F27fC28Eba0101BDb439F32eBf05732d475",
                 "token1": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25792c",
                 "amount": "3840038726682134800",
-                "buy": false,
+                "orderType": 1,
                 "salt": "7442174",
                 "exchangeRate": "15097000000000000000000"
             }
@@ -264,7 +264,7 @@ exchangeRate = value * 10**18
                 "token0": "0x2F123F27fC28Eba0101BDb439F32eBf05732d475",
                 "token1": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25792c",
                 "amount": "590873225312305000",
-                "buy": false,
+                "orderType": 1,
                 "salt": "3346665",
                 "exchangeRate": "15229000000000000000000"
             }
@@ -282,7 +282,7 @@ exchangeRate = value * 10**18
 
 ```
 Method : Get
-Url : http://localhost:3010/order/market/matched/:pairId?buy=true&amount=2000000000&chainId=421613
+Url : http://localhost:3010/order/market/matched/:pairId?orderType=0&amount=2000000000&chainId=421613
 ```
 
 ### Expected Output
@@ -298,7 +298,7 @@ Url : http://localhost:3010/order/market/matched/:pairId?buy=true&amount=2000000
                 "token0": "0x2F123F27fC28Eba0101BDb439F32eBf05732d475",
                 "token1": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25792c",
                 "amount": "3840038726682134800",
-                "buy": false,
+                "orderType": 1,
                 "salt": "7442174",
                 "exchangeRate": "15097000000000000000000"
             }
@@ -310,7 +310,7 @@ Url : http://localhost:3010/order/market/matched/:pairId?buy=true&amount=2000000
                 "token0": "0x2F123F27fC28Eba0101BDb439F32eBf05732d475",
                 "token1": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25792c",
                 "amount": "590873225312305000",
-                "buy": false,
+                "orderType": 1,
                 "salt": "3346665",
                 "exchangeRate": "15229000000000000000000"
             }
@@ -402,19 +402,19 @@ maker : user wallet address
             "id": "0xae7ff72e1c2fb29dcbe0d922be5f1a481a4b97dcf94a6807ae369adc9012b310",
             "amount": "720429376694885500",
             "exchangeRate": "21634000000000000000000",
-            "buy": true
+            "orderType": 0
         },
         {
             "id": "0x55d8b8381426759a852f0c6f96c22c86e39303f6945ec9e3827e3f9a023e7763",
             "amount": "174327979987294320",
             "exchangeRate": "23635000000000000000000",
-            "buy": true
+            "orderType": 0
         },
         {
             "id": "0x90ab70e12e23e313f2f65b95da2fc806b43671bff1762640c8b5fa369e6eb416",
             "amount": "558142806018918000",
             "exchangeRate": "17676000000000000000000",
-            "buy": true
+            "orderType": 0
         }
         ...
     ]
@@ -442,12 +442,12 @@ taker : user wallet address
         {
             "fillAmount": "87199584212942720",
             "exchangeRate": "20827000000000000000000",
-            "buy": true
+            "orderType": 0
         },
         {
             "fillAmount": "436837079722483650",
             "exchangeRate": "21634000000000000000000",
-            "buy": true
+            "orderType": 0
         },
         ...
     ]
@@ -473,12 +473,12 @@ Url : http://localhost:3010/user/orders/cancelled/:maker/pair/:pairId?chainId=42
     "data": [
         {
             "exchangeRate": "23678000000000000000000",
-            "buy": true,
+            "orderType": 0,
             "balanceAmount": "463451784551381840"
         },
         {
             "exchangeRate": "15363000000000000000000",
-            "buy": true,
+            "orderType": 0,
             "balanceAmount": "0"
         },
         ...
@@ -502,14 +502,15 @@ Url : http://localhost:3010/order/create
 ```
 {
     "data" :{
-    "maker": "0x103B62f68Da23f20055c572269be67fA7635f2fc",
-    "token0": "0x842681C1fA28EF2AA2A4BDE174612e901D2b7827",
-    "token1": "0xa50fABf59f2c11fF0F02E7c94A82B442611F37B2",
-    "amount": "1000000000000000000",
-    "buy": true,
-    "salt": "12345",
-    "exchangeRate": "18000000000000000000000"
-
+        "maker": "0x103B62f68Da23f20055c572269be67fA7635f2fc",
+        "token0": "0x842681C1fA28EF2AA2A4BDE174612e901D2b7827",
+        "token1": "0xa50fABf59f2c11fF0F02E7c94A82B442611F37B2",
+        "amount": "1000000000000000000",
+        "orderType": 1,
+        "salt": "12345",
+        "exchangeRate": "18000000000000000000000",
+        "borrowLimit": 0,
+        "loops": 0
     },
     "signature":"0x6de29ba3e7429142040bb55ceb3fb2fc0de6d8c0c02f8ba1a51885b8726d6e1f595833bf10d8bab3a8e65379d8e8159fb20d42ca8c0ff76fa2db3df1017679c21c",
     "chainId": "421613"

@@ -1,7 +1,7 @@
 
 import { getExchangeABI } from "../../utils";
 
-import { handleOrderExecuted, handleOrderCancelled } from "../../handlers/exchange";
+import { handleOrderExecuted, handleOrderCancelled, handleMarginEnabled } from "../../handlers/exchange";
 import { getExchangeAddress } from "../../helper/chain";
 
 
@@ -15,7 +15,8 @@ function ExchangeConfig(chainId : string) {
         abi: getExchangeABI(),
         handlers: {
             "OrderExecuted": handleOrderExecuted,
-            "OrderCancelled": handleOrderCancelled
+            "OrderCancelled": handleOrderCancelled,
+            "MarginEnabled": handleMarginEnabled
         },
         chainId: chainId
     };

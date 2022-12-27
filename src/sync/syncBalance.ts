@@ -2,7 +2,7 @@ import { BigNumber, ethers } from "ethers";
 import { UserPosition, OrderCreated } from "../db";
 import Big from "big.js";
 import { getERC20ABI, getProvider, getInterface, MulticallAbi } from "../utils";
-import { ifOrderCreated, ifUserPosition, marginOrderSignature, orderSignature } from "../helper/interface";
+import { ifOrderCreated, ifUserPosition,  orderSignature } from "../helper/interface";
 import { getExchangeAddress, MulticallAddress } from "../helper/chain";
 
 /**
@@ -101,7 +101,7 @@ async function getMultiBalance(token: string, addresses: string[], ids: string[]
 
             }
 
-            let res = [];
+            let res: orderSignature[] = [];
 
             for (let i in data) {
 
@@ -109,41 +109,21 @@ async function getMultiBalance(token: string, addresses: string[], ids: string[]
                     continue;
                 }
                 else {
-
-                    if (data[i].margin == false) {
-                        res.push({
-                            signature: data[i].signature,
-                            id: data[i].id,
-                            margin: false,
-                            value: {
-                                maker: data[i].maker,
-                                token0: data[i].token0,
-                                token1: data[i].token1,
-                                amount: data[i].amount,
-                                buy: data[i].buy,
-                                salt: data[i].salt,
-                                exchangeRate: data[i].exchangeRate,
-                            }
-                        });
-                    }
-                    else if (data[i].margin == true) {
-                        res.push({
-                            signature: data[i].signature,
-                            id: data[i].id,
-                            margin: true,
-                            value: {
-                                maker: data[i].maker,
-                                token0: data[i].token0,
-                                token1: data[i].token1,
-                                amount: data[i].amount,
-                                long: data[i].buy,
-                                salt: data[i].salt,
-                                exchangeRate: data[i].exchangeRate,
-                                borrowLimit: data[i].borrowLimit,
-                                loops: data[i].loops
-                            }
-                        });
-                    }
+                    res.push({
+                        signature: data[i].signature,
+                        id: data[i].id,
+                        value: {
+                            maker: data[i].maker,
+                            token0: data[i].token0,
+                            token1: data[i].token1,
+                            amount: data[i].amount,
+                            orderType: data[i].orderType,
+                            salt: data[i].salt,
+                            exchangeRate: data[i].exchangeRate,
+                            borrowLimit: data[i].borrowLimit,
+                            loops: data[i].loops
+                        }
+                    });
 
                 }
             }
@@ -194,12 +174,12 @@ async function orderStatus(chainId: string) {
             // creating input for multicall
             for (let k in getOrderCreated) {
 
-                if (getOrderCreated[k].buy == false) {
+                if (getOrderCreated[k].orderType == 1 || getOrderCreated[k].orderType == 3) {
 
                     input.push([getOrderCreated[k].token0, itf.encodeFunctionData("balanceOf", [getOrderCreated[k].maker])]);
 
                 }
-                else if (getOrderCreated[k].buy == true) {
+                else if (getOrderCreated[k].orderType == 0 || getOrderCreated[k].orderType == 2) {
 
                     input.push([getOrderCreated[k].token1, itf.encodeFunctionData("balanceOf", [getOrderCreated[k].maker])]);
                 }
@@ -216,7 +196,7 @@ async function orderStatus(chainId: string) {
                 let amount: Big;
                 let id = getOrderCreated[i].maker;
 
-                if (getOrderCreated[i].buy == false) {
+                if (getOrderCreated[i].orderType == 1 || getOrderCreated[i].orderType == 3) {
                     token = getOrderCreated[i].token0;
                     amount = Big(getOrderCreated[i].balanceAmount);
                 }

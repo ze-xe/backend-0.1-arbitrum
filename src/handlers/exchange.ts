@@ -1,9 +1,10 @@
-import { PairCreated, OrderCreated, OrderExecuted, UserPosition } from "../db";
+import { PairCreated, OrderCreated, OrderExecuted, UserPosition, Token } from "../db";
 import Big from "big.js";
 import { ifOrderCreated, ifPairCreated, ifUserPosition } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 import { number } from "joi";
-import { getDecimals } from "../utils";
+import { getDecimals, getERC20ABI, getProvider } from "../utils";
+import { ethers } from "ethers";
 
 
 
@@ -21,12 +22,12 @@ async function handleOrderExecuted(data: any, argument: any) {
         });
 
         if (isDuplicateTxn) {
-            console.log("Execute duplicate",data,argument)
+            console.log("OrderExecute duplicate, id :", data[0].toLowerCase())
             return;
         }
 
-        let id = data[0];
-        let taker = data[1];
+        let id = data[0]?.toLowerCase();
+        let taker = data[1]?.toLowerCase();
         let fillAmount = data[2].toString();
         argument.id = id;
         argument.taker = taker;
@@ -46,7 +47,7 @@ async function handleOrderExecuted(data: any, argument: any) {
         argument.exchangeRate = getOrderDetails.exchangeRate;
         argument.pair = getOrderDetails.pair;
         argument.exchangeRateDecimals = Number(getPairDetails.exchangeRateDecimals);
-        argument.buy = getOrderDetails.buy;
+        argument.orderType = getOrderDetails.orderType;
 
         // updating ExchangeRateDecimal
         let exchangeRateDecimals: number | string = Number(getDecimals(getOrderDetails.exchangeRate));
@@ -61,7 +62,7 @@ async function handleOrderExecuted(data: any, argument: any) {
         socketService.emit(EVENT_NAME.PAIR_ORDER, {
             amount: `-${fillAmount}`,
             exchangeRate: getOrderDetails.exchangeRate,
-            buy: getOrderDetails.buy,
+            orderType: getOrderDetails.orderType,
             pair: getOrderDetails.pair
         });
 
@@ -69,7 +70,7 @@ async function handleOrderExecuted(data: any, argument: any) {
         socketService.emit(EVENT_NAME.PAIR_HISTORY, {
             amount: fillAmount,
             exchangeRate: getOrderDetails.exchangeRate,
-            buy: getOrderDetails.buy,
+            orderType: getOrderDetails.orderType,
             pair: getOrderDetails.pair
         })
 
@@ -81,7 +82,7 @@ async function handleOrderExecuted(data: any, argument: any) {
             { $set: { exchangeRate: getOrderDetails.exchangeRate, priceDiff: priceDiff, exchangeRateDecimals: argument.exchangeRateDecimals } }
         );
 
-        if (getOrderDetails.buy == false) {
+        if (getOrderDetails.orderType == 1 || getOrderDetails.orderType == 3) {
             // for maker
 
             let token0 = getPairDetails.token0;
@@ -113,7 +114,7 @@ async function handleOrderExecuted(data: any, argument: any) {
             }
 
         }
-        else if (getOrderDetails.buy == true) {
+        else if (getOrderDetails.orderType == 0 || getOrderDetails.orderType == 2) {
             // for maker
 
             let token1 = getPairDetails.token1;
@@ -157,7 +158,7 @@ async function handleOrderExecuted(data: any, argument: any) {
 
 async function handleOrderCancelled(data: any) {
 
-    let id = data[0];
+    let id = data[0].toLowerCase();
 
     let orderDetails: ifOrderCreated | null = await OrderCreated.findOne({ id: id }).lean();
 
@@ -173,11 +174,11 @@ async function handleOrderCancelled(data: any) {
     socketService.emit(EVENT_NAME.PAIR_ORDER, {
         amount: `-${orderDetails.balanceAmount}`,
         exchangeRate: orderDetails.exchangeRate,
-        buy: orderDetails.buy,
+        orderType: orderDetails.orderType,
         pair: orderDetails.pair
     });
     // update user inOrder
-    if (orderDetails.buy == false) {
+    if (orderDetails.orderType == 1 || orderDetails.orderType == 3) {
         let getUser: ifUserPosition | null = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token0, chainId: orderDetails.chainId }).lean();
         if (getUser) {
             let currentInOrderBalance = Big(getUser.inOrderBalance).minus(orderDetails.balanceAmount).toString();
@@ -190,7 +191,7 @@ async function handleOrderCancelled(data: any) {
         }
 
     }
-    else if (orderDetails.buy == true) {
+    else if (orderDetails.orderType == 0 || orderDetails.orderType == 2) {
         let getUser: ifUserPosition | null = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token1, chainId: orderDetails.chainId }).lean()
         if (getUser) {
             let token1Amount = Big(getUser.inOrderBalance).minus(Big(orderDetails.balanceAmount).times(orderDetails.exchangeRate).div(Big(10).pow(18))).toString();
@@ -209,5 +210,106 @@ async function handleOrderCancelled(data: any) {
 
 }
 
+
+export async function handleMarginEnabled(data: string[]) {
+    try {
+
+        let token: string = data[0].toLowerCase();
+        let cToken = data[1];
+        let chainId = "421613";
+        const isTokenExist = await Token.findOne({ id: token }).lean();
+        let symbol;
+
+        if (isTokenExist) {
+            if (isTokenExist.marginEnabled == true) {
+                return
+            }
+            else if (isTokenExist.marginEnabled == false) {
+                await Token.findOneAndUpdate({ id: token }, { $set: { marginEnabled: true } });
+                symbol = isTokenExist.symbol;
+            }
+        }
+
+        if (!isTokenExist) {
+            let provider = getProvider(chainId);
+            let getTokenDetails = new ethers.Contract(token, getERC20ABI(), provider);
+            let name = getTokenDetails["name"]();
+            symbol = getTokenDetails["symbol"]();
+            let decimals = getTokenDetails["decimals"]();
+            let promise = await Promise.all([name, symbol, decimals]);
+            name = promise[0];
+            symbol = promise[1];
+            decimals = promise[2];
+
+            let temp = {
+                id: token,
+                name: name,
+                symbol: symbol,
+                decimals: decimals,
+                price: "0",
+                chainId: chainId,
+                marginEnabled: true
+            };
+
+            await Token.create(temp);
+
+            console.log("Token Added", token, chainId, symbol);
+        }
+
+
+        // creating pair
+
+        let allToken = await Token.find({ marginEnabled: true, id: { $nin: [token] } }).lean();
+    
+
+        for (let i in allToken) {
+
+            let isPairExist = await PairCreated.findOne({ token0: token, token1: allToken[i].id }).lean()
+
+            if (isPairExist) {
+                if (isPairExist.marginEnabled == true) {
+                    continue
+                }
+                else if (isPairExist.marginEnabled == false) {
+                    
+                    await PairCreated.findOneAndUpdate(
+                        { _id: isPairExist._id },
+                        { $set: { marginEnabled: true } }
+                    )
+                    continue
+                }
+            }
+            else {
+                // checking opposite pair
+                let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [allToken[i].id, token]);
+                let id = ethers.utils.keccak256(encoder);
+
+                let isPairExist = await PairCreated.findOne({ id: id }).lean();
+
+                if (isPairExist) {
+
+                    if (isPairExist.marginEnabled == true) {
+                        continue
+                    }
+                    else if (isPairExist.marginEnabled == false) {
+                        await PairCreated.findOneAndUpdate(
+                            { _id: isPairExist._id },
+                            { $set: { marginEnabled: true } }
+                        )
+                        continue
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+    catch (error) {
+        console.log("Error @ handleOrderExecuted", error);
+    }
+
+}
 
 export { handleOrderExecuted, handleOrderCancelled };

@@ -1,6 +1,6 @@
 import { Token } from "../db";
-import { getERC20ABI, getProvider} from "../utils";
-import {ethers} from "ethers";
+import { getERC20ABI, getProvider } from "../utils";
+import { ethers } from "ethers";
 
 
 
@@ -9,7 +9,7 @@ async function handleToken(token: string, chainId: string) {
         const isTokenExist = await Token.findOne({ id: token });
 
         if (isTokenExist) {
-            return isTokenExist.symbol;
+            return { symbol: isTokenExist.symbol, marginEnabled: isTokenExist.marginEnabled };
         }
 
         let provider = getProvider(chainId);
@@ -33,8 +33,9 @@ async function handleToken(token: string, chainId: string) {
         };
 
         Token.create(temp);
-        return symbol
-        console.log("Token Added", token, chainId);
+
+        console.log("Token Added", token, chainId, symbol);
+        return  { symbol: symbol, marginEnabled: false }
     }
     catch (error) {
         console.log("Error @ handleToken1", error);

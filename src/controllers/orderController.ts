@@ -7,7 +7,7 @@ import { createOrderSchema } from "../helper/validateRequest";
 import { getMultiBalance, multicall } from "../sync/syncBalance";
 import { mainIPFS } from "../IPFS/putFiles";
 import { errorMessage } from "../helper/errorMessage";
-import { ifOrderCreated, ifPairCreated, ifUserPosition, marginOrderSignature, orderSignature } from "../helper/interface";
+import { ifOrderCreated, ifPairCreated, ifUserPosition,  orderSignature } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 import { _handleMarginOrderCreated } from "./marginOrderController";
 
@@ -24,7 +24,7 @@ import { _handleMarginOrderCreated } from "./marginOrderController";
     "token0": "0x842681C1fA28EF2AA2A4BDE174612e901D2b7827",
     "token1": "0xa50fABf59f2c11fF0F02E7c94A82B442611F37B2",
     "amount": "1000000000000000000",
-    "buy": true,
+    "orderType": 0,
     "salt": "12345",
     "exchangeRate": "18000000000000000000000"
     }
@@ -32,31 +32,18 @@ import { _handleMarginOrderCreated } from "./marginOrderController";
  * @param {*} req.body.ipfs (boolean) if it is present that means request is sent from backup 
  * @returns  error with message if any validation fail, if success return order created successfully
  */
-
-
 async function handleOrderCreated(req: any, res: any) {
     try {
 
-        let signature: string = req.body.signature;
+        let signature: string = req.body.signature?.toLowerCase();
         let data = req.body.data;
         let chainId: string = req.body.chainId;
         let ipfs: boolean = req.body.ipfs;
-        let margin: boolean = req.body.margin;
+        let orderType: number = data.orderType;
         let addresses = [data.maker, data.token0, data.token1];
-
-
-        // if margin Order
-        if (margin == true) {
-            let response = await _handleMarginOrderCreated(signature, data, chainId, ipfs)
-
-            if (response.status == false) {
-                return res.status(response.statusCode).send({ status: false, error: response.error })
-            }
-            else if (response.status == true) {
-                return res.status(response.statusCode).send({ status: true, message: response.message })
-            }
-        }
-
+        data.maker = data.maker?.toLowerCase();
+        data.token0 = data.token0?.toLowerCase();
+        data.token1 = data.token1?.toLowerCase();
         await createOrderSchema.validateAsync({ createOrderSchemaData: req.body.data, signature: signature, chainId: chainId });
         for (let i in addresses) {
 
@@ -87,9 +74,25 @@ async function handleOrderCreated(req: any, res: any) {
             return res.status(201).send({ status: true, message: "Order Already Created" });
         }
 
+        // if margin Order
+        if (orderType == 2 || orderType == 3) {
+            let response = await _handleMarginOrderCreated(signature, data, chainId, ipfs, id, exchangeRateDecimals)
+
+            if (response.status == false) {
+                return res.status(response.statusCode).send({ status: false, error: response.error })
+            }
+            else if (response.status == true) {
+                return res.status(response.statusCode).send({ status: true, message: response.message })
+            }
+        }
+
+
+
         let amount = Big(data.amount);
 
-        if (data.buy == false) {
+
+
+        if (data.orderType == 1) {
 
             const findUserPosition: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
 
@@ -152,7 +155,7 @@ async function handleOrderCreated(req: any, res: any) {
             }
         }
 
-        else if (data.buy == true) {
+        else if (data.orderType == 0) {
 
             let findUserPosition: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token1, chainId: chainId });
 
@@ -219,24 +222,43 @@ async function handleOrderCreated(req: any, res: any) {
         let createPair: ifPairCreated | any;
 
         if (!isPairExist) {
-            let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token0, data.token1]);
+            // cheking for opposite pair
+            let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token1, data.token0]);
             let id = ethers.utils.keccak256(encoder);
-            let token0 = await handleToken(data.token0, chainId);
-            let token1 = await handleToken(data.token1, chainId);
-            let temp = {
-                id: id,
-                exchangeRateDecimals: exchangeRateDecimals,
-                minToken0Order: (10 ** 10).toString(),
-                exchangeRate: '0',
-                priceDiff: '0',
-                token0: data.token0,
-                token1: data.token1,
-                chainId: chainId,
-                symbol: `${token0}_${token1}`
-            }
-            createPair = await PairCreated.create(temp);
 
-            console.log("Pair Created ", "T0 ", data.token0, "T1 ", data.token1, "CId ", chainId);
+            let isPairExist1: ifPairCreated = await PairCreated.findOne({ id: id }).lean();;
+
+            if (isPairExist1) {
+                createPair = isPairExist1;
+            }
+
+            if (!isPairExist1) {
+                let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token0, data.token1]);
+                let id = ethers.utils.keccak256(encoder);
+
+                let token0 = await handleToken(data.token0, chainId);
+                let token1 = await handleToken(data.token1, chainId);
+                let marginEnabled = false;
+                if(token0?.marginEnabled == true && token1?.marginEnabled == true){
+                    marginEnabled = true
+                }
+                let temp = {
+                    id: id,
+                    exchangeRateDecimals: exchangeRateDecimals,
+                    minToken0Order: (10 ** 10).toString(),
+                    exchangeRate: '0',
+                    priceDiff: '0',
+                    token0: data.token0,
+                    token1: data.token1,
+                    chainId: chainId,
+                    symbol: `${token0?.symbol}_${token1?.symbol}`,
+                    marginEnabled: marginEnabled
+                }
+                createPair = await PairCreated.create(temp);
+
+                console.log("Pair Created ", "T0 ", data.token0, "T1 ", data.token1, "CId ", chainId);
+
+            }
 
         }
         let pair: string;
@@ -267,13 +289,13 @@ async function handleOrderCreated(req: any, res: any) {
                     amount: data.amount,
                     salt: data.salt,
                     exchangeRate: data.exchangeRate,
-                    buy: data.buy,
+                    orderType: data.orderType,
                     chainId: chainId,
                     exchangeRateDecimals: exchangeRateDecimals,
                     balanceAmount: data.amount,
                     active: true,
                     deleted: false,
-                    cid: cid
+                    cid: cid,
                 }
             );
         }
@@ -290,13 +312,13 @@ async function handleOrderCreated(req: any, res: any) {
                 amount: data.amount,
                 salt: data.salt,
                 exchangeRate: data.exchangeRate,
-                buy: data.buy,
+                orderType: data.orderType,
                 chainId: chainId,
                 exchangeRateDecimals: exchangeRateDecimals,
                 balanceAmount: data.amount,
                 active: true,
                 deleted: false,
-                cid: cid
+                cid: cid,
             }
         );
 
@@ -305,7 +327,7 @@ async function handleOrderCreated(req: any, res: any) {
             socketService.emit(EVENT_NAME.PAIR_ORDER, {
                 amount: data.amount,
                 exchangeRate: data.exchangeRate,
-                buy: data.buy,
+                orderType: data.orderType,
                 pair: pair
             });
         }
@@ -324,6 +346,11 @@ async function handleOrderCreated(req: any, res: any) {
 }
 
 
+
+
+
+
+
 /**
  * @dev this api function will provide order as per the exchangeRate
  * @param {*} req.params.pairId (string) a valid pairId required
@@ -334,15 +361,159 @@ async function handleOrderCreated(req: any, res: any) {
  * @param {*} res 
  * @returns 
  */
+// async function getLimitMatchedOrders(req: any, res: any) {
+
+//     try {
+
+//         let pairId: string = req.params.pairId;
+
+//         let exchangeRate: string = req.query.exchangeRate;
+
+//         let buy: string = req.query.buy;
+
+//         let amount: number = Number(req.query.amount);
+
+//         let chainId: string = req.query.chainId;
+
+
+//         if (!pairId) {
+//             return res.status(400).send({ status: false, error: errorMessage.pairId });
+//         }
+
+//         if (!exchangeRate || isNaN(Number(exchangeRate))) {
+//             return res.status(400).send({ status: false, error: errorMessage.exchangerate });
+//         }
+
+//         if (!buy || (buy != "true" && buy != "false")) {
+//             return res.status(400).send({ status: false, error: errorMessage.buy });
+//         }
+
+//         if (!amount || isNaN(amount) == true) {
+//             return res.status(400).send({ status: false, error: errorMessage.amount });
+//         }
+
+//         const isPairIdExist: ifPairCreated | null = await PairCreated.findOne({ id: pairId, chainId: chainId }).lean();
+
+//         if (!isPairIdExist) {
+//             return res.status(404).send({ status: false, error: errorMessage.pairId });
+//         }
+
+//         let getMatchedDoc: ifOrderCreated[] = [];
+
+//         if (buy == "true") {
+//             getMatchedDoc = await OrderCreated.aggregate(
+//                 [
+//                     {
+//                         $match: {
+//                             $and: [
+//                                 { pair: pairId },
+//                                 { "$expr": { "$lte": [{ "$toDouble": "$exchangeRate" }, Number(exchangeRate)] } },
+//                                 { buy: false },
+//                                 { chainId: chainId },
+//                                 { deleted: false },
+//                                 { active: true },
+//                                 { cancelled: false }
+//                             ]
+//                         }
+//                     },
+//                     {
+//                         $sort: { exchangeRate: 1, balanceAmount: 1 }
+//                     }
+//                 ],
+//                 {
+//                     collation: {
+//                         locale: "en_US",
+//                         numericOrdering: true
+//                     }
+//                 }
+//             );
+//         }
+//         else if (buy == "false") {
+//             getMatchedDoc = await OrderCreated.aggregate(
+//                 [
+//                     {
+//                         $match: {
+//                             $and: [
+//                                 { pair: pairId },
+//                                 { "$expr": { "$gte": [{ "$toDouble": "$exchangeRate" }, Number(exchangeRate)] } },
+//                                 { buy: true },
+//                                 { chainId: chainId },
+//                                 { deleted: false },
+//                                 { active: true },
+//                                 { cancelled: false }
+//                             ]
+//                         }
+//                     },
+//                     {
+//                         $sort: { exchangeRate: -1, balanceAmount: 1 }
+//                     }
+//                 ],
+//                 {
+//                     collation: {
+//                         locale: "en_US",
+//                         numericOrdering: true
+//                     }
+//                 }
+//             );
+//         }
+
+//         let data: ifOrderCreated[] = [];
+//         let currAmount = 0;
+//         let counter = 0;
+//         let addresses = [];
+//         let amounts = [];
+//         let ids = [];
+
+//         if (getMatchedDoc.length == 0) {
+//             return res.status(200).send({ status: true, data: [] });
+//         }
+
+//         for (let i = 0; i < getMatchedDoc.length; i++) {
+
+//             if (currAmount >= amount) {
+//                 counter++;
+//                 if (counter > 10) {
+//                     break;
+//                 }
+//             }
+
+//             currAmount += Number(getMatchedDoc[i].balanceAmount);
+//             addresses.push(getMatchedDoc[i].maker);
+//             amounts.push(Number(getMatchedDoc[i].balanceAmount));
+//             data.push(getMatchedDoc[i]);
+//             ids.push(getMatchedDoc[i]._id);
+
+//         }
+
+//         let token;
+//         if (buy == "true") {
+//             token = data[0].token0;
+//         } else {
+//             token = data[0].token1;
+//         }
+
+//         let response = await getMultiBalance(token, addresses, ids, data, chainId, amounts);
+
+//         if (!response) {
+//             return res.status(200).send({ status: true, data: [] });
+//         }
+
+//         return res.status(200).send({ status: true, data: response });
+//     }
+//     catch (error: any) {
+//         console.log("Error @ getMatchedOrders", error);
+//         return res.status(500).send({ status: false, error: error.message });
+//     }
+// }
 async function getLimitMatchedOrders(req: any, res: any) {
 
     try {
 
-        let pairId: string = req.params.pairId;
+        let pairId: string = req.params.pairId?.toLowerCase();
 
         let exchangeRate: string = req.query.exchangeRate;
 
-        let buy: string = req.query.buy;
+        let orderType: number = Number(req.query.orderType);
 
         let amount: number = Number(req.query.amount);
 
@@ -357,8 +528,8 @@ async function getLimitMatchedOrders(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.exchangerate });
         }
 
-        if (!buy || (buy != "true" && buy != "false")) {
-            return res.status(400).send({ status: false, error: errorMessage.buy });
+        if (isNaN(orderType) == true) {
+            return res.status(400).send({ status: false, error: errorMessage.orderType });
         }
 
         if (!amount || isNaN(amount) == true) {
@@ -373,7 +544,7 @@ async function getLimitMatchedOrders(req: any, res: any) {
 
         let getMatchedDoc: ifOrderCreated[] = [];
 
-        if (buy == "true") {
+        if (orderType == 0 || orderType == 2) {
             getMatchedDoc = await OrderCreated.aggregate(
                 [
                     {
@@ -381,7 +552,7 @@ async function getLimitMatchedOrders(req: any, res: any) {
                             $and: [
                                 { pair: pairId },
                                 { "$expr": { "$lte": [{ "$toDouble": "$exchangeRate" }, Number(exchangeRate)] } },
-                                { buy: false },
+                                { orderType: { $in: [1, 3] } },
                                 { chainId: chainId },
                                 { deleted: false },
                                 { active: true },
@@ -401,7 +572,7 @@ async function getLimitMatchedOrders(req: any, res: any) {
                 }
             );
         }
-        else if (buy == "false") {
+        else if (orderType == 1 || orderType == 3) {
             getMatchedDoc = await OrderCreated.aggregate(
                 [
                     {
@@ -409,7 +580,7 @@ async function getLimitMatchedOrders(req: any, res: any) {
                             $and: [
                                 { pair: pairId },
                                 { "$expr": { "$gte": [{ "$toDouble": "$exchangeRate" }, Number(exchangeRate)] } },
-                                { buy: true },
+                                { orderType: { $in: [0, 2] } },
                                 { chainId: chainId },
                                 { deleted: false },
                                 { active: true },
@@ -459,7 +630,7 @@ async function getLimitMatchedOrders(req: any, res: any) {
         }
 
         let token;
-        if (buy == "true") {
+        if (orderType == 0 || orderType == 2) {
             token = data[0].token0;
         } else {
             token = data[0].token1;
@@ -483,8 +654,8 @@ async function getLimitMatchedOrders(req: any, res: any) {
 async function getMatchedMarketOrders(req: any, res: any) {
     try {
 
-        let pairId: string = req.params.pairId;
-        let buy: string = req.query.buy;
+        let pairId: string = req.params.pairId?.toLowerCase();
+        let orderType: number = Number(req.query.orderType);
         let amount: number = Number(req.query.amount);
         let chainId: string = req.query.chainId;
 
@@ -496,8 +667,8 @@ async function getMatchedMarketOrders(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.pairId });
         }
 
-        if (!buy || (buy != "false" && buy != "true")) {
-            return res.status(400).send({ status: false, error: errorMessage.buy });
+        if (isNaN(orderType) == true) {
+            return res.status(400).send({ status: false, error: errorMessage.orderType });
         }
 
         if (isNaN(amount) == true || amount <= 0) {
@@ -505,11 +676,12 @@ async function getMatchedMarketOrders(req: any, res: any) {
         }
 
         let getMatchedDoc: ifOrderCreated[] = [];
-        if (buy == "true") {
-            getMatchedDoc = await OrderCreated.find({ pair: pairId, buy: false, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+
+        if (orderType == 0 || orderType == 2) {
+            getMatchedDoc = await OrderCreated.find({ pair: pairId, orderType: { $in: [1, 3] }, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
         }
-        else if (buy == "false") {
-            getMatchedDoc = await OrderCreated.find({ pair: pairId, buy: true, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+        else if (orderType == 1 || orderType == 3) {
+            getMatchedDoc = await OrderCreated.find({ pair: pairId, orderType: { $in: [0, 2] }, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
         }
 
         let data: ifOrderCreated[] = [];
@@ -527,10 +699,10 @@ async function getMatchedMarketOrders(req: any, res: any) {
                     break;
                 }
             }
-            if (buy == "true") {
+            if (orderType == 0 || orderType == 2) {
                 currAmount += Number(Big(getMatchedDoc[i].balanceAmount).times(getMatchedDoc[i].exchangeRate).div(Big(10).pow(18)));
             }
-            else if (buy == "false") {
+            else if (orderType == 1 || orderType == 3) {
                 currAmount += Number(getMatchedDoc[i].balanceAmount)
             }
             addresses.push(getMatchedDoc[i].maker);
@@ -545,7 +717,7 @@ async function getMatchedMarketOrders(req: any, res: any) {
         }
 
         let token;
-        if (buy == "true") {
+        if (orderType == 0 || orderType == 2) {
             token = data[0].token0;
         } else {
             token = data[0].token1;

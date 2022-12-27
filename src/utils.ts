@@ -60,62 +60,21 @@ function validateSignature(maker: string, signature: string, value: object, chai
         // The named list of all type definitions
         const types = {
             Order: [
-                { name: "maker", type: "address" },
-                { name: "token0", type: "address" },
-                { name: "token1", type: "address" },
-                { name: "amount", type: "uint256" },
-                { name: "buy", type: "bool" },
-                { name: "salt", type: "uint32" },
-                { name: "exchangeRate", type: "uint216" }
-            ],
-        };
-
-        const digest: string = ethers.utils._TypedDataEncoder.hash(domain, types, value);
-
-        const signatureAddress: string = ethers.utils.recoverAddress(digest, signature);
-        // console.log(maker, signatureAddress)
-        if (maker == signatureAddress) {
-            return digest;
-        }
-
-        return null;
-
-    }
-    catch (error: any) {
-        console.log("Error @ validateSignature", error.message);
-        return null
-    }
-}
-
-
-function validateMarginSignature(maker: string, signature: string, value: object, chainId: string): (string | null) {
-    try {
-
-        const domain = {
-            name: "zexe",
-            version: "1",
-            chainId: chainId,
-            verifyingContract: getExchangeAddress(chainId),
-        };
-
-        // The named list of all type definitions
-        const types = {
-            LeverageOrder: [
-                { name: 'maker', type: 'address' },
-                { name: 'token0', type: 'address' },
-                { name: 'token1', type: 'address' },
-                { name: 'amount', type: 'uint256' },
-                { name: 'long', type: 'bool' },
+				{ name: 'maker', type: 'address' },
+				{ name: 'token0', type: 'address' },
+				{ name: 'token1', type: 'address' },
+				{ name: 'amount', type: 'uint256' },
+				{ name: 'orderType', type: 'uint8' },
                 { name: 'salt', type: 'uint32' },
-                { name: 'exchangeRate', type: 'uint176' },
-                { name: 'borrowLimit', type: 'uint32' },
-                { name: 'loops', type: 'uint8' }
-            ],
+				{ name: 'exchangeRate', type: 'uint176' },
+				{ name: 'borrowLimit', type: 'uint32' },
+				{ name: 'loops', type: 'uint8' }
+			]
         };
 
-        const digest: string = ethers.utils._TypedDataEncoder.hash(domain, types, value);
+        const digest: string = ethers.utils._TypedDataEncoder.hash(domain, types, value).toLowerCase();
 
-        const signatureAddress: string = ethers.utils.recoverAddress(digest, signature);
+        const signatureAddress: string = ethers.utils.recoverAddress(digest, signature).toLowerCase();
         // console.log(maker, signatureAddress)
         if (maker == signatureAddress) {
             return digest;
@@ -129,6 +88,7 @@ function validateMarginSignature(maker: string, signature: string, value: object
         return null
     }
 }
+
 
 
 
@@ -251,4 +211,4 @@ export const expressMonitorConfig = {
 
 
 
-export { getExchangeABI, getERC20ABI, validateSignature, parseEther, getInterface, getProvider, MulticallAbi, getDecimals, validateMarginSignature };
+export { getExchangeABI, getERC20ABI, validateSignature, parseEther, getInterface, getProvider, MulticallAbi, getDecimals };
