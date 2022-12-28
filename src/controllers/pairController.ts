@@ -1,11 +1,9 @@
 import { ifOrderCreated, ifPairCreated } from "../helper/interface";
 
 import { PairCreated, Token, OrderCreated, OrderExecuted } from "../db";
-import Big from "big.js";
-import { parseEther } from "../utils";
 import { Decimals } from "../helper/constant";
-import { errorMessage } from "../helper/errorMessage";
-
+import { errorMessage } from "../helper/errorMessage"
+import { sentry } from "../../app";
 
 
 
@@ -101,6 +99,7 @@ async function fetchOrders(req: any, res: any) {
         return res.status(200).send({ status: true, data: data });
     }
     catch (error: any) {
+        sentry.captureException(error)
         console.log("Error @ fetchOrders", error);
         return res.status(500).send({ status: false, error: error.message });
     }
@@ -153,6 +152,7 @@ async function getAllPairDetails(req: any, res: any) {
     }
     catch (error: any) {
         console.log("Error @ getAllPairDetails", error);
+        sentry.captureException(error)
         res.status(500).send({ status: false, error: error.message });
     }
 }
@@ -180,8 +180,9 @@ async function getPairOrderExecutedHistory(req: any, res: any) {
 
     }
     catch (error: any) {
+        sentry.captureException(error)
         console.log("Error @ getPairOrderExecutedHistory", error);
-        return res.status(500).send({ status: false, error: error.message });
+        return res.status(500).send({ status: false, error: error.message }); 
     }
 }
 
@@ -286,8 +287,10 @@ async function getPairTradingStatus(req: any, res: any) {
 
     }
     catch (error: any) {
+        sentry.captureException(error)
         console.log("Error @ getPairTradingStatus", error);
         return res.status(500).send({ status: false, error: error.message });
+       
     }
 }
 

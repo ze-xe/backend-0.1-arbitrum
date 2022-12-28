@@ -9,7 +9,7 @@ import mongoose from "mongoose";
 import { startOrderStatus } from "./sync/syncBalance";
 import { ifOrderCreated } from "./helper/interface";
 import { socketService } from "./socketIo/socket.io";
-import { httpServer } from "../app";
+import { httpServer, sentry } from "../app";
 require("dotenv").config();
 
 
@@ -73,6 +73,7 @@ async function start(chainId: string) {
         startOrderStatus(chainId)
     }
     catch (error) {
+        sentry.captureException(error)
         console.log("Error @ start", error);
     }
 }

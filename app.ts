@@ -9,22 +9,39 @@ import chartRoute from "./src/routes/chartRoute"
 import DBRoute from "./src/routes/DBRoute"
 import helmet from "helmet";
 import { start } from "./src/appUtil";
-import { socketService } from "./src/socketIo/socket.io";
 import { createServer } from "http";
 export const httpServer = createServer(app);
 import morgan from 'morgan';
 import { expressMonitorConfig } from "./src/utils";
+import * as Sentry from "@sentry/node";
+import * as Tracing from "@sentry/tracing";
 
+export const sentry = Sentry
+
+Sentry.init({
+    dsn: "https://7d303c69af974f47aeb870a4537472ee@o4504400337698816.ingest.sentry.io/4504405098823680",
+    integrations: [
+        // enable HTTP calls tracing
+        new Sentry.Integrations.Http({ tracing: true }),
+        // enable Express.js middleware tracing
+        new Tracing.Integrations.Express({ app }),
+    ],
+
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 1.0,
+});
+
+
+app.use(Sentry.Handlers.requestHandler());
+
+app.use(Sentry.Handlers.tracingHandler());
 
 app.use(require('express-status-monitor')(
-expressMonitorConfig
+    expressMonitorConfig
 ));
-
-
-app.use(morgan('dev'))
-
-
-
+app.use(morgan('dev'));
 
 require("dotenv").config();
 
@@ -44,6 +61,17 @@ app.use(DBRoute)
 app.use(orderRoute);
 
 
+app.get("/debug-sentry", function mainHandler(req, res) {
+    throw new Error("My first Sentry error!");
+});
+
+// // All controllers should live here
+// app.get("/", function rootHandler(req, res) {
+//     res.end("Hello world!");
+// });
+
+
+
 
 async function run(chainId: string) {
     try {
@@ -55,6 +83,16 @@ async function run(chainId: string) {
 }
 run("421613");
 
+
+
+// The error handler must be before any other error middleware and after all controllers
+app.use(Sentry.Handlers.errorHandler());
+
+// Optional fallthrough error handler
+app.use(function onError(err: any, req: any, res: any, next: any) {
+    res.statusCode = 500;
+    res.end(res.sentry + "\n");
+});
 
 httpServer.listen(process.env.PORT || 3010, function () {
     console.log("app running on port " + (process.env.PORT || 3010));

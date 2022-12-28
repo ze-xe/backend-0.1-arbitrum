@@ -1,5 +1,6 @@
 
 
+import { sentry } from "../../app";
 import { OrderCreated, OrderExecuted, UserPosition } from "../db";
 import { errorMessage } from "../helper/errorMessage";
 import { ifUserPosition } from "../helper/interface";
@@ -82,6 +83,7 @@ async function getUserOrderHistory(req: any, res: any) {
         return res.status(200).send({ status: true, data: getOrderHistory });
     }
     catch (error: any) {
+        sentry.captureException(error)
         console.log("Error @ getUserOrderHistory", error);
         return res.status(500).send({ status: false, error: error.message });
     }
@@ -112,6 +114,7 @@ async function getOrderCancelled(req: any, res: any) {
         return res.status(200).send({ status: true, data: getOrderCancelledDoc });
     }
     catch (error: any) {
+        sentry.captureException(error)
         console.log("Error @ getMatchedMarketOrders", error);
         return res.status(500).send({ status: false, error: error.message });
     }
@@ -146,6 +149,7 @@ async function getUserInOrderBalance(req: any, res: any) {
 
     }
     catch (error: any) {
+        sentry.captureException(error)
         console.log("Error @ getMatchedMarketOrders", error);
         return res.status(500).send({ status: false, error: error.message });
     }

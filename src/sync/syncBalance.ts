@@ -4,6 +4,7 @@ import Big from "big.js";
 import { getERC20ABI, getProvider, getInterface, MulticallAbi } from "../utils";
 import { ifOrderCreated, ifUserPosition,  orderSignature } from "../helper/interface";
 import { getExchangeAddress, MulticallAddress } from "../helper/chain";
+import { sentry } from "../../app";
 
 /**
  * @dev this function is use to get onchain data for create order api, i.e balance and allowance
@@ -39,6 +40,7 @@ async function multicall(token: string, maker: string, chainId: string): Promise
 
     }
     catch (error) {
+        sentry.captureException(error)
         console.log(`Error @ Multicall`, error)
         return null
     }
@@ -130,7 +132,8 @@ async function getMultiBalance(token: string, addresses: string[], ids: string[]
 
             return res;
         } catch (error) {
-            console.log("Error @ Multicall", error);
+            sentry.captureException(error);
+            console.log("Error @ getMultiBalance", error);
             return null
 
         }
@@ -240,6 +243,7 @@ async function orderStatus(chainId: string) {
 
     }
     catch (error) {
+        sentry.captureException(error)
         console.log("Error @ orderStatus", error);
     }
 }

@@ -1,4 +1,5 @@
 import Big from "big.js";
+import { sentry } from "../../app";
 import { OrderExecuted, PairCreated } from "../db";
 import { errorMessage } from "../helper/errorMessage";
 import { Interval } from "../helper/interface";
@@ -554,6 +555,7 @@ export async function getBar(req: any, res: any) {
     }
 
     catch (error: any) {
+        sentry.captureException(error)
         console.log("Error @ getBar", error);
         return res.status(500).send({ status: false, error: error.message });
     }
@@ -581,6 +583,7 @@ export async function getSymbol(req: any, res: any) {
         return res.status(200).send({ status: true, data: data })
     }
     catch (error: any) {
+        sentry.captureException(error)
         console.log("Error @ getSymbol", error);
         return res.status(500).send({ status: false, error: error.message });
     }

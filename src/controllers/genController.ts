@@ -1,3 +1,4 @@
+import { sentry } from "../../app";
 import { Token } from "../db";
 import { errorMessage } from "../helper/errorMessage";
 
@@ -16,6 +17,7 @@ async function getAllTokens(req: any, res: any) {
 
     }
     catch (error: any) {
+        sentry.captureException(error)
         console.log("Error @ getAllTokens", error);
         return res.status(500).send({ status: false, error: error.message });
     }

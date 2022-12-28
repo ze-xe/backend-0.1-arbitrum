@@ -1,5 +1,6 @@
 import Big from "big.js";
 import { ethers } from "ethers";
+import { sentry } from "../../app";
 import { OrderCreated, OrderCreatedBackup, PairCreated, UserPosition } from "../db";
 import { handleToken } from "../handlers/token";
 import { errorMessage } from "../helper/errorMessage";
@@ -8,9 +9,6 @@ import { createOrderSchema } from "../helper/validateRequest";
 import { mainIPFS } from "../IPFS/putFiles";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 import { multicall } from "../sync/syncBalance";
-import { getDecimals } from "../utils";
-
-
 
 
 export async function _handleMarginOrderCreated(signature: string, data: any, chainId: string, ipfs: boolean, id: string, exchangeRateDecimals: any) {
@@ -328,7 +326,7 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
 
     }
     catch (error: any) {
-
+        sentry.captureException(error)
         console.log("Error @ handleOrderCreated", error);
         return { status: false, error: error.message, statusCode: 500 };
     }

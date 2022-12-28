@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { sentry } from "../../app";
 import { backupConnection, connect, OrderCreated, OrderCreatedBackup } from "../db";
 
 
@@ -25,6 +26,7 @@ export async function DBStatus(req: any, res: any) {
 
     }
     catch (error: any) {
+        sentry.captureException(error)
         console.log("Error @ DBStatus", error);
         return res.status(500).send({ status: false, error: error.message });
     }
@@ -49,6 +51,7 @@ export async function fetchDBRecords(req: any, res: any) {
 
     }
     catch (error: any) {
+        sentry.captureException(error)
         console.log("Error @ fetchDBRecords", error);
         return res.status(500).send({ status: false, error: error.message });
     }

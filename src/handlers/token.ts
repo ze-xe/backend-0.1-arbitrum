@@ -1,6 +1,7 @@
 import { Token } from "../db";
 import { getERC20ABI, getProvider } from "../utils";
 import { ethers } from "ethers";
+import { sentry } from "../../app";
 
 
 
@@ -38,7 +39,8 @@ async function handleToken(token: string, chainId: string) {
         return  { symbol: symbol, marginEnabled: false }
     }
     catch (error) {
-        console.log("Error @ handleToken1", error);
+        sentry.captureException(error)
+        console.log("Error @ handleToken", error);
     }
 }
 

@@ -10,6 +10,7 @@ import { errorMessage } from "../helper/errorMessage";
 import { ifOrderCreated, ifPairCreated, ifUserPosition,  orderSignature } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 import { _handleMarginOrderCreated } from "./marginOrderController";
+import { sentry } from "../../app";
 
 
 /**
@@ -340,6 +341,7 @@ async function handleOrderCreated(req: any, res: any) {
     catch (error: any) {
 
         if (error.isJoi == true) error.status = 422;
+        sentry.captureException(error)
         console.log("Error @ handleOrderCreated", error);
         return res.status(error.status).send({ status: false, error: error.message });
     }
@@ -361,150 +363,7 @@ async function handleOrderCreated(req: any, res: any) {
  * @param {*} res 
  * @returns 
  */
-// async function getLimitMatchedOrders(req: any, res: any) {
 
-//     try {
-
-//         let pairId: string = req.params.pairId;
-
-//         let exchangeRate: string = req.query.exchangeRate;
-
-//         let buy: string = req.query.buy;
-
-//         let amount: number = Number(req.query.amount);
-
-//         let chainId: string = req.query.chainId;
-
-
-//         if (!pairId) {
-//             return res.status(400).send({ status: false, error: errorMessage.pairId });
-//         }
-
-//         if (!exchangeRate || isNaN(Number(exchangeRate))) {
-//             return res.status(400).send({ status: false, error: errorMessage.exchangerate });
-//         }
-
-//         if (!buy || (buy != "true" && buy != "false")) {
-//             return res.status(400).send({ status: false, error: errorMessage.buy });
-//         }
-
-//         if (!amount || isNaN(amount) == true) {
-//             return res.status(400).send({ status: false, error: errorMessage.amount });
-//         }
-
-//         const isPairIdExist: ifPairCreated | null = await PairCreated.findOne({ id: pairId, chainId: chainId }).lean();
-
-//         if (!isPairIdExist) {
-//             return res.status(404).send({ status: false, error: errorMessage.pairId });
-//         }
-
-//         let getMatchedDoc: ifOrderCreated[] = [];
-
-//         if (buy == "true") {
-//             getMatchedDoc = await OrderCreated.aggregate(
-//                 [
-//                     {
-//                         $match: {
-//                             $and: [
-//                                 { pair: pairId },
-//                                 { "$expr": { "$lte": [{ "$toDouble": "$exchangeRate" }, Number(exchangeRate)] } },
-//                                 { buy: false },
-//                                 { chainId: chainId },
-//                                 { deleted: false },
-//                                 { active: true },
-//                                 { cancelled: false }
-//                             ]
-//                         }
-//                     },
-//                     {
-//                         $sort: { exchangeRate: 1, balanceAmount: 1 }
-//                     }
-//                 ],
-//                 {
-//                     collation: {
-//                         locale: "en_US",
-//                         numericOrdering: true
-//                     }
-//                 }
-//             );
-//         }
-//         else if (buy == "false") {
-//             getMatchedDoc = await OrderCreated.aggregate(
-//                 [
-//                     {
-//                         $match: {
-//                             $and: [
-//                                 { pair: pairId },
-//                                 { "$expr": { "$gte": [{ "$toDouble": "$exchangeRate" }, Number(exchangeRate)] } },
-//                                 { buy: true },
-//                                 { chainId: chainId },
-//                                 { deleted: false },
-//                                 { active: true },
-//                                 { cancelled: false }
-//                             ]
-//                         }
-//                     },
-//                     {
-//                         $sort: { exchangeRate: -1, balanceAmount: 1 }
-//                     }
-//                 ],
-//                 {
-//                     collation: {
-//                         locale: "en_US",
-//                         numericOrdering: true
-//                     }
-//                 }
-//             );
-//         }
-
-//         let data: ifOrderCreated[] = [];
-//         let currAmount = 0;
-//         let counter = 0;
-//         let addresses = [];
-//         let amounts = [];
-//         let ids = [];
-
-//         if (getMatchedDoc.length == 0) {
-//             return res.status(200).send({ status: true, data: [] });
-//         }
-
-//         for (let i = 0; i < getMatchedDoc.length; i++) {
-
-//             if (currAmount >= amount) {
-//                 counter++;
-//                 if (counter > 10) {
-//                     break;
-//                 }
-//             }
-
-//             currAmount += Number(getMatchedDoc[i].balanceAmount);
-//             addresses.push(getMatchedDoc[i].maker);
-//             amounts.push(Number(getMatchedDoc[i].balanceAmount));
-//             data.push(getMatchedDoc[i]);
-//             ids.push(getMatchedDoc[i]._id);
-
-//         }
-
-//         let token;
-//         if (buy == "true") {
-//             token = data[0].token0;
-//         } else {
-//             token = data[0].token1;
-//         }
-
-//         let response = await getMultiBalance(token, addresses, ids, data, chainId, amounts);
-
-//         if (!response) {
-//             return res.status(200).send({ status: true, data: [] });
-//         }
-
-//         return res.status(200).send({ status: true, data: response });
-//     }
-//     catch (error: any) {
-//         console.log("Error @ getMatchedOrders", error);
-//         return res.status(500).send({ status: false, error: error.message });
-//     }
-// }
 async function getLimitMatchedOrders(req: any, res: any) {
 
     try {
@@ -646,6 +505,7 @@ async function getLimitMatchedOrders(req: any, res: any) {
     }
     catch (error: any) {
         console.log("Error @ getMatchedOrders", error);
+        sentry.captureException(error)
         return res.status(500).send({ status: false, error: error.message });
     }
 }
@@ -732,6 +592,7 @@ async function getMatchedMarketOrders(req: any, res: any) {
     }
     catch (error: any) {
         console.log("Error @ getMatchedMarketOrders", error);
+        sentry.captureException(error)
         return res.status(500).send({ status: false, error: error.message });
     }
 }

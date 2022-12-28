@@ -3,6 +3,7 @@ import { Sync } from "../db";
 import { ethers } from "ethers";
 import { getInterface, getProvider } from "../utils";
 import { ifEventListner, ifSync } from "../helper/interface";
+import { sentry } from "../../app";
 require("dotenv").config();
 
 
@@ -72,11 +73,10 @@ async function eventListner({ contractAddress, abi, handlers, chainId }: ifEvent
     }
     catch (error) {
 
-
         console.log("to sync");
         console.log("Error at eventListner", error);
+        sentry.captureException(error)
         return historicEventListner({ contractAddress, abi, handlers, chainId });
-
     }
 
 }
@@ -91,6 +91,8 @@ async function eventListner({ contractAddress, abi, handlers, chainId }: ifEvent
  * @param {*}  handlers (object) this will call respective handler function as per the event name
  * @param {*} chainId (string) numeric chainId
  */
+
+let errorCount = 0;
 async function historicEventListner({ contractAddress, abi, handlers, chainId }: ifEventListner) {
 
 
@@ -153,15 +155,22 @@ async function historicEventListner({ contractAddress, abi, handlers, chainId }:
             return eventListner({ contractAddress, abi, handlers, chainId });
         }
         catch (error) {
-
-            await Sync.findOneAndUpdate(
-                {},
-                { blockNumberExchange: fromBlock },
-                { upsert: true }
-            );
-
-            console.log("Error @ historicEventListner", error);
-            return eventSync();
+            if (errorCount < 5) {
+                await Sync.findOneAndUpdate(
+                    {},
+                    { blockNumberExchange: fromBlock },
+                    { upsert: true }
+                );
+                sentry.captureException(error)
+                console.log("Error @ historicEventListner", error);
+                errorCount++
+                return eventSync();
+                
+            }
+            else{
+                errorCount = 0;
+                sentry.captureException(error)
+            }
         }
     }
 

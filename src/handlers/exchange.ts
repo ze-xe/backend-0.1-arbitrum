@@ -5,6 +5,7 @@ import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 import { number } from "joi";
 import { getDecimals, getERC20ABI, getProvider } from "../utils";
 import { ethers } from "ethers";
+import { sentry } from "../../app";
 
 
 
@@ -150,6 +151,7 @@ async function handleOrderExecuted(data: any, argument: any) {
 
     }
     catch (error) {
+        sentry.captureException(error)
         console.log("Error @ handleOrderExecuted", error);
     }
 
@@ -158,55 +160,62 @@ async function handleOrderExecuted(data: any, argument: any) {
 
 async function handleOrderCancelled(data: any) {
 
-    let id = data[0].toLowerCase();
+    try{
+        let id = data[0].toLowerCase();
 
-    let orderDetails: ifOrderCreated | null = await OrderCreated.findOne({ id: id }).lean();
-
-    if (!orderDetails) {
-        return console.log(`Order cancelled OrderId not found ${data[0]}`);
-    }
-
-    if (orderDetails.cancelled == true) {
-        return console.log("Order is already cancelled");
-    }
-    // cancel order 
-
-    socketService.emit(EVENT_NAME.PAIR_ORDER, {
-        amount: `-${orderDetails.balanceAmount}`,
-        exchangeRate: orderDetails.exchangeRate,
-        orderType: orderDetails.orderType,
-        pair: orderDetails.pair
-    });
-    // update user inOrder
-    if (orderDetails.orderType == 1 || orderDetails.orderType == 3) {
-        let getUser: ifUserPosition | null = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token0, chainId: orderDetails.chainId }).lean();
-        if (getUser) {
-            let currentInOrderBalance = Big(getUser.inOrderBalance).minus(orderDetails.balanceAmount).toString();
-
-            await UserPosition.findOneAndUpdate(
-                { id: orderDetails.maker, token: orderDetails.token0, chainId: orderDetails.chainId },
-                { $set: { inOrderBalance: currentInOrderBalance } }
-            );
-
+        let orderDetails: ifOrderCreated | null = await OrderCreated.findOne({ id: id }).lean();
+    
+        if (!orderDetails) {
+            return console.log(`Order cancelled OrderId not found ${data[0]}`);
         }
-
-    }
-    else if (orderDetails.orderType == 0 || orderDetails.orderType == 2) {
-        let getUser: ifUserPosition | null = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token1, chainId: orderDetails.chainId }).lean()
-        if (getUser) {
-            let token1Amount = Big(getUser.inOrderBalance).minus(Big(orderDetails.balanceAmount).times(orderDetails.exchangeRate).div(Big(10).pow(18))).toString();
-
-            await UserPosition.findOneAndUpdate(
-                { id: orderDetails.maker, token: orderDetails.token1, chainId: orderDetails.chainId },
-                { $set: { inOrderBalance: token1Amount } }
-            );
+    
+        if (orderDetails.cancelled == true) {
+            return console.log("Order is already cancelled");
         }
-
+        // cancel order 
+    
+        socketService.emit(EVENT_NAME.PAIR_ORDER, {
+            amount: `-${orderDetails.balanceAmount}`,
+            exchangeRate: orderDetails.exchangeRate,
+            orderType: orderDetails.orderType,
+            pair: orderDetails.pair
+        });
+        // update user inOrder
+        if (orderDetails.orderType == 1 || orderDetails.orderType == 3) {
+            let getUser: ifUserPosition | null = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token0, chainId: orderDetails.chainId }).lean();
+            if (getUser) {
+                let currentInOrderBalance = Big(getUser.inOrderBalance).minus(orderDetails.balanceAmount).toString();
+    
+                await UserPosition.findOneAndUpdate(
+                    { id: orderDetails.maker, token: orderDetails.token0, chainId: orderDetails.chainId },
+                    { $set: { inOrderBalance: currentInOrderBalance } }
+                );
+    
+            }
+    
+        }
+        else if (orderDetails.orderType == 0 || orderDetails.orderType == 2) {
+            let getUser: ifUserPosition | null = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token1, chainId: orderDetails.chainId }).lean()
+            if (getUser) {
+                let token1Amount = Big(getUser.inOrderBalance).minus(Big(orderDetails.balanceAmount).times(orderDetails.exchangeRate).div(Big(10).pow(18))).toString();
+    
+                await UserPosition.findOneAndUpdate(
+                    { id: orderDetails.maker, token: orderDetails.token1, chainId: orderDetails.chainId },
+                    { $set: { inOrderBalance: token1Amount } }
+                );
+            }
+    
+        }
+    
+        await OrderCreated.findOneAndUpdate({ _id: orderDetails._id }, { $set: { cancelled: true, active: false } });
+    
+        console.log(`order Cancelled, orderId : ${data[0]}`);
     }
-
-    await OrderCreated.findOneAndUpdate({ _id: orderDetails._id }, { $set: { cancelled: true, active: false } });
-
-    console.log(`order Cancelled, orderId : ${data[0]}`);
+    catch (error) {
+        sentry.captureException(error)
+        console.log("Error @ handleOrderCancelled", error);
+    }
+    
 
 }
 
@@ -307,7 +316,8 @@ export async function handleMarginEnabled(data: string[]) {
 
     }
     catch (error) {
-        console.log("Error @ handleOrderExecuted", error);
+        sentry.captureException(error)
+        console.log("Error @ handleMarginEnabled", error);
     }
 
 }

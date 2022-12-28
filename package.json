@@ -16,6 +16,8 @@
     "test1": "mocha -r ts-node/register --timeout 60000 ./src/test/margin_test.ts"
   },
   "dependencies": {
+    "@sentry/node": "^7.28.1",
+    "@sentry/tracing": "^7.28.1",
     "@types/express": "^4.17.14",
     "@types/morgan": "^1.9.3",
     "axios": "^1.1.3",
