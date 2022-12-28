@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { sentry } from "../../app";
-import { backupConnection, connect, OrderCreated, OrderCreatedBackup } from "../db";
+import { OrderCreated } from "../db";
 
 
 
@@ -15,12 +15,12 @@ export async function DBStatus(req: any, res: any) {
             }
         };
 
-        let result =  serverStatus()
+        let result = serverStatus()
 
         if (result.dbState == "connected" || result.dbState == "connecting") {
             return res.status(200).send({ status: true, data: result });
         }
-        else{
+        else {
             return res.status(500).send({ status: false, data: result });
         }
 
@@ -37,15 +37,15 @@ export async function DBStatus(req: any, res: any) {
 export async function fetchDBRecords(req: any, res: any) {
 
     try {
-        
+
         const orders = await OrderCreated.findOne()
-        
-       
+
+
 
         if (!orders) {
             return res.status(500).send({ status: false, data: null });
         }
-        else{
+        else {
             return res.status(200).send({ status: true, data: orders });
         }
 

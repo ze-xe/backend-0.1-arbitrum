@@ -1,6 +1,4 @@
 
-import { ethers } from "ethers";
-import Big from "big.js";
 import { OrderCreated, OrderCreatedBackup } from "./db";
 import axios, { AxiosResponse } from "axios";
 import { ExchangeConfig } from "./sync/configs/exchange";

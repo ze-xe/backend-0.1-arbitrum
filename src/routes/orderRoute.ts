@@ -1,6 +1,5 @@
 import express from "express";
 import { getAllTokens } from "../controllers/genController";
-// import { handleMarginOrderCreated } from "../controllers/marginOrderController";
 import { handleOrderCreated, getLimitMatchedOrders, getMatchedMarketOrders } from "../controllers/orderController";
 
 const router = express.Router();

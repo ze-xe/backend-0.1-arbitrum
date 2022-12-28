@@ -1,4 +1,4 @@
-// import { server } from "../../offchain_routes";
+
 import {Server} from "socket.io"
 
 class SocketService{
@@ -27,10 +27,7 @@ class SocketService{
     }
 }
 
-// export namespace EVENT_NAME {
-//     'PAIR_ORDER';
-//     'PAIR_HISTORY';
-// }
+
 
 export const  EVENT_NAME  = {
     PAIR_ORDER: "PAIR_ORDER",

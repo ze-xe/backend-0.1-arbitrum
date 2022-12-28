@@ -2,7 +2,6 @@ import { PairCreated, OrderCreated, OrderExecuted, UserPosition, Token } from ".
 import Big from "big.js";
 import { ifOrderCreated, ifPairCreated, ifUserPosition } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
-import { number } from "joi";
 import { getDecimals, getERC20ABI, getProvider } from "../utils";
 import { ethers } from "ethers";
 import { sentry } from "../../app";

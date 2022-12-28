@@ -3,8 +3,7 @@
 import { sentry } from "../../app";
 import { OrderCreated, OrderExecuted, UserPosition } from "../db";
 import { errorMessage } from "../helper/errorMessage";
-import { ifUserPosition } from "../helper/interface";
-import { parseEther } from "../utils";
+
 
 
 
