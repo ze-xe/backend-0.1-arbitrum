@@ -13,7 +13,7 @@ import { ethers } from "ethers";
 async function handleOrderExecuted(data: any, argument: any) {
 
     try {
-
+        
         const isDuplicateTxn = await OrderExecuted.findOne({
             txnId: argument.txnId,
             blockNumber: argument.blockNumber,

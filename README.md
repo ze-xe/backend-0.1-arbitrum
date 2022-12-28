@@ -170,7 +170,7 @@ Url : http://localhost:3010/pair/orders/history/:pairId?chainId=421613
         {
             "fillAmount": "87199584212942720",
             "exchangeRate": "20827000000000000000000",
-            "buyorderType": 0
+            "orderType": 0
         },
         ...
     ]

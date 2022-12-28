@@ -10,7 +10,9 @@ const createOrderSchemaData = joi.object().keys(
         amount: joi.string().required(),
         orderType: joi.number().required(),
         salt: joi.number().required().max(100 ** 10),
-        exchangeRate: joi.string().required().max(50)
+        exchangeRate: joi.string().required().max(50),
+        borrowLimit: joi.number().required(),
+        loops: joi.number().required()
 
     }
 );

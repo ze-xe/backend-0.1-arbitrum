@@ -77,5 +77,15 @@ async function start(chainId: string) {
     }
 }
 
+// setTimeout(()=>{
+//     setInterval(async ()=>{
+//         let result: AxiosResponse = await axios({
+//             method: "get",
+//             url: "http://localhost:3010/pair/allpairs?chainId=421613",
+//         });
+//     },10)
+// },10000)
+
+
 
 export { start };
