@@ -10,10 +10,14 @@
     "start": "ts-node build",
     "build": "tsc -p .",
     "dev": "ts-node app.ts",
+    "devTest": "set NODE_ENV=test && ts-node app.ts",
     "prod": "./node_modules/.bin/pm2 start app.ts --watch",
     "prod2": "pm2 start ecosystem.config.js",
     "test": "mocha -r ts-node/register --timeout 60000 ./src/test/mocha_test.ts",
-    "test1": "mocha -r ts-node/register --timeout 60000 ./src/test/margin_test.ts"
+    "test1": "mocha -r ts-node/register --timeout 60000 ./src/test/margin_test.ts",
+    "test2": "mocha -r ts-node/register --timeout 60000 ./src/test/api/pairTest.ts",
+    "test3": "set NODE_ENV=test && mocha -r ts-node/register --timeout 180000 ./src/test/api/orderScriptTest.ts",
+    "test4": "set NODE_ENV=test && mocha -r ts-node/register --timeout 180000 ./src/test/api/marginOrderLong.ts"
   },
   "dependencies": {
     "@sentry/node": "^7.28.1",
@@ -23,6 +27,7 @@
     "axios": "^1.1.3",
     "big.js": "^6.2.1",
     "cors": "^2.8.5",
+    "custom-env": "^2.0.1",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
     "express": "^4.18.2",
@@ -32,6 +37,7 @@
     "minimist": "^1.2.7",
     "mongoose": "^6.7.0",
     "morgan": "^1.10.0",
+    "path": "^0.12.7",
     "pm2": "^5.2.2",
     "socket.io": "^4.5.4",
     "typescript": "^4.9.4",

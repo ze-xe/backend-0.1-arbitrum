@@ -55,31 +55,31 @@ describe("zexe order creation", async () => {
     let amount = ethers.utils.parseEther(`${Math.random() * 5}`).toString();
     let orderType = 1;
 
-      /* 
-    it('mint 10 btc to user1, 2000000 usdt to user2', async () => {
-        // let user1BtcBalancePre = await btc.balanceOf(user1.address);
-        // let user2UsdcBalancePre = await usdc.balanceOf(user2.address);
+    /* 
+  it('mint 10 btc to user1, 2000000 usdt to user2', async () => {
+      // let user1BtcBalancePre = await btc.balanceOf(user1.address);
+      // let user2UsdcBalancePre = await usdc.balanceOf(user2.address);
 
-        const btcAmount = ethers.utils.parseEther('100000');
-        let tx1 = await btc.connect(user1).mint(user1.address, btcAmount);
-        // approve for exchange
-        let approve = await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
-        let approve2 = await btc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256);
+      const btcAmount = ethers.utils.parseEther('100000');
+      let tx1 = await btc.connect(user1).mint(user1.address, btcAmount);
+      // approve for exchange
+      let approve = await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
+      let approve2 = await btc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256);
 
-        const usdcAmount = ethers.utils.parseEther('2000000');
-        // let tx2 = await usdc.connect(user2).mint(user2.address, usdcAmount);
-        // approve for exchange
-        let approve1 = await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256);
-        let approve3 = await usdc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
+      const usdcAmount = ethers.utils.parseEther('2000000');
+      // let tx2 = await usdc.connect(user2).mint(user2.address, usdcAmount);
+      // approve for exchange
+      let approve1 = await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256);
+      let approve3 = await usdc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
 
-        // let user1BtcBalancePost = await btc.balanceOf(user1.address);
-        // let user2UsdcBalancePost = await usdc.balanceOf(user2.address);
+      // let user1BtcBalancePost = await btc.balanceOf(user1.address);
+      // let user2UsdcBalancePost = await usdc.balanceOf(user2.address);
 
-        // expect(user1BtcBalancePost.toString()).to.equal(ethers.utils.parseEther(`${Big(btcAmount).plus(user1BtcBalancePre).div(Big(10).pow(18))}`).toString());
-        // expect(user2UsdcBalancePost.toString()).to.equal(ethers.utils.parseEther(`${Big(usdcAmount).plus(user2UsdcBalancePre).div(Big(10).pow(18))}`).toString());
+      // expect(user1BtcBalancePost.toString()).to.equal(ethers.utils.parseEther(`${Big(btcAmount).plus(user1BtcBalancePre).div(Big(10).pow(18))}`).toString());
+      // expect(user2UsdcBalancePost.toString()).to.equal(ethers.utils.parseEther(`${Big(usdcAmount).plus(user2UsdcBalancePre).div(Big(10).pow(18))}`).toString());
 
-    });
-    */
+  });
+  */
 
     it(`user1 creates limit order to sell ${+amount / 10 ** 18} btc @ ${+exchangeRate / 10 ** 18}`, async () => {
         const domain = {
@@ -156,7 +156,7 @@ describe("zexe order creation", async () => {
 
     });
 
-    
+
     it(`user2 buy user1s btc order @ ${+exchangeRate / 10 ** 18}`, async () => {
         // let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
         // let user2BtcBalancePre = (await btc.balanceOf(user2.address)).toString();
@@ -181,7 +181,7 @@ describe("zexe order creation", async () => {
         let user2UsdcBalancePost;
         let user2BtcBalancePost;
         // console.log(await exTxn.wait(1))
-        exTxn.wait(1).then(async (resp: any) => {
+        await exTxn.wait(1).then(async (resp: any) => {
             // user1BtcBalancePost = (await btc.balanceOf(user1.address)).toString();
             // user1UsdcBalancePost = (await usdc.balanceOf(user1.address)).toString();
             // user2UsdcBalancePost = (await usdc.balanceOf(user2.address)).toString();
@@ -200,7 +200,7 @@ describe("zexe order creation", async () => {
         });
 
     });
-    
+
 
 
 

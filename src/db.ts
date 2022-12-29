@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 
-require("dotenv").config();
+import path from 'path';
+
+require("dotenv").config({path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test')? ".env.test" : ".env")});
 
 
 
@@ -39,6 +41,7 @@ async function connect() {
             console.log(err)
         }
         );
+    backupConnection
 }
 
 
@@ -46,4 +49,4 @@ async function connect() {
 
 
 
-export { Sync, connect, PairCreated, OrderCreated, OrderExecuted, Token, UserPosition,  OrderCreatedBackup };
+export { Sync, connect, PairCreated, OrderCreated, OrderExecuted, Token, UserPosition, OrderCreatedBackup };

@@ -15,6 +15,7 @@ import morgan from 'morgan';
 import { expressMonitorConfig } from "./src/utils";
 import * as Sentry from "@sentry/node";
 import * as Tracing from "@sentry/tracing";
+import path from "path";
 
 export const sentry = Sentry
 
@@ -31,6 +32,7 @@ Sentry.init({
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
     tracesSampleRate: 1.0,
+    enabled: process.env.NODE_ENV == "production"
 });
 
 
@@ -41,12 +43,13 @@ app.use(Sentry.Handlers.tracingHandler());
 app.use(require('express-status-monitor')(
     expressMonitorConfig
 ));
-app.use(morgan('dev'));
 
-require("dotenv").config();
+require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 
+if (!process.env.NODE_ENV?.includes('test')) {
+    app.use(morgan('dev'));
+}
 
-backupConnection;
 connect();
 app.use(cors({
     origin: '*'

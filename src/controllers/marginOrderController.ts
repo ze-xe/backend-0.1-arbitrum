@@ -30,10 +30,10 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
             // for new order , will sell token1
             const findUserPosition1: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token1, chainId: chainId }).lean();
 
-            const token1Amount = 
-            Big(balanceAmount)
-            .times(data.exchangeRate)
-            .div(Big(10).pow(18));
+            const token1Amount =
+                Big(balanceAmount)
+                    .times(data.exchangeRate)
+                    .div(Big(10).pow(18));
 
             if (findUserPosition1) {
                 const _id = findUserPosition1._id.toString();
@@ -248,16 +248,18 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
         else {
             pair = createPair.id.toString();
         }
-        let cid;
+        let cid = "";
 
         if (!ipfs) {
-            cid = await mainIPFS([
-                data,
-                signature,
-                chainId
-            ],
-                id
-            );
+            if (!process.env.NODE_ENV?.includes('test')) {
+                cid = await mainIPFS([
+                    data,
+                    signature,
+                    chainId
+                ],
+                    id
+                );
+            }
 
             OrderCreatedBackup.create(
                 {
@@ -284,7 +286,7 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
         }
 
 
-        OrderCreated.create(
+        await OrderCreated.create(
 
             {
                 id: id,
@@ -321,7 +323,7 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
 
         console.log("MarginOrder Created ", "maker ", data.maker, "amount ", data.amount.toString(), id);
 
-        return { status: true, message: "Margin Order created successfully", statusCode: 201 };
+        return { status: true, message: "Order created successfully", statusCode: 201 };
 
     }
     catch (error: any) {

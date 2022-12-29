@@ -1,3 +1,4 @@
+import path from "path";
 
 
 
@@ -8,9 +9,9 @@ const Decimals = {
     token: 18,
     amount: 18
 };
+require("dotenv").config({path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test')? ".env.test" : ".env")});
 
-
-const ExchangeAddress = "0x9509abD256C8c05756a2f88142b89B6247b47C6f";
+const ExchangeAddress = process.env.EXCHANGE_ADD! as string; 
 const BtcAddress = "0x22f1311b6caE87A896a0B6915DAc39709e90E8b9";// orignal
 // const BtcAddress = "0x728824E0534265f21917316733BE8936602154e7"; // ethereum
 const UsdcAddress = "0x4ebEcD763ba4508565241043bB6E4592De3CCf14";

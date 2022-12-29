@@ -32,6 +32,7 @@ class SocketService{
 export const  EVENT_NAME  = {
     PAIR_ORDER: "PAIR_ORDER",
     PAIR_HISTORY: "PAIR_HISTORY",
+    CANCEL_ORDER: "CANCEL_ORDER"
 }
 
 export const socketService = new SocketService();

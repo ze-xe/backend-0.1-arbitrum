@@ -7,7 +7,7 @@ import { createOrderSchema } from "../helper/validateRequest";
 import { getMultiBalance, multicall } from "../sync/syncBalance";
 import { mainIPFS } from "../IPFS/putFiles";
 import { errorMessage } from "../helper/errorMessage";
-import { ifOrderCreated, ifPairCreated, ifUserPosition,  orderSignature } from "../helper/interface";
+import { ifOrderCreated, ifPairCreated, ifUserPosition, orderSignature } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 import { _handleMarginOrderCreated } from "./marginOrderController";
 import { sentry } from "../../app";
@@ -240,7 +240,7 @@ async function handleOrderCreated(req: any, res: any) {
                 let token0 = await handleToken(data.token0, chainId);
                 let token1 = await handleToken(data.token1, chainId);
                 let marginEnabled = false;
-                if(token0?.marginEnabled == true && token1?.marginEnabled == true){
+                if (token0?.marginEnabled == true && token1?.marginEnabled == true) {
                     marginEnabled = true
                 }
                 let temp = {
@@ -269,15 +269,18 @@ async function handleOrderCreated(req: any, res: any) {
         else {
             pair = createPair.id.toString();
         }
-        let cid;
+        let cid = "";
         if (!ipfs) {
-            cid = await mainIPFS([
-                data,
-                signature,
-                chainId
-            ],
-                id
-            );
+
+            if (!process.env.NODE_ENV?.includes('test')) {
+                cid = await mainIPFS([
+                    data,
+                    signature,
+                    chainId
+                ],
+                    id
+                );
+            }
 
             OrderCreatedBackup.create(
                 {
@@ -301,7 +304,7 @@ async function handleOrderCreated(req: any, res: any) {
             );
         }
 
-        OrderCreated.create(
+        await OrderCreated.create(
 
             {
                 id: id,

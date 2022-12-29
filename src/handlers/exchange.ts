@@ -2,6 +2,7 @@ import { PairCreated, OrderCreated, OrderExecuted, UserPosition, Token } from ".
 import Big from "big.js";
 import { ifOrderCreated, ifPairCreated, ifUserPosition } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
+
 import { getDecimals, getERC20ABI, getProvider } from "../utils";
 import { ethers } from "ethers";
 import { sentry } from "../../app";
@@ -55,24 +56,6 @@ async function handleOrderExecuted(data: any, argument: any) {
         if (isNaN(exchangeRateDecimals) == false) {
             argument.exchangeRateDecimals = exchangeRateDecimals;
         }
-
-
-        // updating pair orders
-
-        socketService.emit(EVENT_NAME.PAIR_ORDER, {
-            amount: `-${fillAmount}`,
-            exchangeRate: getOrderDetails.exchangeRate,
-            orderType: getOrderDetails.orderType,
-            pair: getOrderDetails.pair
-        });
-
-        // updating pair history
-        socketService.emit(EVENT_NAME.PAIR_HISTORY, {
-            amount: fillAmount,
-            exchangeRate: getOrderDetails.exchangeRate,
-            orderType: getOrderDetails.orderType,
-            pair: getOrderDetails.pair
-        })
 
         await OrderExecuted.create(argument);
         let priceDiff = new Big(getOrderDetails.exchangeRate).minus(getPairDetails.exchangeRate).toString();
@@ -146,6 +129,23 @@ async function handleOrderExecuted(data: any, argument: any) {
             }
         }
 
+         // updating pair orders
+
+         socketService.emit(EVENT_NAME.PAIR_ORDER, {
+            amount: `-${fillAmount}`,
+            exchangeRate: getOrderDetails.exchangeRate,
+            orderType: getOrderDetails.orderType,
+            pair: getOrderDetails.pair
+        });
+
+        // updating pair history
+        socketService.emit(EVENT_NAME.PAIR_HISTORY, {
+            amount: fillAmount,
+            exchangeRate: getOrderDetails.exchangeRate,
+            orderType: getOrderDetails.orderType,
+            pair: getOrderDetails.pair
+        })
+
         console.log("Order Executed", taker, fillAmount, id);
 
     }
@@ -173,12 +173,7 @@ async function handleOrderCancelled(data: any) {
         }
         // cancel order 
     
-        socketService.emit(EVENT_NAME.PAIR_ORDER, {
-            amount: `-${orderDetails.balanceAmount}`,
-            exchangeRate: orderDetails.exchangeRate,
-            orderType: orderDetails.orderType,
-            pair: orderDetails.pair
-        });
+       
         // update user inOrder
         if (orderDetails.orderType == 1 || orderDetails.orderType == 3) {
             let getUser: ifUserPosition | null = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token0, chainId: orderDetails.chainId }).lean();
@@ -207,6 +202,20 @@ async function handleOrderCancelled(data: any) {
         }
     
         await OrderCreated.findOneAndUpdate({ _id: orderDetails._id }, { $set: { cancelled: true, active: false } });
+
+        socketService.emit(EVENT_NAME.PAIR_ORDER, {
+            amount: `-${orderDetails.balanceAmount}`,
+            exchangeRate: orderDetails.exchangeRate,
+            orderType: orderDetails.orderType,
+            pair: orderDetails.pair
+        });
+        
+        socketService.emit(EVENT_NAME.CANCEL_ORDER, {
+            amount: `-${orderDetails.balanceAmount}`,
+            exchangeRate: orderDetails.exchangeRate,
+            orderType: orderDetails.orderType,
+            pair: orderDetails.pair
+        });
     
         console.log(`order Cancelled, orderId : ${data[0]}`);
     }
