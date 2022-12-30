@@ -22,7 +22,7 @@ services:
       - "8090:3010"
     environment:
         - MONGO_URL=mongodb://root:password@mongozexe:27017/?authMechanism=DEFAULT
-        - MONGO_URL1=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/zexe-test8?retryWrites=true&w=majority
+        - MONGO_URL1=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/zexe-test9-test?retryWrites=true&w=majority
         - WEB_3_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweERjZTFjMzYxYzgyNEI1ZjRFMzRGY2ZCNjUxMUYzNjkwNjc5RjhmODYiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njk4OTQyMTQ5NjMsIm5hbWUiOiJ6ZXhlLjAxIn0.YR1oAHiW_tA0lwG29tXz2wrYdTjWdCijto4yP_3uHHg
   #     - PORT=${PORT}
   #     - ANALYSER_PORT=${ANALYSER_PORT}
@@ -38,4 +38,4 @@ services:
   #     - HOLDINGS_COLLECTION_NAME=${HOLDINGS_COLLECTION_NAME}
   #     - CREDIT_COLLECTION_NAME=${CREDIT_COLLECTION_NAME}
   #     - MASTER_API_KEY=${MASTER_API_KEY}
-    command: npm run dev
+    command: npm run devTest

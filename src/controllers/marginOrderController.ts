@@ -10,7 +10,7 @@ import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 import { multicall } from "../sync/syncBalance";
 
 
-export async function _handleMarginOrderCreated(signature: string, data: any, chainId: string, ipfs: boolean, id: string, exchangeRateDecimals: any) {
+export async function _handleMarginOrderCreated(signature: string, data: any, chainId: string, ipfs: boolean | undefined, id: string, exchangeRateDecimals: any) {
     try {
 
         let amount = Big(data.amount);

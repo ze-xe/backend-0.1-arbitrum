@@ -13,11 +13,13 @@
     "devTest": "set NODE_ENV=test && ts-node app.ts",
     "prod": "./node_modules/.bin/pm2 start app.ts --watch",
     "prod2": "pm2 start ecosystem.config.js",
-    "test": "mocha -r ts-node/register --timeout 60000 ./src/test/mocha_test.ts",
+    "test": "set NODE_ENV=test && mocha -r ts-node/register --timeout 180000 ./src/test/api/**/*.ts",
+    "coverage": "nyc npm run test",
+    "test0": "mocha -r ts-node/register --timeout 60000 ./src/test/mocha_test.ts",
     "test1": "mocha -r ts-node/register --timeout 60000 ./src/test/margin_test.ts",
     "test2": "mocha -r ts-node/register --timeout 60000 ./src/test/api/pairTest.ts",
-    "test3": "set NODE_ENV=test && mocha -r ts-node/register --timeout 180000 ./src/test/api/orderScriptTest.ts",
-    "test4": "set NODE_ENV=test && mocha -r ts-node/register --timeout 180000 ./src/test/api/marginOrderLong.ts"
+    "test3": "set NODE_ENV=test && mocha -r ts-node/register --timeout 180000 ./src/test/api/AorderScriptTest.ts",
+    "test4": "set NODE_ENV=test && mocha -r ts-node/register --timeout 180000 ./src/test/api/BmarginOrderLong.ts"
   },
   "dependencies": {
     "@sentry/node": "^7.28.1",
@@ -37,6 +39,7 @@
     "minimist": "^1.2.7",
     "mongoose": "^6.7.0",
     "morgan": "^1.10.0",
+    "nyc": "^15.1.0",
     "path": "^0.12.7",
     "pm2": "^5.2.2",
     "socket.io": "^4.5.4",

@@ -195,17 +195,23 @@ async function orderStatus(chainId: string) {
 
                 let balance: string = BigNumber.from(resp[1][i]).toString();
 
-                let token: string;
-                let amount: Big;
+                let token: string = '';
+                let amount: Big = Big(0);
                 let id = getOrderCreated[i].maker;
 
                 if (getOrderCreated[i].orderType == 1 || getOrderCreated[i].orderType == 3) {
                     token = getOrderCreated[i].token0;
                     amount = Big(getOrderCreated[i].balanceAmount);
+                    if(getOrderCreated[i].orderType == 3){
+                        amount = Big(getOrderCreated[i].amount);
+                    }
                 }
-                else {
+                else if(getOrderCreated[i].orderType == 0 || getOrderCreated[i].orderType == 2) {
                     token = getOrderCreated[i].token1;
                     amount = Big(getOrderCreated[i].balanceAmount).times(getOrderCreated[i].exchangeRate).div(Big(10).pow(18));
+                    if(getOrderCreated[i].orderType == 2){
+                        amount = Big(getOrderCreated[i].amount).times(getOrderCreated[i].exchangeRate).div(Big(10).pow(18));
+                    }
                 }
 
                 if (getOrderCreated[i].active == true) {

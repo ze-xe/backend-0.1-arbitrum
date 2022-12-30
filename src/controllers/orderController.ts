@@ -39,7 +39,7 @@ async function handleOrderCreated(req: any, res: any) {
         let signature: string = req.body.signature?.toLowerCase();
         let data = req.body.data;
         let chainId: string = req.body.chainId;
-        let ipfs: boolean = req.body.ipfs;
+        let ipfs: boolean | undefined = req.body.ipfs;
         let orderType: number = data.orderType;
         let addresses = [data.maker, data.token0, data.token1];
         data.maker = data.maker?.toLowerCase();
