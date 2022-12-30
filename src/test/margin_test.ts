@@ -7,7 +7,7 @@ import { ethers } from "ethers";
 import { getExchangeABI, getERC20ABI, getProvider, leverageAbi } from "../utils";
 import Big from "big.js";
 import { BtcAddress, UsdcAddress, ExchangeAddress, EthAddress, leverAddress, cUsdcAddress, cBtcAddress } from '../helper/constant';
-import { clinetSocketService } from "./socket-client";
+// import { clinetSocketService } from "./socket-client";
 import { io, connect } from "socket.io-client";
 import { getExchangeAddress } from "../helper/chain";
 import { EVENT_NAME } from "../socketIo/socket.io";
