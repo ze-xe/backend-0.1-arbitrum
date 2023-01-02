@@ -3,22 +3,26 @@ import { ethers } from "ethers";
 import Big from "big.js";
 import { getExchangeAddress, getRpcLink } from "./helper/chain";
 
-const exchangeDeployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Exchange.json")).toString());
+// const exchangeDeployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Exchange.json")).toString());
+export let Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/deployments/arbitrumGoerli/deployments.json")).toString());
 
 const erc20Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/ERC20.json")).toString());
 
 const MulticallAbi = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Multical.json")).toString());
 
-export const leverageAbi = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Leverage.json")).toString());
+export const leverageAbi = Deployments["sources"]["Lever"];
 
 function getExchangeABI() {
-    return exchangeDeployments["abi"];
-
+    return Deployments["sources"]["Exchange"];
 }
-
 
 function getERC20ABI() {
     return erc20Deployments["abi"];
+}
+
+export function getContractAddress(name: string) {
+
+    return Deployments["contracts"][name]["address"]
 }
 
 
@@ -51,7 +55,7 @@ function validateSignature(maker: string, signature: string, value: object, chai
 
         const domain = {
             name: "zexe",
-            version: "1",
+            version: "0.0.1",
             chainId: chainId,
             verifyingContract: getExchangeAddress(chainId),
         };
@@ -59,16 +63,16 @@ function validateSignature(maker: string, signature: string, value: object, chai
         // The named list of all type definitions
         const types = {
             Order: [
-				{ name: 'maker', type: 'address' },
-				{ name: 'token0', type: 'address' },
-				{ name: 'token1', type: 'address' },
-				{ name: 'amount', type: 'uint256' },
-				{ name: 'orderType', type: 'uint8' },
+                { name: 'maker', type: 'address' },
+                { name: 'token0', type: 'address' },
+                { name: 'token1', type: 'address' },
+                { name: 'amount', type: 'uint256' },
+                { name: 'orderType', type: 'uint8' },
                 { name: 'salt', type: 'uint32' },
-				{ name: 'exchangeRate', type: 'uint176' },
-				{ name: 'borrowLimit', type: 'uint32' },
-				{ name: 'loops', type: 'uint8' }
-			]
+                { name: 'exchangeRate', type: 'uint176' },
+                { name: 'borrowLimit', type: 'uint32' },
+                { name: 'loops', type: 'uint8' }
+            ]
         };
 
         const digest: string = ethers.utils._TypedDataEncoder.hash(domain, types, value).toLowerCase();
@@ -202,7 +206,7 @@ export const expressMonitorConfig = {
             path: '/DB/fetch/record',
             headers: {},
         },
- 
+
     ],
     // ignoreStartsWith: '/pair'
 }

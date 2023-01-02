@@ -305,6 +305,10 @@ export async function getBar(req: any, res: any) {
         let firstDataRequest = req.query.firstDataRequest;
         console.log(interval);
 
+        if(firstDataRequest){
+            console.log("from", from)
+            console.log("to", to)
+        }
         let intervalFromReq = ["5", "15", "30", "60", "240", "1D", "1W"]
 
         if (!intervalFromReq.includes(interval)) {
@@ -327,9 +331,9 @@ export async function getBar(req: any, res: any) {
             to = Date.now();
         }
 
-        if(to > Date.now()){
-            to = Date.now()
-        }
+        // if(to > Date.now()){
+        //     to = Date.now()
+        // }
 
         if (!pairId) {
             return res.status(400).send({ status: false, error: errorMessage.ticker });

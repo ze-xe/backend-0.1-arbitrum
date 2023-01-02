@@ -16,7 +16,8 @@ function ExchangeConfig(chainId : string) {
         handlers: {
             "OrderExecuted": handleOrderExecuted,
             "OrderCancelled": handleOrderCancelled,
-            "MarginEnabled": handleMarginEnabled
+            "MarginEnabled": handleMarginEnabled,
+            // "MinTokenAmountSet"
         },
         chainId: chainId
     };

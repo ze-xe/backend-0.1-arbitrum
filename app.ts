@@ -100,3 +100,7 @@ app.use(function onError(err: any, req: any, res: any, next: any) {
 httpServer.listen(process.env.PORT || 3010, function () {
     console.log("app running on port " + (process.env.PORT || 3010));
 });
+
+
+
+// set NODE_ENV=test && mocha -r ts-node/register --timeout 180000 ./src/test/api/BmarginOrderLong.ts

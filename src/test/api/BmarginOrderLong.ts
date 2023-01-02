@@ -65,7 +65,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
         // httpServer
         await connect()
     });
-
+    
     it('mint 100 btc to user1, 100 BTC to user2', async () => {
         // ORDER IS LONG means user1 want more btc
 
@@ -123,13 +123,13 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
             usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256),
         ])
     })
-
+    
 
 
     it(`user1 create margin order 1 btc @ 20000}`, async () => {
         const domain = {
             name: "zexe",
-            version: "1",
+            version: "0.0.1",
             chainId: chainId.toString(),
             verifyingContract: getExchangeAddress(chainId),
         };
@@ -171,9 +171,9 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
             value
         );
         signatures.push(storedSignature);
-        // console.log([
-        //     value, storedSignature
-        // ]);
+        console.log([
+            value, storedSignature
+        ]);
         let res = await request("http://localhost:3010")
             .post("/order/create")
             .send(
@@ -194,7 +194,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
                     "chainId": chainId
                 }
             );
-
+        
         expect(res).to.have.status(201);
         expect(res.body.status).to.be.equal(true);
         expect(res.body).to.be.an('object');
@@ -203,7 +203,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
     });
 
     it(`find created order in data base`, async () => {
-
+        
         let data = await OrderCreated.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
         expect(data).to.be.an('object');
         expect(data.amount).to.equal(amount);
@@ -211,88 +211,88 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
         expect(Number(data.loops)).to.equal(loops)
         orderCreated.push(data)
     })
-
-
-    it(`user1 sell usdc got from market to user2 and got 2 btc @ 20000`, async () => {
-        let user1BtcBalancePre = btc.balanceOf(user1.address);
-        let user2BtcBalancePre = btc.balanceOf(user2.address);
-        let user2UsdcBalancePre = usdc.balanceOf(user2.address);
-        let user1UsdcBalancePre = usdc.balanceOf(user1.address);
-        let promise = await Promise.all([user1BtcBalancePre, user2BtcBalancePre, user2UsdcBalancePre, user1UsdcBalancePre])
-        user1BtcBalancePre = promise[0].toString();
-        user2BtcBalancePre = promise[1].toString()
-        user2UsdcBalancePre = promise[2].toString()
-        user1UsdcBalancePre = promise[3].toString()
-        console.log(user1BtcBalancePre)
-        const btcAmount = ethers.utils.parseEther('2').toString();
-        await lever.connect(user1).enterMarkets([cBtc.address, cUsdc.address]);
-        await lever.connect(user2).enterMarkets([cBtc.address, cUsdc.address]);
-
-        let exTxn = await exchange.connect(user2).executeLimitOrders(
-            [signatures[0]],
-            [orders[0]],
-            btcAmount,
-            { gasLimit: "100000000" }
-        );
-
-        await exTxn.wait(1)
-        let user1BtcBalancePost = btc.balanceOf(user1.address);
-        let user1UsdcBalancePost = usdc.balanceOf(user1.address);
-        let user2UsdcBalancePost = usdc.balanceOf(user2.address);
-        let user2BtcBalancePost = btc.balanceOf(user2.address);
-
-        let promise1 = await Promise.all([user1BtcBalancePost, user1UsdcBalancePost, user2UsdcBalancePost, user2BtcBalancePost]);
-        user1BtcBalancePost = promise1[0].toString();
-        user1UsdcBalancePost = promise1[1].toString();
-        user2UsdcBalancePost = promise1[2].toString();
-        user2BtcBalancePost = promise1[3].toString();
-        console.log(user1BtcBalancePost)
-        expect(user2BtcBalancePost).to.equal(parseEther(Big(user2BtcBalancePre).minus(btcAmount).toString()));
-        expect(user2UsdcBalancePost).to.equal(
-            parseEther(
-                Big(user2UsdcBalancePre)
-                    .plus(
-                        Big(btcAmount)
-                            .times(exchangeRate)
-                            .div(Big(10).pow(18))).toString()))
-
-    });
-
-    it(`cancelled  order `, async () => {
-
-
-
-        let exTxn = await exchange.connect(user1).cancelOrder(
-            signatures[0],
-            orders[0],
-            { gasLimit: "100000000" }
-        )
-        await exTxn.wait(1);
-
-        let wait = () => {
-            return new Promise((resolve, reject) => {
-
-                let timeOutId = setTimeout(() => {
-                    return resolve("Success")
-                }, 60000)
-
-                socket.on(EVENT_NAME.CANCEL_ORDER, (data) => {
-                    clearTimeout(timeOutId)
-                    console.log("order cancel")
-                    return resolve("Success")
+    
+    
+        it(`user1 sell usdc got from market to user2 and got 2 btc @ 20000`, async () => {
+            let user1BtcBalancePre = btc.balanceOf(user1.address);
+            let user2BtcBalancePre = btc.balanceOf(user2.address);
+            let user2UsdcBalancePre = usdc.balanceOf(user2.address);
+            let user1UsdcBalancePre = usdc.balanceOf(user1.address);
+            let promise = await Promise.all([user1BtcBalancePre, user2BtcBalancePre, user2UsdcBalancePre, user1UsdcBalancePre])
+            user1BtcBalancePre = promise[0].toString();
+            user2BtcBalancePre = promise[1].toString()
+            user2UsdcBalancePre = promise[2].toString()
+            user1UsdcBalancePre = promise[3].toString()
+            // console.log(user1BtcBalancePre)
+            const btcAmount = ethers.utils.parseEther('2').toString();
+            await lever.connect(user1).enterMarkets([cBtc.address, cUsdc.address]);
+            await lever.connect(user2).enterMarkets([cBtc.address, cUsdc.address]);
+    
+            let exTxn = await exchange.connect(user2).executeT0LimitOrders(
+                [signatures[0]],
+                [orders[0]],
+                btcAmount,
+                { gasLimit: "100000000" }
+            );
+    
+            await exTxn.wait(1)
+            let user1BtcBalancePost = btc.balanceOf(user1.address);
+            let user1UsdcBalancePost = usdc.balanceOf(user1.address);
+            let user2UsdcBalancePost = usdc.balanceOf(user2.address);
+            let user2BtcBalancePost = btc.balanceOf(user2.address);
+    
+            let promise1 = await Promise.all([user1BtcBalancePost, user1UsdcBalancePost, user2UsdcBalancePost, user2BtcBalancePost]);
+            user1BtcBalancePost = promise1[0].toString();
+            user1UsdcBalancePost = promise1[1].toString();
+            user2UsdcBalancePost = promise1[2].toString();
+            user2BtcBalancePost = promise1[3].toString();
+            // console.log(user1BtcBalancePost)
+            expect(user2BtcBalancePost).to.equal(parseEther(Big(user2BtcBalancePre).minus(btcAmount).toString()));
+            expect(user2UsdcBalancePost).to.equal(
+                parseEther(
+                    Big(user2UsdcBalancePre)
+                        .plus(
+                            Big(btcAmount)
+                                .times(exchangeRate)
+                                .div(Big(10).pow(18))).toString()))
+    
+        });
+    
+        it(`cancelled  order `, async () => {
+    
+    
+    
+            let exTxn = await exchange.connect(user1).cancelOrder(
+                signatures[0],
+                orders[0],
+                { gasLimit: "100000000" }
+            )
+            await exTxn.wait(1);
+    
+            let wait = () => {
+                return new Promise((resolve, reject) => {
+    
+                    let timeOutId = setTimeout(() => {
+                        return resolve("Success")
+                    }, 60000)
+    
+                    socket.on(EVENT_NAME.CANCEL_ORDER, (data) => {
+                        clearTimeout(timeOutId)
+                        console.log("order cancel")
+                        return resolve("Success")
+                    })
                 })
-            })
-        }
-        let res = await wait()
-        expect(res).to.equal("Success")
-        let data = await OrderCreated.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
-        expect(data).to.be.an('object')
-        expect(data).not.to.be.null;
-        expect(data.cancelled).to.equal(true)
-
-    })
-
-
+            }
+            let res = await wait()
+            expect(res).to.equal("Success")
+            let data = await OrderCreated.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
+            expect(data).to.be.an('object')
+            expect(data).not.to.be.null;
+            expect(data.cancelled).to.equal(true)
+    
+        })
+    
+    
 
 
 });

@@ -2,7 +2,7 @@ import { BigNumber, ethers } from "ethers";
 import { UserPosition, OrderCreated } from "../db";
 import Big from "big.js";
 import { getERC20ABI, getProvider, getInterface, MulticallAbi } from "../utils";
-import { ifOrderCreated, ifUserPosition,  orderSignature } from "../helper/interface";
+import { ifOrderCreated, ifUserPosition, orderSignature } from "../helper/interface";
 import { getExchangeAddress, MulticallAddress } from "../helper/chain";
 import { sentry } from "../../app";
 
@@ -13,6 +13,7 @@ import { sentry } from "../../app";
  * @param {*} chainId (string) numeric chainId
  * @returns ([number])) [balance, allowance]
  */
+
 async function multicall(token: string, maker: string, chainId: string): Promise<number[] | null> {
     try {
 
@@ -26,6 +27,44 @@ async function multicall(token: string, maker: string, chainId: string): Promise
 
         const itf: ethers.utils.Interface = getInterface(getERC20ABI());
         const input: string[][] = [[token, itf.encodeFunctionData("balanceOf", [maker])], [token, itf.encodeFunctionData("allowance", [maker, getExchangeAddress(chainId)])]]
+        let resp = await multicall.callStatic.aggregate(
+            input
+        );
+
+        let outPut: number[] = [];
+
+        for (let i in resp[1]) {
+            outPut.push(Number(BigNumber.from(resp[1][i]).toString()))
+        }
+
+        return outPut
+
+    }
+    catch (error) {
+        sentry.captureException(error)
+        console.log(`Error @ Multicall`, error)
+        return null
+    }
+}
+
+export async function multicallFor2Tokens(token0: string, token1: string, maker: string, chainId: string): Promise<number[] | null> {
+    try {
+
+        const provider: ethers.providers.JsonRpcProvider = getProvider(chainId);
+
+        const multicall = new ethers.Contract(
+            MulticallAddress[`${chainId}`],
+            MulticallAbi,
+            provider
+        );
+
+        const itf: ethers.utils.Interface = getInterface(getERC20ABI());
+        const input: string[][] = [
+            [token0, itf.encodeFunctionData("balanceOf", [maker])],
+            [token0, itf.encodeFunctionData("allowance", [maker, getExchangeAddress(chainId)])],
+            [token1, itf.encodeFunctionData("balanceOf", [maker])],
+            [token1, itf.encodeFunctionData("allowance", [maker, getExchangeAddress(chainId)])]
+        ]
         let resp = await multicall.callStatic.aggregate(
             input
         );
@@ -202,14 +241,14 @@ async function orderStatus(chainId: string) {
                 if (getOrderCreated[i].orderType == 1 || getOrderCreated[i].orderType == 3) {
                     token = getOrderCreated[i].token0;
                     amount = Big(getOrderCreated[i].balanceAmount);
-                    if(getOrderCreated[i].orderType == 3){
+                    if (getOrderCreated[i].orderType == 3) {
                         amount = Big(getOrderCreated[i].amount);
                     }
                 }
-                else if(getOrderCreated[i].orderType == 0 || getOrderCreated[i].orderType == 2) {
+                else if (getOrderCreated[i].orderType == 0 || getOrderCreated[i].orderType == 2) {
                     token = getOrderCreated[i].token1;
                     amount = Big(getOrderCreated[i].balanceAmount).times(getOrderCreated[i].exchangeRate).div(Big(10).pow(18));
-                    if(getOrderCreated[i].orderType == 2){
+                    if (getOrderCreated[i].orderType == 2) {
                         amount = Big(getOrderCreated[i].amount).times(getOrderCreated[i].exchangeRate).div(Big(10).pow(18));
                     }
                 }

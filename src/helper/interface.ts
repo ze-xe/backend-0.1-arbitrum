@@ -44,6 +44,7 @@ export interface ifPairCreated {
     priceDiff: string
     chainId: string
     _id: string
+    marginEnabled: boolean
 }
 
 export interface orderSignature {

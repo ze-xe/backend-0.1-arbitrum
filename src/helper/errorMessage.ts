@@ -15,7 +15,9 @@ export const errorMessage = {
     token: "token is required",
     allowance: "insufficient allowance",
     symbol: "symbol is not found",
-    ticker: "ticker is not found"
+    ticker: "ticker is not found",
+    market: "market not approve",
+    borrowLimit: "Borrow Limit not valid borrowLimit = <0.75 or > 0.05 "
 
 };
 

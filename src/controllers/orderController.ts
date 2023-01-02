@@ -87,11 +87,7 @@ async function handleOrderCreated(req: any, res: any) {
             }
         }
 
-
-
         let amount = Big(data.amount);
-
-
 
         if (data.orderType == 1) {
 
@@ -103,7 +99,6 @@ async function handleOrderCreated(req: any, res: any) {
 
             if (!ipfs) {
                 multicallData = await multicall(data.token0, data.maker, chainId)
-
                 if (multicallData) {
                     userToken0Balance = multicallData[0];
                     allowance = multicallData[1];

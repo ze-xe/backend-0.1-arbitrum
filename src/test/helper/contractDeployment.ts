@@ -4,28 +4,25 @@
 
 
 
-export const ExchangeAddress = "0xC8a28C6EA6825428a5270F7e9070Cbe31E2cFDbf";
-export const BtcAddress = "0x370a499A5Da9db63c8D73aC31631884e8A6F2046";// orignal
-// export const BtcAddress = "0x728824E0534265f21917316733BE8936602154e7"; // ethereum
-export const UsdcAddress = "0x85A84D9796642feD966F05F27deE4460a5F74fEd";
-export const EthAddress = "0xa0f42D19bbeBa02A7bE143f80eBe414A1F0Af2F8";
-export const ZexeAddress = "0xb961d7eC6944074EccaA4054b36B7855453658B3";
-export const leverAddress = "0xAF81CfD5ef93821f48E50ddB6dc37f70218D0123";
-export const cUsdcAddress = "0xB49C251Ca54c9941fa6971276f10b24ea48DbA39";
-export const cBtcAddress = "0x99e55a91Dfd1E7f86327E47d04a392C5cc9A0728";
+// export const ExchangeAddress = "0x4B2124F67CEc43A54fE8677F9216ED09397Aa395";
+// export const BtcAddress = "0x0f8741A07973674e56dF1294Daff50FF13924ac9";// orignal
+// // export const BtcAddress = "0x728824E0534265f21917316733BE8936602154e7"; // ethereum
+// export const UsdcAddress = "0x04a187564eeCb189864335fb3D97d5A39183b296";
+// export const EthAddress = "0xE7D84064Bc67eC586Bd56F26b513F3Fc7f1B52d0";
+// export const ZexeAddress = "0x0295182deC3eDE4D40E407C2621796b26440A281";
+// export const leverAddress = "0x37A5B286E8114dcd78aABE3B168dD9084151EDf9";
+// export const cUsdcAddress = "0x0Afdc413B3C275a212654dE79dCe2f0D33BA221D";
+// export const cBtcAddress = "0xD54f04376C50147eEcDf2E2042f37Cb1BBBCD462";
 
-
-
-// Exchange deployed to: 0xC8a28C6EA6825428a5270F7e9070Cbe31E2cFDbf
-// Lever deployed to: 0xAF81CfD5ef93821f48E50ddB6dc37f70218D0123
-// ETH deployed to: 0xa0f42D19bbeBa02A7bE143f80eBe414A1F0Af2F8
-// lETH market deployed to: 0x8795fdC78D8d5cb3C4b31acFfd5654F6D1002d45
-// BTC deployed to: 0x370a499A5Da9db63c8D73aC31631884e8A6F2046
-// lBTC deployed to: 0x99e55a91Dfd1E7f86327E47d04a392C5cc9A0728
-// USDC deployed to: 0x85A84D9796642feD966F05F27deE4460a5F74fEd
-// lUSDC deployed to: 0xB49C251Ca54c9941fa6971276f10b24ea48DbA39
-// ZEXE deployed to: 0xb961d7eC6944074EccaA4054b36B7855453658B3
-// lZEXE deployed to: 0xc8Ab87b3FCBfa7C4B569A65097EF079E56117C1e
-
+export let ExchangeAddress = "0xE472E97F241bA46E22044fE079A36c88C96866F8";
+// console.log(ExchangeAddress)
+export let BtcAddress = "0x1A8f1c33073dC24D54B47ed2eaFA15a57FA1BF75";// orignal
+// const BtcAddress = "0x728824E0534265f21917316733BE8936602154e7"; // ethereum
+export let UsdcAddress = "0xf98f57B4122738C45B012a7c755291057D39Eaa8";
+export let EthAddress = "0x2D035b495213EA5eE559ef39eD6036D03a2D9069";
+export let leverAddress = "0x2A676e9fbfCb75ba4172e63cC3e866e86861755C";
+export let ZexeAddress = "0x6148f88Bb30A7Ab2A0f57c7d1C1CC78E133BB244";
+export let cUsdcAddress = "0x8CAE73F871a4E892Fe54136ca95a25D6D2BD248B";
+export let cBtcAddress = "0x30f0D74F478815Ffe14058da48eDc78dcF79F749";
 
 

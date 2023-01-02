@@ -47,7 +47,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         // httpServer
         await connect()
     });
-
+    
     it('mint 10 btc to user1, 200000 usdt to user2, approve exchange contract', async () => {
 
         let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
@@ -58,13 +58,16 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
         // approve for exchange
         let approve = await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
+        await btc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256)
 
         const usdcAmount = ethers.utils.parseEther('200000').toString();
         let tx2 = await usdc.connect(user2).mint(user2.address, usdcAmount);
 
         // approve for exchange
         let approve1 = await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256);
-
+        await usdc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
+        await approve1.wait(1)
+        console.log(approve)
         let user1BtcBalancePost = (await btc.balanceOf(user1.address)).toString();
         let user2UsdcBalancePost = (await usdc.balanceOf(user2.address)).toString();
 
@@ -73,13 +76,13 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
 
     });
-
+    
 
     it(`user1 creates limit order to sell 1 btc @ 20000, check user inOrder Balance`, async () => {
 
         const domain = {
             name: "zexe",
-            version: "1",
+            version: "0.0.1",
             chainId: chainId.toString(),
             verifyingContract: getExchangeAddress(chainId),
         };
@@ -120,9 +123,9 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
             value
         );
         signatures.push(storedSignature);
-        // console.log([
-        //     value, storedSignature
-        // ]);
+        console.log([
+            value, storedSignature
+        ]);
 
         let userPositionPre = await UserPosition.findOne({ token: btc.address.toLowerCase(), id: user1.address.toLowerCase() }).lean();
 
@@ -149,7 +152,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
             );
 
         let userPositionPost = await UserPosition.findOne({ token: btc.address.toLowerCase(), id: user1.address.toLowerCase() }).lean()
-
+        // console.log(res)
         expect(res).to.have.status(201);
         expect(res.body.status).to.be.equal(true);
         expect(res.body).to.be.an('object');
@@ -168,7 +171,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         orderId = data.id
     })
 
-
+    
     it(`user2 buy user1s 0.8 btc order`, async () => {
         // balances
         let user1BtcBalancePre = btc.balanceOf(user1.address);
@@ -188,7 +191,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
         btcAmount = ethers.utils.parseEther(`0.8`).toString();
 
-        const exTxn = await exchange.connect(user2).executeLimitOrders(
+        const exTxn = await exchange.connect(user2).executeT0LimitOrders(
             [signatures[0]],
             [orders[0]],
             btcAmount,
@@ -299,6 +302,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
 
     })
+    
 
 
 

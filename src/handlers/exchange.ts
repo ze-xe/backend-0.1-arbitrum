@@ -232,7 +232,7 @@ export async function handleMarginEnabled(data: string[]) {
     try {
 
         let token: string = data[0].toLowerCase();
-        let cToken = data[1];
+        let cToken = data[1].toLowerCase();
         let chainId = "421613";
         const isTokenExist = await Token.findOne({ id: token }).lean();
         let symbol;
@@ -242,7 +242,7 @@ export async function handleMarginEnabled(data: string[]) {
                 return
             }
             else if (isTokenExist.marginEnabled == false) {
-                await Token.findOneAndUpdate({ id: token }, { $set: { marginEnabled: true } });
+                await Token.findOneAndUpdate({ id: token }, { $set: { marginEnabled: true, cId: cToken } });
                 symbol = isTokenExist.symbol;
             }
         }
@@ -265,6 +265,7 @@ export async function handleMarginEnabled(data: string[]) {
                 decimals: decimals,
                 price: "0",
                 chainId: chainId,
+                cId: cToken,
                 marginEnabled: true
             };
 

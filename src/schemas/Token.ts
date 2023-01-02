@@ -8,7 +8,8 @@ const TokenSchema = new mongoose.Schema({
     price: Number,
     decimals: Number,
     chainId: String,
-    marginEnabled: {type:Boolean, default: false}
+    marginEnabled: {type:Boolean, default: false},
+    cId: String
 
 },
     { timestamps: true }
