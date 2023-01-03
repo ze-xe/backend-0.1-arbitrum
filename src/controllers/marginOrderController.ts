@@ -715,7 +715,7 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
         let lever = new ethers.Contract(leverAddress, leverageAbi, provider);
 
         // checking market enter or not
-        let assetIn: string[] = (await lever.getAssetsIn(data.maker)).map((x: string) => x.toLocaleLowerCase())
+        let assetIn: string[] = [];
 
         let multicallData: number[] | null;
         let userToken0Balance = 0;
@@ -726,7 +726,7 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
         if (!ipfs) {
 
             multicallData = await multicallFor2Tokens(data.token0, data.token1, data.maker, chainId);
-
+            assetIn = (await lever.getAssetsIn(data.maker)).map((x: string) => x.toLocaleLowerCase());
             if (multicallData) {
                 userToken0Balance = multicallData[0];
                 allowanceToken0 = multicallData[1];
