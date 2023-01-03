@@ -6,6 +6,7 @@ import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 import { getDecimals, getERC20ABI, getProvider } from "../utils";
 import { ethers } from "ethers";
 import { sentry } from "../../app";
+import { getLoop, loopFillAmount } from "./helper/getLoop";
 
 
 
@@ -14,7 +15,7 @@ import { sentry } from "../../app";
 async function handleOrderExecuted(data: any, argument: any) {
 
     try {
-        
+
         const isDuplicateTxn = await OrderExecuted.findOne({
             txnId: argument.txnId,
             blockNumber: argument.blockNumber,
@@ -27,7 +28,8 @@ async function handleOrderExecuted(data: any, argument: any) {
             return;
         }
 
-        let id = data[0]?.toLowerCase();
+        let id =
+            data[0]?.toLowerCase();
         let taker = data[1]?.toLowerCase();
         let fillAmount = data[2].toString();
         argument.id = id;
@@ -70,30 +72,78 @@ async function handleOrderExecuted(data: any, argument: any) {
 
             let token0 = getPairDetails.token0;
 
-            let getUserPosition0: ifUserPosition | null = await UserPosition.findOne({ id: getOrderDetails.maker, token: token0 });
+            if (getOrderDetails.orderType == 1) {
+                let getUserPosition0: ifUserPosition | null = await UserPosition.findOne({ id: getOrderDetails.maker, token: token0 });
 
-            if (!getUserPosition0) {
-                return console.log(`user position not found for token0 ${token0}, make ${getOrderDetails.maker}`)
-            }
+                if (!getUserPosition0) {
+                    return console.log(`user position not found for token0 ${token0}, make ${getOrderDetails.maker}`)
+                }
 
-            let currentInOrderBalance0 = new Big(getUserPosition0.inOrderBalance).minus(fillAmount).toString();
+                let currentInOrderBalance0 = new Big(getUserPosition0.inOrderBalance).minus(fillAmount).toString();
 
-            await UserPosition.findOneAndUpdate(
-                { id: getOrderDetails.maker, token: token0 },
-                { $set: { inOrderBalance: currentInOrderBalance0 } }
-            );
-
-            let currentFillAmount = new Big(getOrderDetails.balanceAmount).minus(fillAmount);
-
-            if (Number(currentFillAmount) <= Number(getPairDetails.minToken0Order)) {
-                await OrderCreated.findOneAndUpdate({ _id: getOrderDetails._id.toString() },
-                    { $set: { balanceAmount: currentFillAmount, deleted: true, active: false } });
-            }
-            else {
-                await OrderCreated.findOneAndUpdate(
-                    { _id: getOrderDetails._id.toString() },
-                    { $set: { balanceAmount: currentFillAmount } }
+                await UserPosition.findOneAndUpdate(
+                    { id: getOrderDetails.maker, token: token0 },
+                    { $set: { inOrderBalance: currentInOrderBalance0 } }
                 );
+
+                let currentFillAmount = new Big(getOrderDetails.balanceAmount).minus(fillAmount);
+
+                if (Number(currentFillAmount) <= Number(getPairDetails.minToken0Order)) {
+                    await OrderCreated.findOneAndUpdate({ _id: getOrderDetails._id.toString() },
+                        { $set: { balanceAmount: currentFillAmount, deleted: true, active: false } });
+                }
+                else {
+                    await OrderCreated.findOneAndUpdate(
+                        { _id: getOrderDetails._id.toString() },
+                        { $set: { balanceAmount: currentFillAmount } }
+                    );
+                }
+            }
+            else if (getOrderDetails.orderType == 3) {
+
+                let userPositionToken0 = await UserPosition.findOne({ id: getOrderDetails.maker, token: getOrderDetails.token0 }).lean()! as any
+                let userPositionToken1 = await UserPosition.findOne({ id: getOrderDetails.maker, token: getOrderDetails.token1 }).lean()! as any
+
+
+                let currentFillAmount = Big(getOrderDetails.fillAmount).plus(fillAmount).toString();
+                let orderAmount = getOrderDetails.amount;
+                let borrowLimit = getOrderDetails.borrowLimit;
+
+                let currentLoop = getLoop(currentFillAmount, borrowLimit, orderAmount);
+
+                let amountToFill = loopFillAmount(orderAmount, borrowLimit, Math.ceil(+currentLoop).toString())
+
+                let token0Balance = "0";
+                let token1Balance = "0";
+                let fillPercent = "0." + currentLoop.split('.')[1]
+                if (Number(fillPercent) > 0) {
+                    token0Balance = Big(1 - Number(fillPercent)).times(amountToFill).toString();
+                    token1Balance = Big(fillPercent).times(amountToFill).times(Big(getOrderDetails.exchangeRate).div(Big(10).pow(18))).toString()
+                }
+
+                // updating userInOrder Balance 
+                let token0InOrder = Big(userPositionToken0?.inOrderBalance).minus(getOrderDetails.lastInOrderToken0).plus(token0Balance).toString();
+                let token1InOrder = Big(userPositionToken1.inOrderBalance).minus(getOrderDetails.lastInOrderToken1).plus(token1Balance).toString();
+
+                await Promise.all(
+                    [
+                        UserPosition.findOneAndUpdate(
+                            { id: getOrderDetails.maker, token: getOrderDetails.token0 },
+                            { $set: { inOrderBalance: token0InOrder } }
+                        ),
+
+                        UserPosition.findOneAndUpdate(
+                            { id: getOrderDetails.maker, token: getOrderDetails.token1 },
+                            { $set: { inOrderBalance: token1InOrder } }
+                        ),
+
+                        OrderCreated.findOneAndUpdate(
+                            { _id: getOrderDetails._id },
+                            { $set: { lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance } }
+                        )
+                    ]
+                )
+
             }
 
         }
@@ -102,36 +152,89 @@ async function handleOrderExecuted(data: any, argument: any) {
 
             let token1 = getPairDetails.token1;
 
-            let getUserPosition1: ifUserPosition | null = await UserPosition.findOne({ id: getOrderDetails.maker, token: token1 });
+            if (getOrderDetails.orderType == 0) {
+                let getUserPosition1: ifUserPosition | null = await UserPosition.findOne({ id: getOrderDetails.maker, token: token1 });
 
-            if (!getUserPosition1) {
-                return console.log(`User Position not found ${getOrderDetails.maker}, ${token1}`)
-            }
+                if (!getUserPosition1) {
+                    return console.log(`User Position not found ${getOrderDetails.maker}, ${token1}`)
+                }
 
-            let currentBalance1 = Big(getUserPosition1.inOrderBalance).minus(Big(fillAmount).times(getOrderDetails.exchangeRate).div(Big(10).pow(18))).toString();
+                let currentBalance1 = Big(getUserPosition1.inOrderBalance).minus(Big(fillAmount).times(getOrderDetails.exchangeRate).div(Big(10).pow(18))).toString();
 
-            await UserPosition.findOneAndUpdate(
-                { id: getOrderDetails.maker, token: token1 },
-                { $set: { inOrderBalance: currentBalance1 } }
-            );
-
-            let currentFillAmount = new Big(getOrderDetails.balanceAmount).minus(fillAmount);
-
-            if (Number(currentFillAmount) < Number(getPairDetails.minToken0Order)) {
-                await OrderCreated.findOneAndUpdate({ _id: getOrderDetails._id.toString() },
-                    { $set: { deleted: true, active: false, balanceAmount: currentFillAmount } });
-            }
-            else {
-                await OrderCreated.findOneAndUpdate(
-                    { _id: getOrderDetails._id.toString() },
-                    { $set: { balanceAmount: currentFillAmount } }
+                await UserPosition.findOneAndUpdate(
+                    { id: getOrderDetails.maker, token: token1 },
+                    { $set: { inOrderBalance: currentBalance1 } }
                 );
+
+                let currentFillAmount = new Big(getOrderDetails.balanceAmount).minus(fillAmount);
+
+                if (Number(currentFillAmount) < Number(getPairDetails.minToken0Order)) {
+                    await OrderCreated.findOneAndUpdate({ _id: getOrderDetails._id.toString() },
+                        { $set: { deleted: true, active: false, balanceAmount: currentFillAmount } });
+                }
+                else {
+                    await OrderCreated.findOneAndUpdate(
+                        { _id: getOrderDetails._id.toString() },
+                        { $set: { balanceAmount: currentFillAmount } }
+                    );
+                }
             }
+
+            else if (getOrderDetails.orderType == 2) {
+
+                let userPositionToken0 = await UserPosition.findOne({ id: getOrderDetails.maker, token: getOrderDetails.token0 }).lean()! as any
+                let userPositionToken1 = await UserPosition.findOne({ id: getOrderDetails.maker, token: getOrderDetails.token1 }).lean()! as any
+
+
+                let currentFillAmount = Big(getOrderDetails.fillAmount).plus(fillAmount).toString();
+                let orderAmount = getOrderDetails.amount;
+                let borrowLimit = getOrderDetails.borrowLimit;
+
+                let currentLoop = getLoop(currentFillAmount, borrowLimit, orderAmount);
+
+                let amountToFill = loopFillAmount(orderAmount, borrowLimit, Math.ceil(+currentLoop).toString())
+
+                let token0Balance = "0";
+                let token1Balance = "0";
+                let fillPercent = "0." + currentLoop.split('.')[1]
+                if (Number(fillPercent) > 0) {
+                    token0Balance = Big(fillPercent).times(amountToFill).toString();
+                    token1Balance = Big(1 - Number(fillPercent)).times(amountToFill).times(Big(getOrderDetails.exchangeRate).div(Big(10).pow(18))).toString()
+                }
+
+                // updating userInOrder Balance 
+                let token0InOrder = Big(userPositionToken0?.inOrderBalance).minus(getOrderDetails.lastInOrderToken0).plus(token0Balance).toString();
+                let token1InOrder = Big(userPositionToken1.inOrderBalance).minus(getOrderDetails.lastInOrderToken1).plus(token1Balance).toString();
+
+                await Promise.all(
+                    [
+                        UserPosition.findOneAndUpdate(
+                            { id: getOrderDetails.maker, token: getOrderDetails.token0 },
+                            { $set: { inOrderBalance: token0InOrder } }
+                        ),
+
+                        UserPosition.findOneAndUpdate(
+                            { id: getOrderDetails.maker, token: getOrderDetails.token1 },
+                            { $set: { inOrderBalance: token1InOrder } }
+                        ),
+
+                        OrderCreated.findOneAndUpdate(
+                            { _id: getOrderDetails._id },
+                            { $set: { lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance, fillAmount: currentFillAmount } }
+                        )
+                    ]
+                )
+
+
+
+            }
+
+
         }
 
-         // updating pair orders
+        // updating pair orders
 
-         socketService.emit(EVENT_NAME.PAIR_ORDER, {
+        socketService.emit(EVENT_NAME.PAIR_ORDER, {
             amount: `-${fillAmount}`,
             exchangeRate: getOrderDetails.exchangeRate,
             orderType: getOrderDetails.orderType,
@@ -159,48 +262,70 @@ async function handleOrderExecuted(data: any, argument: any) {
 
 async function handleOrderCancelled(data: any) {
 
-    try{
+    try {
         let id = data[0].toLowerCase();
 
         let orderDetails: ifOrderCreated | null = await OrderCreated.findOne({ id: id }).lean();
-    
+
         if (!orderDetails) {
             return console.log(`Order cancelled OrderId not found ${data[0]}`);
         }
-    
+
         if (orderDetails.cancelled == true) {
             return console.log("Order is already cancelled");
         }
         // cancel order 
-    
-       
+
+
         // update user inOrder
-        if (orderDetails.orderType == 1 || orderDetails.orderType == 3) {
+        if (orderDetails.orderType == 1) {
             let getUser: ifUserPosition | null = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token0, chainId: orderDetails.chainId }).lean();
             if (getUser) {
                 let currentInOrderBalance = Big(getUser.inOrderBalance).minus(orderDetails.balanceAmount).toString();
-    
+
                 await UserPosition.findOneAndUpdate(
                     { id: orderDetails.maker, token: orderDetails.token0, chainId: orderDetails.chainId },
                     { $set: { inOrderBalance: currentInOrderBalance } }
                 );
-    
+
             }
-    
+
         }
-        else if (orderDetails.orderType == 0 || orderDetails.orderType == 2) {
+        else if (orderDetails.orderType == 0) {
+
             let getUser: ifUserPosition | null = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token1, chainId: orderDetails.chainId }).lean()
             if (getUser) {
                 let token1Amount = Big(getUser.inOrderBalance).minus(Big(orderDetails.balanceAmount).times(orderDetails.exchangeRate).div(Big(10).pow(18))).toString();
-    
+
                 await UserPosition.findOneAndUpdate(
                     { id: orderDetails.maker, token: orderDetails.token1, chainId: orderDetails.chainId },
                     { $set: { inOrderBalance: token1Amount } }
                 );
             }
-    
+
         }
-    
+        else if (orderDetails.orderType == 2 || orderDetails.orderType == 3) {
+
+            let token0Position = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token0 }).lean()! as any;
+            let token1Position = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token1 }).lean()! as any;
+            let token0InOrder = Big(token0Position?.inOrderBalance).minus(orderDetails.lastInOrderToken0).toString();
+            let token1InOrder = Big(token1Position?.inOrderBalance).minus(orderDetails.lastInOrderToken1).toString();
+
+            await Promise.all(
+                [
+                    UserPosition.findOneAndUpdate(
+                        { _id: token0Position._id },
+                        { $set: { inOrderBalance: token0InOrder } }
+                    ),
+                    UserPosition.findOneAndUpdate(
+                        { _id: token1Position._id },
+                        { $set: { inOrderBalance: token1InOrder } }
+                    )
+                ]
+            )
+
+        }
+
         await OrderCreated.findOneAndUpdate({ _id: orderDetails._id }, { $set: { cancelled: true, active: false } });
 
         socketService.emit(EVENT_NAME.PAIR_ORDER, {
@@ -209,21 +334,21 @@ async function handleOrderCancelled(data: any) {
             orderType: orderDetails.orderType,
             pair: orderDetails.pair
         });
-        
+
         socketService.emit(EVENT_NAME.CANCEL_ORDER, {
             amount: `-${orderDetails.balanceAmount}`,
             exchangeRate: orderDetails.exchangeRate,
             orderType: orderDetails.orderType,
             pair: orderDetails.pair
         });
-    
+
         console.log(`order Cancelled, orderId : ${data[0]}`);
     }
     catch (error) {
         sentry.captureException(error)
         console.log("Error @ handleOrderCancelled", error);
     }
-    
+
 
 }
 
@@ -278,7 +403,7 @@ export async function handleMarginEnabled(data: string[]) {
         // creating pair
 
         let allToken = await Token.find({ marginEnabled: true, id: { $nin: [token] } }).lean();
-    
+
 
         for (let i in allToken) {
 
@@ -289,7 +414,7 @@ export async function handleMarginEnabled(data: string[]) {
                     continue
                 }
                 else if (isPairExist.marginEnabled == false) {
-                    
+
                     await PairCreated.findOneAndUpdate(
                         { _id: isPairExist._id },
                         { $set: { marginEnabled: true } }

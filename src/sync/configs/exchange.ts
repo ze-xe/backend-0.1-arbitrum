@@ -3,12 +3,14 @@ import { getExchangeABI } from "../../utils";
 
 import { handleOrderExecuted, handleOrderCancelled, handleMarginEnabled } from "../../handlers/exchange";
 import { getExchangeAddress } from "../../helper/chain";
+import { handleFeesSet } from "../../handlers/handleFeeSet";
+import { handleMinTokenAmountSet } from "../../handlers/handleMinTokenAmountSet";
 
 
 
 
 
-function ExchangeConfig(chainId : string) {
+function ExchangeConfig(chainId: string) {
 
     return {
         contractAddress: getExchangeAddress(chainId),
@@ -17,7 +19,8 @@ function ExchangeConfig(chainId : string) {
             "OrderExecuted": handleOrderExecuted,
             "OrderCancelled": handleOrderCancelled,
             "MarginEnabled": handleMarginEnabled,
-            // "MinTokenAmountSet"
+            "FeesSet": handleFeesSet,
+            "MinTokenAmountSet": handleMinTokenAmountSet
         },
         chainId: chainId
     };

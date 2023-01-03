@@ -9,7 +9,8 @@ const TokenSchema = new mongoose.Schema({
     decimals: Number,
     chainId: String,
     marginEnabled: {type:Boolean, default: false},
-    cId: String
+    cId: String,
+    minTokenAmount: {type: String, default: "10000000000"}
 
 },
     { timestamps: true }

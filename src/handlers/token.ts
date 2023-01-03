@@ -10,7 +10,7 @@ async function handleToken(token: string, chainId: string) {
         const isTokenExist = await Token.findOne({ id: token });
 
         if (isTokenExist) {
-            return { symbol: isTokenExist.symbol, marginEnabled: isTokenExist.marginEnabled };
+            return { symbol: isTokenExist.symbol, marginEnabled: isTokenExist.marginEnabled, minToken0Amount: isTokenExist.minTokenAmount };
         }
 
         let provider = getProvider(chainId);
@@ -36,7 +36,7 @@ async function handleToken(token: string, chainId: string) {
         Token.create(temp);
 
         console.log("Token Added", token, chainId, symbol);
-        return  { symbol: symbol, marginEnabled: false }
+        return  { symbol: symbol, marginEnabled: false, minToken0Amount: "10000000000" }
     }
     catch (error) {
         sentry.captureException(error)

@@ -21,7 +21,10 @@ export interface ifOrderCreated {
     _id: string
     borrowLimit: string,
     loops: string,
-    orderType: number
+    orderType: number,
+    fillAmount: string
+    lastInOrderToken0: string
+    lastInOrderToken1: string
     
 }
 
@@ -44,7 +47,8 @@ export interface ifPairCreated {
     priceDiff: string
     chainId: string
     _id: string
-    marginEnabled: boolean
+    marginEnabled: boolean,
+
 }
 
 export interface orderSignature {

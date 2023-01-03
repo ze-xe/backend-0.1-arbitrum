@@ -241,7 +241,7 @@ async function handleOrderCreated(req: any, res: any) {
                 let temp = {
                     id: id,
                     exchangeRateDecimals: exchangeRateDecimals,
-                    minToken0Order: (10 ** 10).toString(),
+                    minToken0Order: token0?.minToken0Amount,
                     exchangeRate: '0',
                     priceDiff: '0',
                     token0: data.token0,
