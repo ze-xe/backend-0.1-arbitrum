@@ -12,6 +12,8 @@ const MulticallAbi = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Multical.
 
 export const leverageAbi = Deployments["sources"]["Lever"];
 
+// export const ExchangeAddress1 =  Deployments["contracts"]["Exchange"]["address"]
+
 function getExchangeABI() {
     return Deployments["sources"]["Exchange"];
 }
@@ -20,10 +22,7 @@ function getERC20ABI() {
     return erc20Deployments["abi"];
 }
 
-export function getContractAddress(name: string) {
 
-    return Deployments["contracts"][name]["address"]
-}
 
 
 function parseEther(value: number | string): string {
