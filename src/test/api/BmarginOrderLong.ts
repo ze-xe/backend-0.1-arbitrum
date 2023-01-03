@@ -13,6 +13,7 @@ import { io } from "socket.io-client";
 import path from "path";
 import { connect, OrderCreated } from "../../db";
 import { ifOrderCreated } from "../../helper/interface";
+import { version } from "../../helper/constant";
 
 
 
@@ -129,7 +130,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
     it(`user1 create margin order 1 btc @ 20000}`, async () => {
         const domain = {
             name: "zexe",
-            version: "0.0.1",
+            version: version,
             chainId: chainId.toString(),
             verifyingContract: getExchangeAddress(chainId),
         };

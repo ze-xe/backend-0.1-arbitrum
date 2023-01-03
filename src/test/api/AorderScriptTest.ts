@@ -14,6 +14,7 @@ import { getERC20ABI, getExchangeABI, getProvider, parseEther } from "../../util
 import { io } from "socket.io-client";
 import path from "path";
 import { EVENT_NAME } from "../../socketIo/socket.io";
+import { version } from "../../helper/constant";
 use(chaiHttp);
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 const socket = io("http://localhost:3010");
@@ -82,7 +83,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
         const domain = {
             name: "zexe",
-            version: "0.0.1",
+            version: version,
             chainId: chainId.toString(),
             verifyingContract: getExchangeAddress(chainId),
         };

@@ -2,7 +2,7 @@
 import fs from "fs";
 
 
-let Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/deployments/arbitrumGoerli/deployments.json")).toString());
+const Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/deployments.json")).toString());
 
 
 export const Decimals = {
@@ -11,16 +11,16 @@ export const Decimals = {
 };
 
 
-
-export let ExchangeAddress: string = getContractAddress("Exchange");
-export let BtcAddress = getContractAddress("BTC");// orignal
-// const BtcAddress = getContractAddress(""); // ethereum
-export let UsdcAddress = getContractAddress("USDC");
-export let EthAddress = getContractAddress("ETH");
-export let leverAddress = getContractAddress("Lever");
-export let ZexeAddress = getContractAddress("ZEXE");
-export let cUsdcAddress = getContractAddress("lUSDC");
-export let cBtcAddress = getContractAddress("lBTC");
+export const version = Deployments["contracts"]["Exchange"]["constructorArguments"][1];
+export const ExchangeAddress: string = getContractAddress("Exchange");
+export const BtcAddress = getContractAddress("BTC");// orignal
+//export const BtcAddress = getContractAddress(""); // ethereum
+export const UsdcAddress = getContractAddress("USDC");
+export const EthAddress = getContractAddress("ETH");
+export const leverAddress = getContractAddress("Lever");
+export const ZexeAddress = getContractAddress("ZEXE");
+export const cUsdcAddress = getContractAddress("lUSDC");
+export const cBtcAddress = getContractAddress("lBTC");
 
 
 function getContractAddress(name: string) {

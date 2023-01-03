@@ -2,9 +2,10 @@ import fs from "fs";
 import { ethers } from "ethers";
 import Big from "big.js";
 import { getExchangeAddress, getRpcLink } from "./helper/chain";
+import { version } from "./helper/constant";
 
 // const exchangeDeployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Exchange.json")).toString());
-export let Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/deployments/arbitrumGoerli/deployments.json")).toString());
+const Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/deployments.json")).toString());
 
 const erc20Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/ERC20.json")).toString());
 
@@ -21,9 +22,6 @@ function getExchangeABI() {
 function getERC20ABI() {
     return erc20Deployments["abi"];
 }
-
-
-
 
 function parseEther(value: number | string): string {
 
@@ -54,7 +52,7 @@ function validateSignature(maker: string, signature: string, value: object, chai
 
         const domain = {
             name: "zexe",
-            version: "0.0.1",
+            version: version,
             chainId: chainId,
             verifyingContract: getExchangeAddress(chainId),
         };
