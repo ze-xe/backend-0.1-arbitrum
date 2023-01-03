@@ -68,7 +68,6 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         let approve1 = await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256);
         await usdc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
         await approve1.wait(1)
-        console.log(approve)
         let user1BtcBalancePost = (await btc.balanceOf(user1.address)).toString();
         let user2UsdcBalancePost = (await usdc.balanceOf(user2.address)).toString();
 

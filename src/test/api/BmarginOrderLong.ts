@@ -66,7 +66,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
         // httpServer
         await connect()
     });
-    /*
+    
     it('mint 100 btc to user1, 100 BTC to user2', async () => {
         // ORDER IS LONG means user1 want more btc
 
@@ -123,7 +123,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
             btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256),
             usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256),
         ])
-    })*/
+    })
 
 
 
@@ -279,7 +279,6 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
 
                 socket.on(EVENT_NAME.CANCEL_ORDER, (data) => {
                     clearTimeout(timeOutId)
-                    console.log("order cancel")
                     return resolve("Success")
                 })
             })
