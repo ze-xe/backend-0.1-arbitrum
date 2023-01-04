@@ -4,6 +4,7 @@ import Big from "big.js";
 import { getERC20ABI, getProvider, getInterface, MulticallAbi } from "../utils";
 import { ifOrderCreated, ifUserPosition, orderSignature } from "../helper/interface";
 import { getExchangeAddress, MulticallAddress } from "../helper/chain";
+import { sentry } from "../../app";
 
 /**
  * @dev this function is use to get onchain data for create order api, i.e balance and allowance
@@ -12,6 +13,7 @@ import { getExchangeAddress, MulticallAddress } from "../helper/chain";
  * @param {*} chainId (string) numeric chainId
  * @returns ([number])) [balance, allowance]
  */
+
 async function multicall(token: string, maker: string, chainId: string): Promise<number[] | null> {
     try {
 
@@ -39,6 +41,45 @@ async function multicall(token: string, maker: string, chainId: string): Promise
 
     }
     catch (error) {
+        sentry.captureException(error)
+        console.log(`Error @ Multicall`, error)
+        return null
+    }
+}
+
+export async function multicallFor2Tokens(token0: string, token1: string, maker: string, chainId: string): Promise<number[] | null> {
+    try {
+
+        const provider: ethers.providers.JsonRpcProvider = getProvider(chainId);
+
+        const multicall = new ethers.Contract(
+            MulticallAddress[`${chainId}`],
+            MulticallAbi,
+            provider
+        );
+
+        const itf: ethers.utils.Interface = getInterface(getERC20ABI());
+        const input: string[][] = [
+            [token0, itf.encodeFunctionData("balanceOf", [maker])],
+            [token0, itf.encodeFunctionData("allowance", [maker, getExchangeAddress(chainId)])],
+            [token1, itf.encodeFunctionData("balanceOf", [maker])],
+            [token1, itf.encodeFunctionData("allowance", [maker, getExchangeAddress(chainId)])]
+        ]
+        let resp = await multicall.callStatic.aggregate(
+            input
+        );
+
+        let outPut: number[] = [];
+
+        for (let i in resp[1]) {
+            outPut.push(Number(BigNumber.from(resp[1][i]).toString()))
+        }
+
+        return outPut
+
+    }
+    catch (error) {
+        sentry.captureException(error)
         console.log(`Error @ Multicall`, error)
         return null
     }
@@ -94,7 +135,7 @@ async function getMultiBalance(token: string, addresses: string[], ids: string[]
                     let currentInOrderBalance = Big(inOrderBalance).minus(amounts[i]).toString();
 
                     let updateUserPosition = UserPosition.findOneAndUpdate({ token: token, id: addresses[i], chainId: chainId }, { $set: { inOrderBalance: currentInOrderBalance } });
-
+                    console.log("Order Deactivate", data[i].id)
                     let deleteOrder = OrderCreated.findOneAndUpdate({ _id: ids[i] }, { $set: { active: false } });
                     await Promise.all([updateUserPosition, deleteOrder]);
                 }
@@ -117,17 +158,21 @@ async function getMultiBalance(token: string, addresses: string[], ids: string[]
                             token0: data[i].token0,
                             token1: data[i].token1,
                             amount: data[i].amount,
-                            buy: data[i].buy,
+                            orderType: data[i].orderType,
                             salt: data[i].salt,
                             exchangeRate: data[i].exchangeRate,
+                            borrowLimit: data[i].borrowLimit,
+                            loops: data[i].loops
                         }
                     });
+
                 }
             }
 
             return res;
         } catch (error) {
-            console.log("Error @ Multicall", error);
+            sentry.captureException(error);
+            console.log("Error @ getMultiBalance", error);
             return null
 
         }
@@ -171,12 +216,12 @@ async function orderStatus(chainId: string) {
             // creating input for multicall
             for (let k in getOrderCreated) {
 
-                if (getOrderCreated[k].buy == false) {
+                if (getOrderCreated[k].orderType == 1 || getOrderCreated[k].orderType == 3) {
 
                     input.push([getOrderCreated[k].token0, itf.encodeFunctionData("balanceOf", [getOrderCreated[k].maker])]);
 
                 }
-                else if (getOrderCreated[k].buy == true) {
+                else if (getOrderCreated[k].orderType == 0 || getOrderCreated[k].orderType == 2) {
 
                     input.push([getOrderCreated[k].token1, itf.encodeFunctionData("balanceOf", [getOrderCreated[k].maker])]);
                 }
@@ -189,17 +234,23 @@ async function orderStatus(chainId: string) {
 
                 let balance: string = BigNumber.from(resp[1][i]).toString();
 
-                let token: string;
-                let amount: Big;
+                let token: string = '';
+                let amount: Big = Big(0);
                 let id = getOrderCreated[i].maker;
 
-                if (getOrderCreated[i].buy == false) {
+                if (getOrderCreated[i].orderType == 1 || getOrderCreated[i].orderType == 3) {
                     token = getOrderCreated[i].token0;
                     amount = Big(getOrderCreated[i].balanceAmount);
+                    if (getOrderCreated[i].orderType == 3) {
+                        amount = Big(getOrderCreated[i].amount);
+                    }
                 }
-                else {
+                else if (getOrderCreated[i].orderType == 0 || getOrderCreated[i].orderType == 2) {
                     token = getOrderCreated[i].token1;
                     amount = Big(getOrderCreated[i].balanceAmount).times(getOrderCreated[i].exchangeRate).div(Big(10).pow(18));
+                    if (getOrderCreated[i].orderType == 2) {
+                        amount = Big(getOrderCreated[i].amount).times(getOrderCreated[i].exchangeRate).div(Big(10).pow(18));
+                    }
                 }
 
                 if (getOrderCreated[i].active == true) {
@@ -237,6 +288,7 @@ async function orderStatus(chainId: string) {
 
     }
     catch (error) {
+        sentry.captureException(error)
         console.log("Error @ orderStatus", error);
     }
 }

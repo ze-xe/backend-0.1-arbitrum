@@ -9,8 +9,9 @@ const PairCreatedSchema = new mongoose.Schema({
     exchangeRate: { type: String, required: true },
     priceDiff: String,
     chainId: String,
-    symbol: String
-
+    symbol: String,
+    marginEnabled: {type: Boolean, default: false},
+    
 },
     { timestamps: true }
 );

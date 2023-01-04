@@ -11,7 +11,6 @@ export interface ifOrderCreated {
     salt: string
     amount: string
     exchangeRate: string
-    buy: boolean
     exchangeRateDecimals: string
     balanceAmount: string
     deleted: boolean
@@ -20,6 +19,13 @@ export interface ifOrderCreated {
     cid: string
     cancelled: boolean
     _id: string
+    borrowLimit: string,
+    loops: string,
+    orderType: number,
+    fillAmount: string
+    lastInOrderToken0: string
+    lastInOrderToken1: string
+    
 }
 
 export interface ifUserPosition {
@@ -41,6 +47,8 @@ export interface ifPairCreated {
     priceDiff: string
     chainId: string
     _id: string
+    marginEnabled: boolean,
+
 }
 
 export interface orderSignature {
@@ -51,9 +59,11 @@ export interface orderSignature {
         token0: string
         token1: string
         amount: string
-        buy: boolean
+        orderType: number
         salt: string
-        exchangeRate: string,
+        exchangeRate: string
+        borrowLimit: string
+        loops: string
     }
 
 }
@@ -81,4 +91,4 @@ export interface ifEventListner {
     chainId: string
 }
 
-export type Interval = "5"| "15"| "30"| "1H"| "4H"| "1D"| "1W";
+export type Interval = "5"| "15"| "30"| "60"| "240"| "1D"| "1W";

@@ -1,18 +1,16 @@
 import { ifOrderCreated, ifPairCreated } from "../helper/interface";
 
 import { PairCreated, Token, OrderCreated, OrderExecuted } from "../db";
-import Big from "big.js";
-import { parseEther } from "../utils";
 import { Decimals } from "../helper/constant";
-import { errorMessage } from "../helper/errorMessage";
+import { errorMessage } from "../helper/errorMessage"
+import { sentry } from "../../app";
 
 
 
-
-async function fetchOrders(req: any, res: any) {
+export async function fetchOrders(req: any, res: any) {
     try {
 
-        let pairId: string = req.params.pairId;
+        let pairId: string = req.params.pairId?.toLowerCase();
         let chainId: string = req.query.chainId;
 
         if (!pairId) {
@@ -29,8 +27,8 @@ async function fetchOrders(req: any, res: any) {
             return res.status(404).send({ status: false, error: errorMessage.pairId });
         }
 
-        let buyOrder: any | ifOrderCreated[] = OrderCreated.find({ pair: pairId, chainId: chainId, buy: true, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).collation({locale:"en_US", numericOrdering:true}).lean();
-        let sellOrder: any | ifOrderCreated[] = OrderCreated.find({ pair: pairId, chainId: chainId, buy: false, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).collation({locale:"en_US", numericOrdering:true}).lean();
+        let buyOrder: any | ifOrderCreated[] = OrderCreated.find({ pair: pairId, chainId: chainId, orderType: { $in: [0, 2] }, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+        let sellOrder: any | ifOrderCreated[] = OrderCreated.find({ pair: pairId, chainId: chainId, orderType: { $in: [1, 3] }, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
 
         let promise = await Promise.all([buyOrder, sellOrder]);
         buyOrder = promise[0];
@@ -101,13 +99,14 @@ async function fetchOrders(req: any, res: any) {
         return res.status(200).send({ status: true, data: data });
     }
     catch (error: any) {
+        sentry.captureException(error)
         console.log("Error @ fetchOrders", error);
         return res.status(500).send({ status: false, error: error.message });
     }
 }
 
 
-async function getAllPairDetails(req: any, res: any) {
+export async function getAllPairDetails(req: any, res: any) {
 
     try {
 
@@ -141,8 +140,10 @@ async function getAllPairDetails(req: any, res: any) {
                 exchangeRate: allPairs[i].exchangeRate,
                 exchangeRateDecimals: allPairs[i].exchangeRateDecimals,
                 priceDiff: allPairs[i].priceDiff,
+                marginEnabeled: allPairs[i].marginEnabled,
                 minToken0Order: allPairs[i].minToken0Order,
-                tokens: [token0, token1]
+                tokens: [token0, token1],
+               
             };
 
             data.push(temp);
@@ -153,294 +154,16 @@ async function getAllPairDetails(req: any, res: any) {
     }
     catch (error: any) {
         console.log("Error @ getAllPairDetails", error);
+        sentry.captureException(error)
         res.status(500).send({ status: false, error: error.message });
     }
 }
 
 
-
-
-async function _getPairPriceTrend(req: any, res: any) {
-
+export async function getPairOrderExecutedHistory(req: any, res: any) {
     try {
 
-        let pairId: string = req.params.pairId;
-        let interval: number = Number(req.query.interval);
-        let chainId: string = req.query.chainId;
-
-        if (isNaN(interval) == true || interval < 300000) {
-            return res.status(400).send({ status: false, error: errorMessage.interval });
-        }
-
-        if (!pairId) {
-            return res.status(400).send({ status: false, error: errorMessage.pairId });
-        }
-        if (!chainId) {
-            return res.status(400).send({ status: false, error: errorMessage.chainId });
-        }
-
-        let data = await OrderExecuted.find({ pair: pairId, chainId: chainId }).sort({ blockTimestamp: 1, createdAt: 1 }).lean();
-        console.log(data.length)
-        if (data.length == 0) {
-
-            let isPairExist = await PairCreated.findOne({ id: pairId, chainId }).lean();
-
-            if (!isPairExist) {
-                return res.status(404).send({ status: false, error: errorMessage.pairId });
-            }
-            return res.status(200).send({ status: true, data: [] });
-        }
-
-        let exchangeRatesTrend = [];
-        let volumeTrend = [];
-
-        let min: string = Big(Number.MAX_VALUE).toString();
-        let max: string = Big(0).toString();
-        let open: string = data[0].exchangeRate;
-        let close: string = data[0].exchangeRate;
-        let currTimestamp = data[0].blockTimestamp;
-        let closeTimeStamp = data[0].blockTimestamp;
-        let volume: string | number = 0;
-
-        for (let i = 0; i < data.length; i++) {
-            if (data[i].blockTimestamp > currTimestamp + interval) {
-
-            }
-
-            if (data[i].blockTimestamp <= currTimestamp + interval) {
-                // this block will mainly update the min max, open close value
-
-                if (Number(data[i].exchangeRate) > Number(max)) {
-                    max = data[i].exchangeRate;
-                }
-
-                if (Number(data[i].exchangeRate) < Number(min)) {
-                    min = data[i].exchangeRate;
-                }
-
-                close = data[i].exchangeRate;
-                volume = Big(volume).plus(data[i].fillAmount).toString();
-
-                if (i == data.length - 1) {
-
-                    let temp = {
-                        time: currTimestamp / 1000,
-                        open: Big(open).div(Big(10).pow(18)).toString(),
-                        high: Big(max).div(Big(10).pow(18)).toString(),
-                        close: Big(close).div(Big(10).pow(18)).toString(),
-                        low: Big(min).div(Big(10).pow(18)).toString(),
-
-                    };
-                    exchangeRatesTrend.push(temp);
-                    volumeTrend.push({ time: currTimestamp / 1000, value: Big(volume).div(Big(10).pow(18)).toString() });
-                }
-            }
-            else {
-
-                //if value exceed it will  genrate object regarding upper if block
-                let temp = {
-                    time: currTimestamp / 1000,
-                    open: Big(open).div(Big(10).pow(18)).toString(),
-                    high: Big(max).div(Big(10).pow(18)).toString(),
-                    close: Big(close).div(Big(10).pow(18)).toString(),
-                    low: Big(min).div(Big(10).pow(18)).toString(),
-
-                };
-                exchangeRatesTrend.push(temp);
-                volumeTrend.push({ time: currTimestamp / 1000, value: Big(volume).div(Big(10).pow(18)).toString() });
-
-                // here now we are updating value as per the current itration
-                min = data[i].exchangeRate;
-                max = data[i].exchangeRate;
-                open = data[i].exchangeRate;
-                close = data[i].exchangeRate;
-                currTimestamp = data[i].blockTimestamp;
-                volume = data[i].fillAmount;
-
-                if (i == data.length - 1) {
-
-                    let temp = {
-                        time: currTimestamp / 1000,
-                        open: Big(open).div(Big(10).pow(18)).toString(),
-                        high: Big(max).div(Big(10).pow(18)).toString(),
-                        close: Big(close).div(Big(10).pow(18)).toString(),
-                        low: Big(min).div(Big(10).pow(18)).toString(),
-                    };
-                    exchangeRatesTrend.push(temp);
-                    volumeTrend.push({ time: currTimestamp / 1000, value: Big(volume).div(Big(10).pow(18)).toString() });
-
-                }
-
-            }
-        }
-
-        let result = {
-            exchangeRate: exchangeRatesTrend,
-            volume: volumeTrend
-        };
-        return res.status(200).send({ status: true, data: result });
-    }
-
-    catch (error: any) {
-        console.log("Error @ getPriceDetails", error);
-        return res.status(500).send({ status: false, error: error.message });
-    }
-}
-
-async function getPairPriceTrend(req: any, res: any) {
-
-    try {
-
-        let pairId: string = req.params.pairId;
-        let interval: number = Number(req.query.interval);
-        let chainId: string = req.query.chainId;
-
-        if (isNaN(interval) == true || interval < 300000) {
-            return res.status(400).send({ status: false, error: errorMessage.interval });
-        }
-
-        if (!pairId) {
-            return res.status(400).send({ status: false, error: errorMessage.pairId });
-        }
-        if (!chainId) {
-            return res.status(400).send({ status: false, error: errorMessage.chainId });
-        }
-
-        let data = await OrderExecuted.find({ pair: pairId, chainId: chainId }).sort({ blockTimestamp: 1, logIndex: 1 }).collation({locale:"en_US", numericOrdering:true}).lean().lean();
-        // console.log(data.length)
-        if (data.length == 0) {
-
-            let isPairExist = await PairCreated.findOne({ id: pairId, chainId }).lean();
-
-            if (!isPairExist) {
-                return res.status(404).send({ status: false, error: errorMessage.pairId });
-            }
-            return res.status(200).send({ status: true, data: [] });
-        }
-
-        let exchangeRatesTrend = [];
-        let volumeTrend = [];
-
-        let min: string = Big(Number.MAX_VALUE).toString();
-        let max: string = Big(0).toString();
-        let open: string = data[0].exchangeRate;
-        let close: string = data[0].exchangeRate;
-        let currTimestamp = data[0].blockTimestamp;
-        let closeTimeStamp = data[0].blockTimestamp;
-        let volume: string | number = 0;
-
-        for (let i = 0; i < data.length; i++) {
-
-
-
-            if (data[i].blockTimestamp <= currTimestamp + interval) {
-                // this block will mainly update the min max, open close value
-
-                if (Number(data[i].exchangeRate) > Number(max)) {
-                    max = data[i].exchangeRate;
-                }
-
-                if (Number(data[i].exchangeRate) < Number(min)) {
-                    min = data[i].exchangeRate;
-                }
-
-                close = data[i].exchangeRate;
-                volume = Big(volume).plus(data[i].fillAmount).toString();
-
-                if (i == data.length - 1) {
-
-                    let temp = {
-                        time: currTimestamp / 1000,
-                        open: Big(open).div(Big(10).pow(18)).toString(),
-                        high: Big(max).div(Big(10).pow(18)).toString(),
-                        close: Big(close).div(Big(10).pow(18)).toString(),
-                        low: Big(min).div(Big(10).pow(18)).toString(),
-
-                    };
-                    exchangeRatesTrend.push(temp);
-                    volumeTrend.push({ time: currTimestamp / 1000, value: Big(volume).div(Big(10).pow(18)).toString() });
-                }
-            }
-            else {
-
-                //if value exceed it will  genrate object regarding upper if block
-                let temp = {
-                    time: currTimestamp / 1000,
-                    open: Big(open).div(Big(10).pow(18)).toString(),
-                    high: Big(max).div(Big(10).pow(18)).toString(),
-                    close: Big(close).div(Big(10).pow(18)).toString(),
-                    low: Big(min).div(Big(10).pow(18)).toString(),
-
-                };
-                exchangeRatesTrend.push(temp);
-                volumeTrend.push({ time: currTimestamp / 1000, value: Big(volume).div(Big(10).pow(18)).toString() });
-
-
-                currTimestamp = currTimestamp + interval;
-                // checking next block lays in next interval
-                if (data[i].blockTimestamp > currTimestamp + interval) {
-                    let temp = {
-                        time: (currTimestamp) / 1000,
-                        open: Big(close).div(Big(10).pow(18)).toString(),
-                        high: Big(close).div(Big(10).pow(18)).toString(),
-                        close: Big(close).div(Big(10).pow(18)).toString(),
-                        low: Big(close).div(Big(10).pow(18)).toString(),
-                    };
-                    exchangeRatesTrend.push(temp);
-                    volumeTrend.push({ time: (currTimestamp) / 1000, value: '0' });
-                    min = close;
-                    max = close;
-                    open = close;
-                    close = close;
-                    currTimestamp = currTimestamp + interval;
-                    volume = '0';
-                    i--;
-                }
-                else {
-                    // block fall in that interval
-                    min = data[i].exchangeRate;
-                    max = data[i].exchangeRate;
-                    open = close;
-                    close = data[i].exchangeRate;
-                    // currTimestamp = currTimestamp + interval;
-                    volume = data[i].fillAmount;
-                }
-
-                if (i == data.length - 1) {
-
-                    let temp = {
-                        time: currTimestamp / 1000,
-                        open: Big(open).div(Big(10).pow(18)).toString(),
-                        high: Big(max).div(Big(10).pow(18)).toString(),
-                        close: Big(close).div(Big(10).pow(18)).toString(),
-                        low: Big(min).div(Big(10).pow(18)).toString(),
-                    };
-                    exchangeRatesTrend.push(temp);
-                    volumeTrend.push({ time: currTimestamp / 1000, value: Big(volume).div(Big(10).pow(18)).toString() });
-
-                }
-
-            }
-        }
-
-        let result = {
-            exchangeRate: exchangeRatesTrend,
-            volume: volumeTrend
-        };
-        return res.status(200).send({ status: true, data: result });
-    }
-
-    catch (error: any) {
-        console.log("Error @ getPriceDetails", error);
-        return res.status(500).send({ status: false, error: error.message });
-    }
-}
-
-
-async function getPairOrderExecutedHistory(req: any, res: any) {
-    try {
-
-        let pairId: string = req.params.pairId;
+        let pairId: string = req.params.pairId?.toLowerCase();
         let chainId: string = req.query.chainId;
 
         if (!pairId) {
@@ -451,24 +174,25 @@ async function getPairOrderExecutedHistory(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
 
-        let getPairOrderHistory = await OrderExecuted.find({ pair: pairId, chainId }).sort({ blockTimestamp: -1, logIndex: -1 }).select({ fillAmount: 1, exchangeRate: 1, buy: 1, _id: 0 }).limit(50).lean();
+        let getPairOrderHistory = await OrderExecuted.find({ pair: pairId, chainId }).sort({ blockTimestamp: -1, logIndex: -1 }).select({ fillAmount: 1, exchangeRate: 1, orderType: 1, _id: 0 }).limit(50).lean();
 
         return res.status(200).send({ status: true, data: getPairOrderHistory });
 
     }
     catch (error: any) {
+        sentry.captureException(error)
         console.log("Error @ getPairOrderExecutedHistory", error);
-        return res.status(500).send({ status: false, error: error.message });
+        return res.status(500).send({ status: false, error: error.message }); 
     }
 }
 
 
 
-async function getPairTradingStatus(req: any, res: any) {
+export async function getPairTradingStatus(req: any, res: any) {
 
     try {
 
-        let pairId: string = req.params.pairId;
+        let pairId: string = req.params.pairId.toLowerCase();
 
         let _24hr = 24 * 60 * 60 * 1000;
         let _7D = 7 * _24hr;
@@ -563,10 +287,11 @@ async function getPairTradingStatus(req: any, res: any) {
 
     }
     catch (error: any) {
+        sentry.captureException(error)
         console.log("Error @ getPairTradingStatus", error);
         return res.status(500).send({ status: false, error: error.message });
+       
     }
 }
 
 
-export { getAllPairDetails, getPairPriceTrend, getPairOrderExecutedHistory, getPairTradingStatus, fetchOrders };

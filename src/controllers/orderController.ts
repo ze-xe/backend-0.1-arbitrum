@@ -9,6 +9,9 @@ import { mainIPFS } from "../IPFS/putFiles";
 import { errorMessage } from "../helper/errorMessage";
 import { ifOrderCreated, ifPairCreated, ifUserPosition, orderSignature } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
+import { _handleMarginOrderCreated } from "./marginOrderController";
+import { sentry } from "../../app";
+
 
 /**
  * 
@@ -22,7 +25,7 @@ import { EVENT_NAME, socketService } from "../socketIo/socket.io";
     "token0": "0x842681C1fA28EF2AA2A4BDE174612e901D2b7827",
     "token1": "0xa50fABf59f2c11fF0F02E7c94A82B442611F37B2",
     "amount": "1000000000000000000",
-    "buy": true,
+    "orderType": 0,
     "salt": "12345",
     "exchangeRate": "18000000000000000000000"
     }
@@ -30,20 +33,19 @@ import { EVENT_NAME, socketService } from "../socketIo/socket.io";
  * @param {*} req.body.ipfs (boolean) if it is present that means request is sent from backup 
  * @returns  error with message if any validation fail, if success return order created successfully
  */
-
-
 async function handleOrderCreated(req: any, res: any) {
     try {
 
-        let signature: string = req.body.signature;
-        let data: orderSignature["value"] = req.body.data;
+        let signature: string = req.body.signature?.toLowerCase();
+        let data = req.body.data;
         let chainId: string = req.body.chainId;
-        let ipfs: boolean = req.body.ipfs;
-
+        let ipfs: boolean | undefined = req.body.ipfs;
+        let orderType: number = data.orderType;
         let addresses = [data.maker, data.token0, data.token1];
-
+        data.maker = data.maker?.toLowerCase();
+        data.token0 = data.token0?.toLowerCase();
+        data.token1 = data.token1?.toLowerCase();
         await createOrderSchema.validateAsync({ createOrderSchemaData: req.body.data, signature: signature, chainId: chainId });
-
         for (let i in addresses) {
 
             if (!ethers.utils.isAddress(addresses[i])) {
@@ -73,9 +75,21 @@ async function handleOrderCreated(req: any, res: any) {
             return res.status(201).send({ status: true, message: "Order Already Created" });
         }
 
+        // if margin Order
+        if (orderType == 2 || orderType == 3) {
+            let response = await _handleMarginOrderCreated(signature, data, chainId, ipfs, id, exchangeRateDecimals)
+
+            if (response.status == false) {
+                return res.status(response.statusCode).send({ status: false, error: response.error })
+            }
+            else if (response.status == true) {
+                return res.status(response.statusCode).send({ status: true, message: response.message })
+            }
+        }
+
         let amount = Big(data.amount);
 
-        if (data.buy == false) {
+        if (data.orderType == 1) {
 
             const findUserPosition: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
 
@@ -85,7 +99,6 @@ async function handleOrderCreated(req: any, res: any) {
 
             if (!ipfs) {
                 multicallData = await multicall(data.token0, data.maker, chainId)
-
                 if (multicallData) {
                     userToken0Balance = multicallData[0];
                     allowance = multicallData[1];
@@ -138,7 +151,7 @@ async function handleOrderCreated(req: any, res: any) {
             }
         }
 
-        else if (data.buy == true) {
+        else if (data.orderType == 0) {
 
             let findUserPosition: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token1, chainId: chainId });
 
@@ -199,32 +212,49 @@ async function handleOrderCreated(req: any, res: any) {
                 );
 
             }
-
         }
-
 
         let isPairExist: ifPairCreated = await PairCreated.findOne({ token0: data.token0, token1: data.token1, chainId: chainId }).lean();
         let createPair: ifPairCreated | any;
 
         if (!isPairExist) {
-            let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token0, data.token1]);
+            // cheking for opposite pair
+            let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token1, data.token0]);
             let id = ethers.utils.keccak256(encoder);
-            let token0 = await handleToken(data.token0, chainId);
-            let token1 = await handleToken(data.token1, chainId);
-            let temp = {
-                id: id,
-                exchangeRateDecimals: exchangeRateDecimals,
-                minToken0Order: (10 ** 10).toString(),
-                exchangeRate: '0',
-                priceDiff: '0',
-                token0: data.token0,
-                token1: data.token1,
-                chainId: chainId,
-                symbol: `${token0}_${token1}`
-            }
-            createPair = await PairCreated.create(temp);
 
-            console.log("Pair Created ", "T0 ", data.token0, "T1 ", data.token1, "CId ", chainId);
+            let isPairExist1: ifPairCreated = await PairCreated.findOne({ id: id }).lean();;
+
+            if (isPairExist1) {
+                createPair = isPairExist1;
+            }
+
+            if (!isPairExist1) {
+                let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token0, data.token1]);
+                let id = ethers.utils.keccak256(encoder);
+
+                let token0 = await handleToken(data.token0, chainId);
+                let token1 = await handleToken(data.token1, chainId);
+                let marginEnabled = false;
+                if (token0?.marginEnabled == true && token1?.marginEnabled == true) {
+                    marginEnabled = true
+                }
+                let temp = {
+                    id: id,
+                    exchangeRateDecimals: exchangeRateDecimals,
+                    minToken0Order: token0?.minToken0Amount,
+                    exchangeRate: '0',
+                    priceDiff: '0',
+                    token0: data.token0,
+                    token1: data.token1,
+                    chainId: chainId,
+                    symbol: `${token0?.symbol}_${token1?.symbol}`,
+                    marginEnabled: marginEnabled
+                }
+                createPair = await PairCreated.create(temp);
+
+                console.log("Pair Created ", "T0 ", data.token0, "T1 ", data.token1, "CId ", chainId);
+
+            }
 
         }
         let pair: string;
@@ -234,15 +264,18 @@ async function handleOrderCreated(req: any, res: any) {
         else {
             pair = createPair.id.toString();
         }
-        let cid;
+        let cid = "";
         if (!ipfs) {
-            cid = await mainIPFS([
-                data,
-                signature,
-                chainId
-            ],
-                id
-            );
+
+            if (!process.env.NODE_ENV?.includes('test')) {
+                cid = await mainIPFS([
+                    data,
+                    signature,
+                    chainId
+                ],
+                    id
+                );
+            }
 
             OrderCreatedBackup.create(
                 {
@@ -255,19 +288,18 @@ async function handleOrderCreated(req: any, res: any) {
                     amount: data.amount,
                     salt: data.salt,
                     exchangeRate: data.exchangeRate,
-                    buy: data.buy,
+                    orderType: data.orderType,
                     chainId: chainId,
                     exchangeRateDecimals: exchangeRateDecimals,
                     balanceAmount: data.amount,
                     active: true,
                     deleted: false,
-                    cid: cid
+                    cid: cid,
                 }
             );
         }
 
-
-        OrderCreated.create(
+        await OrderCreated.create(
 
             {
                 id: id,
@@ -279,24 +311,22 @@ async function handleOrderCreated(req: any, res: any) {
                 amount: data.amount,
                 salt: data.salt,
                 exchangeRate: data.exchangeRate,
-                buy: data.buy,
+                orderType: data.orderType,
                 chainId: chainId,
                 exchangeRateDecimals: exchangeRateDecimals,
                 balanceAmount: data.amount,
                 active: true,
                 deleted: false,
-                cid: cid
+                cid: cid,
             }
         );
-
-
 
         // socket io data
         if (!ipfs) {
             socketService.emit(EVENT_NAME.PAIR_ORDER, {
                 amount: data.amount,
                 exchangeRate: data.exchangeRate,
-                buy: data.buy,
+                orderType: data.orderType,
                 pair: pair
             });
         }
@@ -309,10 +339,16 @@ async function handleOrderCreated(req: any, res: any) {
     catch (error: any) {
 
         if (error.isJoi == true) error.status = 422;
+        sentry.captureException(error)
         console.log("Error @ handleOrderCreated", error);
         return res.status(error.status).send({ status: false, error: error.message });
     }
 }
+
+
+
+
+
 
 
 /**
@@ -325,15 +361,16 @@ async function handleOrderCreated(req: any, res: any) {
  * @param {*} res 
  * @returns 
  */
+
 async function getLimitMatchedOrders(req: any, res: any) {
 
     try {
 
-        let pairId: string = req.params.pairId;
+        let pairId: string = req.params.pairId?.toLowerCase();
 
         let exchangeRate: string = req.query.exchangeRate;
 
-        let buy: string = req.query.buy;
+        let orderType: number = Number(req.query.orderType);
 
         let amount: number = Number(req.query.amount);
 
@@ -348,8 +385,8 @@ async function getLimitMatchedOrders(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.exchangerate });
         }
 
-        if (!buy || (buy != "true" && buy != "false")) {
-            return res.status(400).send({ status: false, error: errorMessage.buy });
+        if (isNaN(orderType) == true) {
+            return res.status(400).send({ status: false, error: errorMessage.orderType });
         }
 
         if (!amount || isNaN(amount) == true) {
@@ -364,15 +401,15 @@ async function getLimitMatchedOrders(req: any, res: any) {
 
         let getMatchedDoc: ifOrderCreated[] = [];
 
-        if (buy == "true") {
+        if (orderType == 0 || orderType == 2) {
             getMatchedDoc = await OrderCreated.aggregate(
                 [
                     {
                         $match: {
                             $and: [
                                 { pair: pairId },
-                                {"$expr" : {"$lte" : [{"$toDouble" :"$exchangeRate"} , Number(exchangeRate)]}},
-                                { buy: false },
+                                { "$expr": { "$lte": [{ "$toDouble": "$exchangeRate" }, Number(exchangeRate)] } },
+                                { orderType: { $in: [1, 3] } },
                                 { chainId: chainId },
                                 { deleted: false },
                                 { active: true },
@@ -392,15 +429,15 @@ async function getLimitMatchedOrders(req: any, res: any) {
                 }
             );
         }
-        else if (buy == "false") {
+        else if (orderType == 1 || orderType == 3) {
             getMatchedDoc = await OrderCreated.aggregate(
                 [
                     {
                         $match: {
                             $and: [
                                 { pair: pairId },
-                                {"$expr" : {"$gte" : [{"$toDouble" :"$exchangeRate"} , Number(exchangeRate)]}},
-                                { buy: true },
+                                { "$expr": { "$gte": [{ "$toDouble": "$exchangeRate" }, Number(exchangeRate)] } },
+                                { orderType: { $in: [0, 2] } },
                                 { chainId: chainId },
                                 { deleted: false },
                                 { active: true },
@@ -450,13 +487,13 @@ async function getLimitMatchedOrders(req: any, res: any) {
         }
 
         let token;
-        if (buy == "true") {
+        if (orderType == 0 || orderType == 2) {
             token = data[0].token0;
         } else {
             token = data[0].token1;
         }
 
-        let response: orderSignature[] | null = await getMultiBalance(token, addresses, ids, data, chainId, amounts);
+        let response = await getMultiBalance(token, addresses, ids, data, chainId, amounts);
 
         if (!response) {
             return res.status(200).send({ status: true, data: [] });
@@ -466,6 +503,7 @@ async function getLimitMatchedOrders(req: any, res: any) {
     }
     catch (error: any) {
         console.log("Error @ getMatchedOrders", error);
+        sentry.captureException(error)
         return res.status(500).send({ status: false, error: error.message });
     }
 }
@@ -474,8 +512,8 @@ async function getLimitMatchedOrders(req: any, res: any) {
 async function getMatchedMarketOrders(req: any, res: any) {
     try {
 
-        let pairId: string = req.params.pairId;
-        let buy: string = req.query.buy;
+        let pairId: string = req.params.pairId?.toLowerCase();
+        let orderType: number = Number(req.query.orderType);
         let amount: number = Number(req.query.amount);
         let chainId: string = req.query.chainId;
 
@@ -487,8 +525,8 @@ async function getMatchedMarketOrders(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.pairId });
         }
 
-        if (!buy || (buy != "false" && buy != "true")) {
-            return res.status(400).send({ status: false, error: errorMessage.buy });
+        if (isNaN(orderType) == true) {
+            return res.status(400).send({ status: false, error: errorMessage.orderType });
         }
 
         if (isNaN(amount) == true || amount <= 0) {
@@ -496,11 +534,12 @@ async function getMatchedMarketOrders(req: any, res: any) {
         }
 
         let getMatchedDoc: ifOrderCreated[] = [];
-        if (buy == "true") {
-            getMatchedDoc = await OrderCreated.find({ pair: pairId, buy: false, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).collation({locale: "en_US", numericOrdering: true}).lean();
+
+        if (orderType == 0 || orderType == 2) {
+            getMatchedDoc = await OrderCreated.find({ pair: pairId, orderType: { $in: [1, 3] }, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
         }
-        else if (buy == "false") {
-            getMatchedDoc = await OrderCreated.find({ pair: pairId, buy: true, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).collation({locale: "en_US", numericOrdering: true}).lean();
+        else if (orderType == 1 || orderType == 3) {
+            getMatchedDoc = await OrderCreated.find({ pair: pairId, orderType: { $in: [0, 2] }, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
         }
 
         let data: ifOrderCreated[] = [];
@@ -518,10 +557,10 @@ async function getMatchedMarketOrders(req: any, res: any) {
                     break;
                 }
             }
-            if (buy == "true") {
+            if (orderType == 0 || orderType == 2) {
                 currAmount += Number(Big(getMatchedDoc[i].balanceAmount).times(getMatchedDoc[i].exchangeRate).div(Big(10).pow(18)));
             }
-            else if (buy == "false") {
+            else if (orderType == 1 || orderType == 3) {
                 currAmount += Number(getMatchedDoc[i].balanceAmount)
             }
             addresses.push(getMatchedDoc[i].maker);
@@ -536,13 +575,13 @@ async function getMatchedMarketOrders(req: any, res: any) {
         }
 
         let token;
-        if (buy == "true") {
+        if (orderType == 0 || orderType == 2) {
             token = data[0].token0;
         } else {
             token = data[0].token1;
         }
 
-        let result: orderSignature[] | null = await getMultiBalance(token, addresses, ids, data, chainId, amounts);
+        let result = await getMultiBalance(token, addresses, ids, data, chainId, amounts);
 
         if (!result) {
             return res.status(200).send({ status: true, data: [] });
@@ -551,6 +590,7 @@ async function getMatchedMarketOrders(req: any, res: any) {
     }
     catch (error: any) {
         console.log("Error @ getMatchedMarketOrders", error);
+        sentry.captureException(error)
         return res.status(500).send({ status: false, error: error.message });
     }
 }

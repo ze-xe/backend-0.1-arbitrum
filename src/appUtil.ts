@@ -1,15 +1,13 @@
 
-import {ethers} from "ethers";
-import Big from "big.js";
 import { OrderCreated, OrderCreatedBackup } from "./db";
 import axios, { AxiosResponse } from "axios";
 import { ExchangeConfig } from "./sync/configs/exchange";
 import { historicEventListner } from "./sync/sync";
 import mongoose from "mongoose";
 import { startOrderStatus } from "./sync/syncBalance";
-import { ifOrderCreated} from "./helper/interface";
+import { ifOrderCreated } from "./helper/interface";
 import { socketService } from "./socketIo/socket.io";
-import { httpServer } from "../app";
+import { httpServer, sentry } from "../app";
 require("dotenv").config();
 
 
@@ -19,7 +17,7 @@ require("dotenv").config();
  */
 async function start(chainId: string) {
     try {
-        let getCreateRecords : ifOrderCreated []= await OrderCreated.find();
+        let getCreateRecords: ifOrderCreated[] = await OrderCreated.find();
 
         if (getCreateRecords.length == 0) {
 
@@ -35,6 +33,18 @@ async function start(chainId: string) {
 
                 for (let i in copyOrder) {
 
+                    const input = {
+                        maker: copyOrder[i].maker,
+                        token0: copyOrder[i].token0,
+                        token1: copyOrder[i].token1,
+                        amount: copyOrder[i].amount,
+                        orderType: copyOrder[i].orderType,
+                        salt: Number(copyOrder[i].salt),
+                        exchangeRate: copyOrder[i].exchangeRate,
+                        borrowLimit: copyOrder[i].borrowLimit,
+                        loops: copyOrder[i].loops
+                    }
+
                     let result: AxiosResponse = await axios({
                         method: "post",
                         url: "http://localhost:3010/order/create",
@@ -42,21 +52,11 @@ async function start(chainId: string) {
                             signature: copyOrder[i].signature,
                             chainId: copyOrder[i].chainId.toString(),
                             ipfs: true,
-                            data: {
-                                maker: copyOrder[i].maker,
-                                token0: copyOrder[i].token0,
-                                token1: copyOrder[i].token1,
-                                amount: copyOrder[i].amount,
-                                buy: copyOrder[i].buy,
-                                salt: Number(copyOrder[i].salt),
-                                exchangeRate:copyOrder[i].exchangeRate,
-
-                            }
+                            data: input
                         }
                     });
 
                     console.log("backup Create Request", result.data);
-
                 }
                 page++;
 
@@ -65,18 +65,26 @@ async function start(chainId: string) {
                 }
 
             }
-
-
-
         }
         await historicEventListner(ExchangeConfig(chainId));
         socketService.init(httpServer)
         startOrderStatus(chainId)
     }
     catch (error) {
+        sentry.captureException(error)
         console.log("Error @ start", error);
     }
 }
+
+// setTimeout(()=>{
+//     setInterval(async ()=>{
+//         let result: AxiosResponse = await axios({
+//             method: "get",
+//             url: "http://localhost:3010/pair/allpairs?chainId=421613",
+//         });
+//     },10)
+// },10000)
+
 
 
 export { start };

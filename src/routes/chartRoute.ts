@@ -1,5 +1,5 @@
 import express from "express";
-import { getBar, getSymbol } from "../controllers/TradingViewController";
+import { getBar, getSymbol } from "../controllers/chartController";
 
 
 const router = express.Router();

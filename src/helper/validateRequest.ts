@@ -4,13 +4,15 @@ import joi from "joi";
 
 const createOrderSchemaData = joi.object().keys(
     {
-        maker: joi.string().required(),
-        token0: joi.string().required(),
-        token1: joi.string().required(),
-        amount: joi.number().unsafe().required().max(10 ** 100),
-        buy: joi.boolean().required(),
+        maker: joi.string().required().max(50),
+        token0: joi.string().required().max(50),
+        token1: joi.string().required().max(50),
+        amount: joi.string().required(),
+        orderType: joi.number().required(),
         salt: joi.number().required().max(100 ** 10),
-        exchangeRate: joi.number().unsafe().required().max(10 ** 100)
+        exchangeRate: joi.string().required().max(50),
+        borrowLimit: joi.number().required(),
+        loops: joi.number().required()
 
     }
 );

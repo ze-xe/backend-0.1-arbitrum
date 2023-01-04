@@ -1,27 +1,27 @@
 import fs from "fs";
 import { ethers } from "ethers";
 import Big from "big.js";
-import { ExchangeAddress } from "./helper/constant";
 import { getExchangeAddress, getRpcLink } from "./helper/chain";
+import { contractName, version } from "./helper/constant";
 
-const exchangeDeployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Exchange.json")).toString());
+// const exchangeDeployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Exchange.json")).toString());
+const Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/deployments.json")).toString());
 
 const erc20Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/ERC20.json")).toString());
 
 const MulticallAbi = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Multical.json")).toString());
 
+export const leverageAbi = Deployments["sources"]["Lever"];
 
+// export const ExchangeAddress1 =  Deployments["contracts"]["Exchange"]["address"]
 
 function getExchangeABI() {
-    return exchangeDeployments["abi"];
-
+    return Deployments["sources"]["Exchange"];
 }
-
 
 function getERC20ABI() {
     return erc20Deployments["abi"];
 }
-
 
 function parseEther(value: number | string): string {
 
@@ -51,8 +51,8 @@ function validateSignature(maker: string, signature: string, value: object, chai
     try {
 
         const domain = {
-            name: "zexe",
-            version: "1",
+            name: contractName,
+            version: version,
             chainId: chainId,
             verifyingContract: getExchangeAddress(chainId),
         };
@@ -60,19 +60,21 @@ function validateSignature(maker: string, signature: string, value: object, chai
         // The named list of all type definitions
         const types = {
             Order: [
-                { name: "maker", type: "address" },
-                { name: "token0", type: "address" },
-                { name: "token1", type: "address" },
-                { name: "amount", type: "uint256" },
-                { name: "buy", type: "bool" },
-                { name: "salt", type: "uint32" },
-                { name: "exchangeRate", type: "uint216" }
-            ],
+                { name: 'maker', type: 'address' },
+                { name: 'token0', type: 'address' },
+                { name: 'token1', type: 'address' },
+                { name: 'amount', type: 'uint256' },
+                { name: 'orderType', type: 'uint8' },
+                { name: 'salt', type: 'uint32' },
+                { name: 'exchangeRate', type: 'uint176' },
+                { name: 'borrowLimit', type: 'uint32' },
+                { name: 'loops', type: 'uint8' }
+            ]
         };
 
-        const digest: string = ethers.utils._TypedDataEncoder.hash(domain, types, value);
+        const digest: string = ethers.utils._TypedDataEncoder.hash(domain, types, value).toLowerCase();
 
-        const signatureAddress: string = ethers.utils.recoverAddress(digest, signature);
+        const signatureAddress: string = ethers.utils.recoverAddress(digest, signature).toLowerCase();
         // console.log(maker, signatureAddress)
         if (maker == signatureAddress) {
             return digest;
@@ -86,6 +88,7 @@ function validateSignature(maker: string, signature: string, value: object, chai
         return null
     }
 }
+
 
 
 
@@ -158,7 +161,52 @@ function getDecimals(exchangeRate: string) {
 }
 
 
+export const expressMonitorConfig = {
 
+    title: 'Express Status',  // Default title
+    theme: 'default.css',     // Default styles
+    path: '/status',
+    socketPath: '/socket.io', // In case you use a custom path
+    // websocket: existingSocketIoInstance,
+    spans: [{
+        interval: 1,            // Every second
+        retention: 60           // Keep 60 datapoints in memory
+    }, {
+        interval: 5,            // Every 5 seconds
+        retention: 60
+    }, {
+        interval: 15,           // Every 15 seconds
+        retention: 60
+    }],
+    chartVisibility: {
+        cpu: true,
+        mem: true,
+        load: true,
+        eventLoop: true,
+        heap: true,
+        responseTime: true,
+        rps: true,
+        statusCodes: true
+    },
+    healthChecks: [
+        {
+            protocol: 'http',
+            host: 'localhost',
+            port: 3010,
+            path: '/DB/status',
+            headers: {},
+        },
+        {
+            protocol: 'http',
+            host: 'localhost',
+            port: 3010,
+            path: '/DB/fetch/record',
+            headers: {},
+        },
+
+    ],
+    // ignoreStartsWith: '/pair'
+}
 
 
 
