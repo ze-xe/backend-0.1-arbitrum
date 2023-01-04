@@ -6,7 +6,7 @@ import chaiHttp from "chai-http";
 import { ethers } from "ethers";
 import mongoose from "mongoose";
 import { httpServer } from "../../../app";
-import { connect, OrderCreated, OrderExecuted, UserPosition } from "../../db";
+import { connect, OrderCreated, OrderExecuted, Sync, UserPosition } from "../../db";
 import { getExchangeAddress } from "../../helper/chain";
 import { BtcAddress, ExchangeAddress, UsdcAddress } from "../helper/contractDeployment";
 import { ifOrderCreated } from "../../helper/interface";
@@ -48,7 +48,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         // httpServer
         await connect()
     });
-    
+
     it('mint 10 btc to user1, 200000 usdt to user2, approve exchange contract', async () => {
 
         let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
@@ -76,7 +76,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
 
     });
-    
+
 
     it(`user1 creates limit order to sell 1 btc @ 20000, check user inOrder Balance`, async () => {
 
@@ -171,7 +171,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         orderId = data.id
     })
 
-    
+
     it(`user2 buy user1s 0.8 btc order`, async () => {
         // balances
         let user1BtcBalancePre = btc.balanceOf(user1.address);
@@ -210,14 +210,19 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         user2UsdcBalancePost = promise1[2].toString();
         user2BtcBalancePost = promise1[3].toString();
 
+        let fee = await Sync.findOne().lean()! as any;
+        let makerFeeAmount = Big(fee?.makerFee).div(1e18).times(btcAmount);
+        let takerFeeAmount = Big(fee.takerFee).div(1e18).times(Big(btcAmount).minus(makerFeeAmount))
+
         expect(user1BtcBalancePost).to.equal(parseEther(Big(user1BtcBalancePre).minus(btcAmount).toString()));
         expect(user1UsdcBalancePost).to.equal(parseEther(
             Big(user1UsdcBalancePre)
-                .plus(Big(btcAmount)
+                .plus((Big(btcAmount)
+                    .minus(makerFeeAmount))
                     .times(exchangeRate)
                     .div(Big(10).pow(18))).toString()
         ));
-        expect(user2BtcBalancePost).to.equal(parseEther(Big(user2BtcBalancePre).plus(btcAmount).toString()))
+        expect(user2BtcBalancePost).to.equal(parseEther(Big(user2BtcBalancePre).plus(Big(btcAmount).minus(takerFeeAmount)).toString()))
         expect(user2UsdcBalancePost).to.equal(parseEther(
             Big(user2UsdcBalancePre)
                 .minus(Big(btcAmount)
@@ -302,7 +307,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
 
     })
-    
+
 
 
 
