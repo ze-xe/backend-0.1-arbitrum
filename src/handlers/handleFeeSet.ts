@@ -6,12 +6,13 @@ import { Sync } from "../db";
 export async function handleFeesSet(data: any){
 
     try{
-        let makerFee = data[0];
-        let takerFee = data[1];
+        let makerFee = data[0].toString();
+        let takerFee = data[1].toString();
 
-       await Sync.findOneAndUpdate(
+       let updateFee = await Sync.findOneAndUpdate(
         {},
-        {$set:{makerFee: makerFee, takerFee: takerFee}}
+        {$set:{makerFee: makerFee, takerFee: takerFee}},
+        {upsert: true}
        );
 
        console.log(`Fees Set updated maker ${makerFee}, taker ${takerFee}`);

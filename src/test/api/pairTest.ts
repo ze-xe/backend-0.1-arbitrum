@@ -16,7 +16,7 @@ describe('Testing Pair Api', () => {
 
     before(async () => { //Before each test we empty the database   
         // await mongoose.createConnection(process.env.MONGO_URL! as string).dropDatabase();
-        // connect()
+        connect()
     });
     /*
       * Test the /GET route
