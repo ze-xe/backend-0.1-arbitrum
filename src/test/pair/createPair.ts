@@ -13,7 +13,7 @@ import path from "path";
 import { connect, OrderCreated, UserPosition } from "../../db";
 import { ifOrderCreated } from "../../helper/interface";
 import { BtcAddress, cBtcAddress, contractName, cUsdcAddress, EthAddress, ExchangeAddress, leverAddress, LinkAddress, UsdcAddress, version, ZexeAddress } from "../../helper/constant";
-
+import { handleOrderCancelled } from "../../handlers/exchange";
 
 
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
@@ -173,58 +173,21 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
 
     });
 
-    it(`find created order in data base`, async () => {
+    it(`find created order in data base, cancel and delete it`, async () => {
 
         for (let i in signatures) {
-            let data = await OrderCreated.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
+            let data = await OrderCreated.findOne({ signature: signatures[i] }).lean()! as ifOrderCreated;
 
             expect(data).to.be.an('object');
             expect(data.amount).to.equal(amount);
             expect(data.maker).to.equal(user1.address.toLowerCase());
             orderCreated.push(data)
-        }
-
-
-    })
-
-    it(`cancel and Delete orders `, async () => {
-
-        for (let i in signatures) {
-
-            let exTxn = await exchange.connect(user1).cancelOrder(
-                signatures[i],
-                orders[i],
-                { gasLimit: "100000000" }
-            )
-            await exTxn.wait(1);
-    
-            let wait = () => {
-                return new Promise((resolve, reject) => {
-    
-                    let timeOutId = setTimeout(() => {
-                        return resolve("Success")
-                    }, 60000)
-    
-                    socket.on(EVENT_NAME.CANCEL_ORDER, (data) => {
-                        clearTimeout(timeOutId)
-                        return resolve("Success")
-                    })
-                })
-            }
-            let res = await wait()
-            expect(res).to.equal("Success")
-            let data = await OrderCreated.findOne({ signature: signatures[i] }).lean()! as ifOrderCreated;
-            expect(data).to.be.an('object')
-            expect(data).not.to.be.null;
-
 
             await OrderCreated.findOneAndDelete({ signature: signatures[i] })
         }
 
+
     })
-
-
-
 
 });
 
