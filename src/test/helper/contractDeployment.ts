@@ -21,6 +21,7 @@ export const leverAddress = getContractAddress("Lever");
 export const ZexeAddress = getContractAddress("ZEXE");
 export const cUsdcAddress = getContractAddress("lUSDC_Market");
 export const cBtcAddress = getContractAddress("lBTC_Market");
+export const LinkAddress = getContractAddress("LINK")
 
 function getContractAddress(name: string) {
     return Deployments["contracts"][name]["address"]
