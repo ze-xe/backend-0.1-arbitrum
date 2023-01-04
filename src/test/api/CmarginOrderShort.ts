@@ -15,7 +15,7 @@ import { connect, OrderCreated } from "../../db";
 import { ifOrderCreated } from "../../helper/interface";
 import { contractName, version } from "../../helper/constant";
 
-
+ 
 
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 
@@ -66,7 +66,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
         // httpServer
         await connect()
     });
-    /*
+    
     it('mint 200000 btc to user1, 200000 BTC to user2', async () => {
         // ORDER IS Short means user1 want more USDC
 
@@ -124,7 +124,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
             usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256),
         ])
     })
-    */
+    
 
 
     it(`user1 create short margin order 1 btc @ 20000}`, async () => {

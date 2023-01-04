@@ -9,12 +9,12 @@
   "scripts": {
     "start": "ts-node build",
     "build": "tsc -p .",
-    "dev": "yarn devDep && ts-node app.ts",
+    "dev": "ts-node app.ts",
     "stag": "yarn stagDep && ts-node app.ts",
     "devTest": "set NODE_ENV=test && ts-node app.ts",
     "prod": "./node_modules/.bin/pm2 start app.ts --watch",
     "prod2": "pm2 start ecosystem.config.js",
-    "test": "set NODE_ENV=test && mocha -r ts-node/register --timeout 180000 ./src/test/api/**/*.ts",
+    "test": "mocha -r ts-node/register --timeout 180000 ./src/test/api/**/*.ts",
     "coverage": "nyc npm run test",
     "test0": "mocha -r ts-node/register --timeout 60000 ./src/test/mocha_test.ts",
     "test1": "mocha -r ts-node/register --timeout 60000 ./src/test/margin_test.ts",
@@ -22,9 +22,11 @@
     "test3": "mocha -r ts-node/register --timeout 180000 ./src/test/api/AorderScriptTest.ts",
     "test4": "mocha -r ts-node/register --timeout 180000 ./src/test/api/BmarginOrderLong.ts",
     "test5": "mocha -r ts-node/register --timeout 180000 ./src/test/api/CmarginOrderShort.ts",
+    "pair": "mocha -r ts-node/register --timeout 180000 ./src/test/pair/createPair.ts",
+    "hand":"mocha -r ts-node/register --timeout 180000 ./src/test/handlers/handleMinTokenAmountSet.ts",
     "dep": "curl https://raw.githubusercontent.com/ze-xe/contracts-0.1/main/deployments/arbitrumGoerli/deployments.json -o ./src/deployments/deployments.json",
     "devDep": "curl https://raw.githubusercontent.com/ze-xe/contracts-0.1/dev/deployments/arbitrumGoerli/deployments.json -o ./src/deployments/deployments.json",
-    "stagDep": "curl https://raw.githubusercontent.com/ze-xe/contracts-0.1/stag/deployments/arbitrumGoerli/deployments.json -o ./src/deployments/deployments.json"
+    "stagDep": "curl https://raw.githubusercontent.com/ze-xe/contracts-0.1/staging/deployments/arbitrumGoerli/deployments.json -o ./src/deployments/deployments.json"
   },
   "dependencies": {
     "@sentry/node": "^7.28.1",
