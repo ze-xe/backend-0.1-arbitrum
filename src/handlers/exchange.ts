@@ -339,7 +339,7 @@ async function handleOrderCancelled(data: any) {
         console.log(`order Cancelled, orderId : ${data[0]}`);
     }
     catch (error) {
-        // sentry.captureException(error)
+        sentry.captureException(error)
         console.log("Error @ handleOrderCancelled", error);
     }
 

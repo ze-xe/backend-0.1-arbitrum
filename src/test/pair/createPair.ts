@@ -4,32 +4,21 @@ import { expect } from "chai";
 import chaiHttp from "chai-http";
 use(chaiHttp);
 import { ethers } from "ethers";
-import Big from "big.js";
-import { EVENT_NAME } from "../../socketIo/socket.io";
-import { getERC20ABI, getExchangeABI, getProvider, leverageAbi, parseEther } from "../../utils";
+import { getERC20ABI, getExchangeABI, getProvider} from "../../utils";
 import { getExchangeAddress } from "../../helper/chain";
-import { io } from "socket.io-client";
 import path from "path";
-import { connect, OrderCreated, UserPosition } from "../../db";
+import { connect, OrderCreated } from "../../db";
 import { ifOrderCreated } from "../../helper/interface";
-import { BtcAddress, cBtcAddress, contractName, cUsdcAddress, EthAddress, ExchangeAddress, leverAddress, LinkAddress, UsdcAddress, version, ZexeAddress } from "../../helper/constant";
+import { BtcAddress, contractName, EthAddress, ExchangeAddress, LinkAddress, UsdcAddress, version, ZexeAddress } from "../../helper/constant";
 import { handleOrderCancelled } from "../../handlers/exchange";
+import { httpServer } from "../../../app";
 
 
-require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
+// require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 
 
 
-const socket = io("http://localhost:3010");
-
-// socket.on(EVENT_NAME.PAIR_ORDER, (data) => {
-//     console.log("pairOrders", data)
-// });
-
-// socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
-//     console.log("pairHistory", data)
-// })
-
+// main server must be close 
 
 describe("Create Pair => Mint token, create order, deleteOrder", async () => {
 
@@ -43,7 +32,6 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
     let eth = new ethers.Contract(EthAddress, getERC20ABI(), provider);
     let zexe = new ethers.Contract(ZexeAddress, getERC20ABI(), provider);
     let link = new ethers.Contract(LinkAddress, getERC20ABI(), provider);
-    let lever = new ethers.Contract(leverAddress, leverageAbi, provider);
     let user1 = new ethers.Wallet(process.env.PRIVATE_KEY1! as string).connect(provider); //2
     let user2 = new ethers.Wallet(process.env.PRIVATE_KEY2! as string).connect(provider); //1
 
@@ -59,10 +47,10 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
 
     before(async () => { //Before each test we empty the database   
         // await mongoose.createConnection(process.env.MONGO_URL! as string).dropDatabase();
-        // httpServer
-        await connect()
+        httpServer
+        // await connect()
     });
-    
+
     it('mint token0, token1', async () => {
 
         const btcAmount = ethers.utils.parseEther('10').toString();
@@ -89,7 +77,7 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
 
     });
 
-    
+
     it(`user1 create margin order 1 btc @ 20000}`, async () => {
         const domain = {
             name: contractName,
@@ -181,9 +169,17 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
             expect(data).to.be.an('object');
             expect(data.amount).to.equal(amount);
             expect(data.maker).to.equal(user1.address.toLowerCase());
-            orderCreated.push(data)
+            await handleOrderCancelled([data.id]);
 
+            let data1 = await OrderCreated.findOne({ signature: signatures[i] }).lean()! as ifOrderCreated;
+            expect(data1).to.be.an('object');
+            expect(data1.amount).to.equal(amount);
+            expect(data1.cancelled).to.equal(true);
             await OrderCreated.findOneAndDelete({ signature: signatures[i] })
+            let data2 = await OrderCreated.findOne({ signature: signatures[i] }).lean()! as ifOrderCreated;
+            expect(data2).to.be.null;
+            httpServer.close();
+
         }
 
 
