@@ -2,7 +2,7 @@ import fs from "fs";
 import { ethers } from "ethers";
 import Big from "big.js";
 import { getExchangeAddress, getRpcLink } from "./helper/chain";
-import { version } from "./helper/constant";
+import { contractName, version } from "./helper/constant";
 
 // const exchangeDeployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Exchange.json")).toString());
 const Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/deployments.json")).toString());
@@ -51,7 +51,7 @@ function validateSignature(maker: string, signature: string, value: object, chai
     try {
 
         const domain = {
-            name: "zexe",
+            name: contractName,
             version: version,
             chainId: chainId,
             verifyingContract: getExchangeAddress(chainId),
