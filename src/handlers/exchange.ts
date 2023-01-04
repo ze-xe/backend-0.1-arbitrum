@@ -28,8 +28,7 @@ async function handleOrderExecuted(data: any, argument: any) {
             return;
         }
 
-        let id =
-            data[0]?.toLowerCase();
+        let id = data[0]?.toLowerCase();
         let taker = data[1]?.toLowerCase();
         let fillAmount = data[2].toString();
         argument.id = id;
@@ -103,7 +102,6 @@ async function handleOrderExecuted(data: any, argument: any) {
 
                 let userPositionToken0 = await UserPosition.findOne({ id: getOrderDetails.maker, token: getOrderDetails.token0 }).lean()! as any
                 let userPositionToken1 = await UserPosition.findOne({ id: getOrderDetails.maker, token: getOrderDetails.token1 }).lean()! as any
-
 
                 let currentFillAmount = Big(getOrderDetails.fillAmount).plus(fillAmount).toString();
                 let orderAmount = getOrderDetails.amount;
@@ -225,8 +223,6 @@ async function handleOrderExecuted(data: any, argument: any) {
                     ]
                 )
 
-
-
             }
 
 
@@ -275,8 +271,6 @@ async function handleOrderCancelled(data: any) {
             return console.log("Order is already cancelled");
         }
         // cancel order 
-
-
         // update user inOrder
         if (orderDetails.orderType == 1) {
             let getUser: ifUserPosition | null = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token0, chainId: orderDetails.chainId }).lean();

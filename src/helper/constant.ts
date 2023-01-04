@@ -10,17 +10,17 @@ export const Decimals = {
     amount: 18
 };
 
-
+export const contractName = Deployments["contracts"]["Exchange"]["constructorArguments"][0];
 export const version = Deployments["contracts"]["Exchange"]["constructorArguments"][1];
-export const ExchangeAddress: string = getContractAddress("Exchange");
+export const ExchangeAddress = getContractAddress("Exchange");
 export const BtcAddress = getContractAddress("BTC");// orignal
 //export const BtcAddress = getContractAddress(""); // ethereum
 export const UsdcAddress = getContractAddress("USDC");
 export const EthAddress = getContractAddress("ETH");
 export const leverAddress = getContractAddress("Lever");
 export const ZexeAddress = getContractAddress("ZEXE");
-export const cUsdcAddress = getContractAddress("lUSDC");
-export const cBtcAddress = getContractAddress("lBTC");
+export const cUsdcAddress = getContractAddress("lUSDC_Market");
+export const cBtcAddress = getContractAddress("lBTC_Market");
 
 
 function getContractAddress(name: string) {
