@@ -13,7 +13,7 @@ import { io } from "socket.io-client";
 import path from "path";
 import { connect, OrderCreated, Sync } from "../../db";
 import { ifOrderCreated } from "../../helper/interface";
-import { contractName, version } from "../../helper/constant";
+import { contractName, getContract, version } from "../../helper/constant";
 
 
 
@@ -38,15 +38,12 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
     let chainId = "421613"
     let provider = getProvider(chainId);
 
-    let exchange = new ethers.Contract(ExchangeAddress, getExchangeABI(), provider);
-    let btc = new ethers.Contract(
-        BtcAddress,
-        // EthAddress, 
-        getERC20ABI(), provider);
-    let usdc = new ethers.Contract(UsdcAddress, getERC20ABI(), provider);
-    let lever = new ethers.Contract(leverAddress, leverageAbi, provider);
-    let cUsdc = new ethers.Contract(cUsdcAddress, getERC20ABI(), provider);
-    let cBtc = new ethers.Contract(cBtcAddress, getERC20ABI(), provider);
+    let exchange = getContract("Exchange")
+    let btc = getContract("BTC")
+    let usdc = getContract("USDC")
+    let lever = getContract("Lever")
+    let cUsdc = getContract("lUSDC_Market")
+    let cBtc = getContract("lBTC_Market")
     let user1 = new ethers.Wallet(process.env.PRIVATE_KEY1! as string).connect(provider); //2
     let user2 = new ethers.Wallet(process.env.PRIVATE_KEY2! as string).connect(provider); //1
 

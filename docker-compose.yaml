@@ -44,3 +44,4 @@ services:
   #     - CREDIT_COLLECTION_NAME=${CREDIT_COLLECTION_NAME}
   #     - MASTER_API_KEY=${MASTER_API_KEY}
     command: npm run dev
+             
