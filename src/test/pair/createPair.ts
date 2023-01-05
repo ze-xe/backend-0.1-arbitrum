@@ -130,7 +130,7 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
             //     value, storedSignature
             // ]);
             let res = await request("http://localhost:3010")
-                .post("/order/create")
+                .post(`/v/${version}/order/create`)
                 .send(
                     {
                         "data": {

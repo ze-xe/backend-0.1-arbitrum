@@ -122,7 +122,7 @@ async function handleOrderExecuted(data: any, argument: any) {
                 // updating userInOrder Balance 
                 let token0InOrder = Big(userPositionToken0?.inOrderBalance).minus(getOrderDetails.lastInOrderToken0).plus(token0Balance).toString();
                 let token1InOrder = Big(userPositionToken1.inOrderBalance).minus(getOrderDetails.lastInOrderToken1).plus(token1Balance).toString();
-
+                let currentBalnce = Big(getOrderDetails.balanceAmount).minus(fillAmount)
                 await Promise.all(
                     [
                         UserPosition.findOneAndUpdate(
@@ -137,7 +137,7 @@ async function handleOrderExecuted(data: any, argument: any) {
 
                         OrderCreated.findOneAndUpdate(
                             { _id: getOrderDetails._id },
-                            { $set: { lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance } }
+                            { $set: { lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance, balanceAmount: currentBalnce, fillAmount: currentFillAmount } }
                         )
                     ]
                 )
@@ -187,7 +187,7 @@ async function handleOrderExecuted(data: any, argument: any) {
                 let currentFillAmount = Big(getOrderDetails.fillAmount).plus(fillAmount).toString();
                 let orderAmount = getOrderDetails.amount;
                 let borrowLimit = getOrderDetails.borrowLimit;
-
+                let currentBalnce = Big(getOrderDetails.balanceAmount).minus(fillAmount)
                 let currentLoop = getLoop(currentFillAmount, borrowLimit, orderAmount);
 
                 let amountToFill = loopFillAmount(orderAmount, borrowLimit, Math.ceil(+currentLoop).toString())
@@ -218,7 +218,7 @@ async function handleOrderExecuted(data: any, argument: any) {
 
                         OrderCreated.findOneAndUpdate(
                             { _id: getOrderDetails._id },
-                            { $set: { lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance, fillAmount: currentFillAmount } }
+                            { $set: { lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance, fillAmount: currentFillAmount, balanceAmount: currentBalnce } }
                         )
                     ]
                 )

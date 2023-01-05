@@ -47,6 +47,6 @@ console.log(s)
 
 
 
-
+console.log("0x196f053669cC6494670f7e866f2D1F770B41CCb7".toLowerCase())
 
 // console.log(Big(1000000000000000).div(1e18).times(40000).toString())

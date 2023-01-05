@@ -11,9 +11,9 @@ import { getERC20ABI, getExchangeABI, getProvider, leverageAbi, parseEther } fro
 import { getExchangeAddress } from "../../helper/chain";
 import { io } from "socket.io-client";
 import path from "path";
-import { connect, OrderCreated } from "../../db";
+import { connect, OrderCreated, Sync } from "../../db";
 import { ifOrderCreated } from "../../helper/interface";
-import {  contractName, version } from "../../helper/constant";
+import { contractName, version } from "../../helper/constant";
 
 
 
@@ -66,7 +66,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
         // httpServer
         await connect()
     });
-    
+
     it('mint 100 btc to user1, 100 BTC to user2', async () => {
         // ORDER IS LONG means user1 want more btc
 
@@ -176,7 +176,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
             value, storedSignature
         ]);
         let res = await request("http://localhost:3010")
-            .post("/order/create")
+            .post(`/v/${version}/order/create`)
             .send(
                 {
                     "data": {
@@ -195,7 +195,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
                     "chainId": chainId
                 }
             );
-
+        console.log(res.body)
         expect(res).to.have.status(201);
         expect(res.body.status).to.be.equal(true);
         expect(res.body).to.be.an('object');
@@ -212,7 +212,6 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
         expect(Number(data.loops)).to.equal(loops)
         orderCreated.push(data)
     })
-
 
     it(`user1 sell usdc got from market to user2 and got 2 btc @ 20000`, async () => {
         let user1BtcBalancePre = btc.balanceOf(user1.address);
@@ -247,16 +246,21 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
         user1UsdcBalancePost = promise1[1].toString();
         user2UsdcBalancePost = promise1[2].toString();
         user2BtcBalancePost = promise1[3].toString();
-        // console.log(user2UsdcBalancePost,btcAmount )
+        // console.log(user2UsdcBalancePost,btcAmount );
 
-        // expect(user2BtcBalancePost).to.equal(parseEther(Big(user2BtcBalancePre).minus(btcAmount).toString()));
-        // expect(user2UsdcBalancePost).to.equal(
-        //     parseEther(
-        //         Big(user2UsdcBalancePre)
-        //             .plus(
-        //                 Big(btcAmount)
-        //                     .times(exchangeRate)
-        //                     .div(Big(10).pow(18))).toString()))
+        let fee = await Sync.findOne().lean()! as any;
+        let makerFeeAmount = Big(fee?.makerFee).div(1e18).times(btcAmount);
+
+        let takerFeeAmount = Big(Big(fee.takerFee).div(1e18)).times(Big(btcAmount));
+
+        expect(user2BtcBalancePost).to.equal(parseEther(Big(user2BtcBalancePre).minus(btcAmount).toString()));
+        expect(user2UsdcBalancePost).to.equal(
+            parseEther(
+                Big(user2UsdcBalancePre)
+                    .plus(
+                        Big(btcAmount).minus(takerFeeAmount)
+                            .times(exchangeRate)
+                            .div(Big(10).pow(18))).toString()))
 
     });
 
