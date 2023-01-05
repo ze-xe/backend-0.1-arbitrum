@@ -24,5 +24,5 @@ export const cBtcAddress = getContractAddress("lBTC_Market");
 export const LinkAddress = getContractAddress("LINK")
 
 function getContractAddress(name: string) {
-    return Deployments["contracts"][name]["address"]
+    return Deployments["contracts"][name]["address"].toLowerCase()
 }

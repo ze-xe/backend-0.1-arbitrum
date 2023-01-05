@@ -10,7 +10,7 @@
     "start": "ts-node build",
     "build": "tsc -p .",
     "dev": "ts-node app.ts",
-    "stag": "yarn stagDep && ts-node app.ts",
+    "stage": "ts-node app.ts",
     "devTest": "set NODE_ENV=test && ts-node app.ts",
     "prod": "./node_modules/.bin/pm2 start app.ts --watch",
     "prod2": "pm2 start ecosystem.config.js",
@@ -23,10 +23,10 @@
     "test4": "mocha -r ts-node/register --timeout 180000 ./src/test/api/BmarginOrderLong.ts",
     "test5": "mocha -r ts-node/register --timeout 180000 ./src/test/api/CmarginOrderShort.ts",
     "pair": "mocha -r ts-node/register --timeout 180000 ./src/test/pair/createPair.ts",
-    "hand":"mocha -r ts-node/register --timeout 180000 ./src/test/handlers/handleMinTokenAmountSet.ts",
+    "handler":"mocha -r ts-node/register --timeout 180000 ./src/test/handlers/handleMinTokenAmountSet.ts",
     "dep": "curl https://raw.githubusercontent.com/ze-xe/contracts-0.1/main/deployments/arbitrumGoerli/deployments.json -o ./src/deployments/deployments.json",
     "devDep": "curl https://raw.githubusercontent.com/ze-xe/contracts-0.1/dev/deployments/arbitrumGoerli/deployments.json -o ./src/deployments/deployments.json",
-    "stagDep": "curl https://raw.githubusercontent.com/ze-xe/contracts-0.1/staging/deployments/arbitrumGoerli/deployments.json -o ./src/deployments/deployments.json"
+    "stageDep": "curl https://raw.githubusercontent.com/ze-xe/contracts-0.1/staging/deployments/arbitrumGoerli/deployments.json -o ./src/deployments/deployments.json"
   },
   "dependencies": {
     "@sentry/node": "^7.28.1",

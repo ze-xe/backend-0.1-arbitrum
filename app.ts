@@ -16,6 +16,7 @@ import { expressMonitorConfig } from "./src/utils";
 import * as Sentry from "@sentry/node";
 import * as Tracing from "@sentry/tracing";
 import path from "path";
+import { version } from "./src/helper/constant";
 
 export const sentry = Sentry
 
@@ -57,10 +58,10 @@ app.use(cors({
 }));
 app.use(helmet());
 app.use(express.json());
-app.use("/pair", pairRoutes);
-app.use("/user", userRoute);
+app.use(`/v/${version}/pair`, pairRoutes);
+app.use(`/v/${version}/user`, userRoute);
 
-app.use("/chart", chartRoute)
+app.use(`/v/${version}/chart`, chartRoute)
 app.use(DBRoute)
 app.use(orderRoute);
 

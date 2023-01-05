@@ -32,6 +32,6 @@ export async function handleMinTokenAmountSet(data: any){
     catch(error){
 
         console.log("Error @ handleMinTokenAmountSet", error);
-        sentry.captureException(error)
+        // sentry.captureException(error)
     }
 }
