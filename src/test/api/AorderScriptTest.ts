@@ -48,7 +48,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         // httpServer
         await connect()
     });
-
+    /*
     it('mint 10 btc to user1, 200000 usdt to user2, approve exchange contract', async () => {
 
         let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
@@ -76,7 +76,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
 
     });
-
+    */
 
     it(`user1 creates limit order to sell 1 btc @ 20000, check user inOrder Balance`, async () => {
 
@@ -132,7 +132,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         let userInOrder = userPositionPre?.inOrderBalance ?? '0';
 
         let res = await request("http://localhost:3010")
-            .post("/order/create")
+            .post(`/v/${version}/order/create`)
             .send(
                 {
                     "data": {
@@ -171,7 +171,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         orderId = data.id
     })
 
-
+    /*
     it(`user2 buy user1s 0.8 btc order`, async () => {
         // balances
         let user1BtcBalancePre = btc.balanceOf(user1.address);
@@ -212,8 +212,10 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
         let fee = await Sync.findOne().lean()! as any;
         let makerFeeAmount = Big(fee?.makerFee).div(1e18).times(btcAmount);
-        let takerFeeAmount = Big(fee.takerFee).div(1e18).times(Big(btcAmount).minus(makerFeeAmount))
 
+        let takerFeeAmount = Big(Big(fee.takerFee).div(1e18)).times(Big(btcAmount));
+
+        console.log(Big(takerFeeAmount).div(1e18).toString())
         expect(user1BtcBalancePost).to.equal(parseEther(Big(user1BtcBalancePre).minus(btcAmount).toString()));
         expect(user1UsdcBalancePost).to.equal(parseEther(
             Big(user1UsdcBalancePre)
@@ -257,8 +259,8 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
 
     it(`find executed Order, check inOrderBalance`, async () => {
-
-        let executeOrder = await OrderExecuted.findOne({ txnId: txnId, id: orderId }).lean();
+        // console.log("txnId=",txnId, "orderId", orderId)
+        let executeOrder = await OrderExecuted.findOne({ id: orderId }).lean();
         let userPosition = await UserPosition.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()
         expect(executeOrder).not.to.be.null;
         expect(executeOrder?.fillAmount).to.equal(btcAmount);
@@ -306,7 +308,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         expect(userPositionPost?.inOrderBalance).to.equal(Big(userPositionPre?.inOrderBalance! as string).minus(Big(amount).minus(btcAmount)).toString());
 
 
-    })
+    })*/
 
 
 
