@@ -171,7 +171,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         orderId = data.id
     })
 
-    /*
+    
     it(`user2 buy user1s 0.8 btc order`, async () => {
         // balances
         let user1BtcBalancePre = btc.balanceOf(user1.address);
@@ -261,7 +261,10 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     it(`find executed Order, check inOrderBalance`, async () => {
         // console.log("txnId=",txnId, "orderId", orderId)
         let executeOrder = await OrderExecuted.findOne({ id: orderId }).lean();
-        let userPosition = await UserPosition.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()
+        let userPosition = await UserPosition.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()! as any;
+        let orderCreated = await OrderCreated.findOne({id: orderId }).lean()! as any;
+
+        expect(orderCreated?.balanceAmount).to.equal(Big(orderCreated.amount).minus(btcAmount).toString())
         expect(executeOrder).not.to.be.null;
         expect(executeOrder?.fillAmount).to.equal(btcAmount);
         expect(executeOrder?.exchangeRate).to.equal(exchangeRate);
@@ -308,7 +311,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         expect(userPositionPost?.inOrderBalance).to.equal(Big(userPositionPre?.inOrderBalance! as string).minus(Big(amount).minus(btcAmount)).toString());
 
 
-    })*/
+    })
 
 
 

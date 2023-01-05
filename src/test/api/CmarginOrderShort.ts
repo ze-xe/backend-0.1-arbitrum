@@ -215,7 +215,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
         orderCreated.push(data)
     })
 
-    /*
+    
     it(`user1 sell btc got from market to user2 and got 40000 usdc @ 20000 exchangeRate`, async () => {
         let user1BtcBalancePre = btc.balanceOf(user1.address);
         let user2BtcBalancePre = btc.balanceOf(user2.address);
@@ -227,7 +227,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
         user2UsdcBalancePre = promise[2].toString()
         user1UsdcBalancePre = promise[3].toString()
         // console.log(user1BtcBalancePre)
-        const btcAmount = ethers.utils.parseEther('2').toString();
+        const btcAmount = ethers.utils.parseEther('3').toString();
         await lever.connect(user1).enterMarkets([cBtc.address, cUsdc.address]);
         await lever.connect(user2).enterMarkets([cBtc.address, cUsdc.address]);
 
@@ -298,7 +298,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
         expect(data).not.to.be.null;
         expect(data.cancelled).to.equal(true)
 
-    })*/
+    })
     
 
 

@@ -103,11 +103,11 @@ async function handleOrderExecuted(data: any, argument: any) {
                 let userPositionToken0 = await UserPosition.findOne({ id: getOrderDetails.maker, token: getOrderDetails.token0 }).lean()! as any
                 let userPositionToken1 = await UserPosition.findOne({ id: getOrderDetails.maker, token: getOrderDetails.token1 }).lean()! as any
 
-                let currentFillAmount = Big(getOrderDetails.fillAmount).plus(fillAmount).toString();
+                let totalFillAmount = Big(getOrderDetails.fillAmount).plus(fillAmount).toString();
                 let orderAmount = getOrderDetails.amount;
                 let borrowLimit = getOrderDetails.borrowLimit;
 
-                let currentLoop = getLoop(currentFillAmount, borrowLimit, orderAmount);
+                let currentLoop = getLoop(totalFillAmount, borrowLimit, orderAmount);
 
                 let amountToFill = loopFillAmount(orderAmount, borrowLimit, Math.ceil(+currentLoop).toString())
 
@@ -133,14 +133,20 @@ async function handleOrderExecuted(data: any, argument: any) {
                         UserPosition.findOneAndUpdate(
                             { id: getOrderDetails.maker, token: getOrderDetails.token1 },
                             { $set: { inOrderBalance: token1InOrder } }
-                        ),
-
-                        OrderCreated.findOneAndUpdate(
-                            { _id: getOrderDetails._id },
-                            { $set: { lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance, balanceAmount: currentBalnce, fillAmount: currentFillAmount } }
                         )
                     ]
                 )
+
+                if (Number(currentBalnce) < Number(getPairDetails.minToken0Order)) {
+                    await OrderCreated.findOneAndUpdate({ _id: getOrderDetails._id.toString() },
+                        { $set: { deleted: true, active: false, balanceAmount: currentBalnce, lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance, fillAmount: totalFillAmount} });
+                }
+                else {
+                    await OrderCreated.findOneAndUpdate(
+                        { _id: getOrderDetails._id.toString() },
+                        { $set: { lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance, fillAmount: totalFillAmount, balanceAmount: currentBalnce } }
+                    );
+                }
 
             }
 
@@ -184,11 +190,11 @@ async function handleOrderExecuted(data: any, argument: any) {
                 let userPositionToken1 = await UserPosition.findOne({ id: getOrderDetails.maker, token: getOrderDetails.token1 }).lean()! as any
 
 
-                let currentFillAmount = Big(getOrderDetails.fillAmount).plus(fillAmount).toString();
+                let totalFillAmount = Big(getOrderDetails.fillAmount).plus(fillAmount).toString();
                 let orderAmount = getOrderDetails.amount;
                 let borrowLimit = getOrderDetails.borrowLimit;
                 let currentBalnce = Big(getOrderDetails.balanceAmount).minus(fillAmount)
-                let currentLoop = getLoop(currentFillAmount, borrowLimit, orderAmount);
+                let currentLoop = getLoop(totalFillAmount, borrowLimit, orderAmount);
 
                 let amountToFill = loopFillAmount(orderAmount, borrowLimit, Math.ceil(+currentLoop).toString())
 
@@ -214,14 +220,20 @@ async function handleOrderExecuted(data: any, argument: any) {
                         UserPosition.findOneAndUpdate(
                             { id: getOrderDetails.maker, token: getOrderDetails.token1 },
                             { $set: { inOrderBalance: token1InOrder } }
-                        ),
-
-                        OrderCreated.findOneAndUpdate(
-                            { _id: getOrderDetails._id },
-                            { $set: { lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance, fillAmount: currentFillAmount, balanceAmount: currentBalnce } }
                         )
                     ]
                 )
+
+                if (Number(currentBalnce) < Number(getPairDetails.minToken0Order)) {
+                    await OrderCreated.findOneAndUpdate({ _id: getOrderDetails._id.toString() },
+                        { $set: { deleted: true, active: false, balanceAmount: currentBalnce, lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance, fillAmount: totalFillAmount} });
+                }
+                else {
+                    await OrderCreated.findOneAndUpdate(
+                        { _id: getOrderDetails._id.toString() },
+                        { $set: { lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance, fillAmount: totalFillAmount, balanceAmount: currentBalnce } }
+                    );
+                }
 
             }
 
