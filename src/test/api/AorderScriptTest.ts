@@ -14,7 +14,7 @@ import { getERC20ABI, getExchangeABI, getProvider, parseEther } from "../../util
 import { io } from "socket.io-client";
 import path from "path";
 import { EVENT_NAME } from "../../socketIo/socket.io";
-import { contractName, version } from "../../helper/constant";
+import { contractName, getContract, version } from "../../helper/constant";
 use(chaiHttp);
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 const socket = io("http://localhost:3010");
@@ -25,12 +25,9 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     // requirements
     let chainId = "421613"
     let provider = getProvider(chainId);
-
-    let exchange = new ethers.Contract(ExchangeAddress, getExchangeABI(), provider);
-    let btc = new ethers.Contract(
-        BtcAddress, getERC20ABI(), provider);
-    let usdc = new ethers.Contract(UsdcAddress, getERC20ABI(), provider);
-
+    let exchange = getContract("Exchange");
+    let btc = getContract("BTC")
+    let usdc = getContract("USDC")
     let user1 = new ethers.Wallet(process.env.PRIVATE_KEY1! as string).connect(provider); //1
     let user2 = new ethers.Wallet(process.env.PRIVATE_KEY2! as string).connect(provider); //2
     let signatures: any[] = [];
@@ -48,7 +45,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         // httpServer
         await connect()
     });
-    /*
+    
     it('mint 10 btc to user1, 200000 usdt to user2, approve exchange contract', async () => {
 
         let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
@@ -76,7 +73,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
 
     });
-    */
+    
 
     it(`user1 creates limit order to sell 1 btc @ 20000, check user inOrder Balance`, async () => {
 
@@ -212,10 +209,8 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
         let fee = await Sync.findOne().lean()! as any;
         let makerFeeAmount = Big(fee?.makerFee).div(1e18).times(btcAmount);
-
         let takerFeeAmount = Big(Big(fee.takerFee).div(1e18)).times(Big(btcAmount));
 
-        console.log(Big(takerFeeAmount).div(1e18).toString())
         expect(user1BtcBalancePost).to.equal(parseEther(Big(user1BtcBalancePre).minus(btcAmount).toString()));
         expect(user1UsdcBalancePost).to.equal(parseEther(
             Big(user1UsdcBalancePre)
@@ -312,6 +307,21 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
 
     })
+
+    // it(`it will get events`,(done)=>{
+
+    //     socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
+           
+    //         expect(data).not.to.be.null;
+
+    //     })
+    //     socket.on(EVENT_NAME.PAIR_ORDER, (data) => {
+           
+    //         expect(data).not.to.be.null;
+    //         done()
+    //     })
+
+    // })
 
 
 
