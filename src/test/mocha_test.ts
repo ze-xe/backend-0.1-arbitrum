@@ -4,7 +4,7 @@ import { expect, assert } from "chai";
 import chaiHttp from "chai-http";
 use(chaiHttp);
 import { ethers } from "ethers";
-import { getExchangeABI, getERC20ABI, getProvider } from "../utils";
+import { getExchangeABI, getERC20ABI, getProvider } from "../utils/utils";
 import Big from "big.js";
 import { BtcAddress, UsdcAddress, ExchangeAddress, EthAddress } from '../helper/constant';
 // import { clinetSocketService } from "./socket-client";

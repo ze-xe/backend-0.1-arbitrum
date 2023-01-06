@@ -26,9 +26,7 @@ services:
         - MONGO_URL=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/dev-zexe-arbitrum006?retryWrites=true&w=majority
         - MONGO_URL1=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/backup-zexe-006?retryWrites=true&w=majority
         - WEB_3_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweERjZTFjMzYxYzgyNEI1ZjRFMzRGY2ZCNjUxMUYzNjkwNjc5RjhmODYiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njk4OTQyMTQ5NjMsIm5hbWUiOiJ6ZXhlLjAxIn0.YR1oAHiW_tA0lwG29tXz2wrYdTjWdCijto4yP_3uHHg
-        - PRIVATE_KEY1=0x7cf03fae45cb10d4e3ba00a10deeacfc8cea1be0eebcfb7277a7df2e5074a405
-        - PRIVATE_KEY2=0xcdb7f4e35a4443b45b8316666caa396b7a9f4686fcff1901c008b15a2fa2e904
-        - EXCHANGE_ADD=0xC8a28C6EA6825428a5270F7e9070Cbe31E2cFDbf
+        - ADMIN_ADD=0x103b62f68da23f20055c572269be67fa7635f2fc
   #     - PORT=${PORT}
   #     - ANALYSER_PORT=${ANALYSER_PORT}
   #     - ANALYSER_SERVER_STRING=analyser

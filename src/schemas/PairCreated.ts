@@ -10,8 +10,9 @@ const PairCreatedSchema = new mongoose.Schema({
     priceDiff: String,
     chainId: String,
     symbol: String,
-    marginEnabled: {type: Boolean, default: false},
-    
+    marginEnabled: { type: Boolean, default: false },
+    active: { type: Boolean, default: true }
+
 },
     { timestamps: true }
 );

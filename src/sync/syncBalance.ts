@@ -1,7 +1,7 @@
 import { BigNumber, ethers } from "ethers";
 import { UserPosition, OrderCreated } from "../db";
 import Big from "big.js";
-import { getERC20ABI, getProvider, getInterface, MulticallAbi } from "../utils";
+import { getERC20ABI, getProvider, getInterface, MulticallAbi } from "../utils/utils";
 import { ifOrderCreated, ifUserPosition, orderSignature } from "../helper/interface";
 import { getExchangeAddress, MulticallAddress } from "../helper/chain";
 import { sentry } from "../../app";

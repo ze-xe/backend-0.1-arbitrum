@@ -1,7 +1,7 @@
 
 import { ethers } from "ethers";
 import fs from "fs";
-import { getERC20ABI, getExchangeABI, getProvider, leverageAbi } from "../utils";
+import { getERC20ABI, getExchangeABI, getProvider, leverageAbi } from "../utils/utils";
 
 
 const Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/deployments.json")).toString());

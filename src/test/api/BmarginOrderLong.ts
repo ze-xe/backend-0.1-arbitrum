@@ -7,7 +7,7 @@ import { ethers } from "ethers";
 import Big from "big.js";
 import { BtcAddress, UsdcAddress, ExchangeAddress, leverAddress, cUsdcAddress, cBtcAddress } from '../helper/contractDeployment';
 import { EVENT_NAME } from "../../socketIo/socket.io";
-import { getERC20ABI, getExchangeABI, getProvider, leverageAbi, parseEther } from "../../utils";
+import { getERC20ABI, getExchangeABI, getProvider, leverageAbi, parseEther } from "../../utils/utils";
 import { getExchangeAddress } from "../../helper/chain";
 import { io } from "socket.io-client";
 import path from "path";

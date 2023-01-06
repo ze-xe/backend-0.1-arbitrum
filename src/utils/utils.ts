@@ -1,8 +1,8 @@
 import fs from "fs";
 import { ethers } from "ethers";
 import Big from "big.js";
-import { getExchangeAddress, getRpcLink } from "./helper/chain";
-import { contractName, version } from "./helper/constant";
+import { getExchangeAddress, getRpcLink } from "../helper/chain";
+import { contractName, version } from "../helper/constant";
 
 // const exchangeDeployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Exchange.json")).toString());
 const Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/deployments.json")).toString());

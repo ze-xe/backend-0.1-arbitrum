@@ -1,6 +1,6 @@
 import { PairCreated, OrderCreated, UserPosition, OrderCreatedBackup } from "../db";
 import { handleToken } from "../handlers/token";
-import { getDecimals, validateSignature } from "../utils";
+import { getDecimals, validateSignature } from "../utils/utils";
 import Big from "big.js";
 import { ethers } from "ethers";
 import { createOrderSchema } from "../helper/validateRequest";
@@ -214,7 +214,7 @@ async function handleOrderCreated(req: any, res: any) {
             }
         }
 
-        let isPairExist: ifPairCreated = await PairCreated.findOne({ token0: data.token0, token1: data.token1, chainId: chainId }).lean();
+        let isPairExist: ifPairCreated = await PairCreated.findOne({ token0: data.token0, token1: data.token1, chainId: chainId, active: true }).lean();
         let createPair: ifPairCreated | any;
 
         if (!isPairExist) {
@@ -222,7 +222,7 @@ async function handleOrderCreated(req: any, res: any) {
             let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token1, data.token0]);
             let id = ethers.utils.keccak256(encoder);
 
-            let isPairExist1: ifPairCreated = await PairCreated.findOne({ id: id }).lean();;
+            let isPairExist1: ifPairCreated = await PairCreated.findOne({ id: id, active: true }).lean();;
 
             if (isPairExist1) {
                 createPair = isPairExist1;
@@ -248,7 +248,8 @@ async function handleOrderCreated(req: any, res: any) {
                     token1: data.token1,
                     chainId: chainId,
                     symbol: `${token0?.symbol}_${token1?.symbol}`,
-                    marginEnabled: marginEnabled
+                    marginEnabled: marginEnabled,
+                    active: true
                 }
                 createPair = await PairCreated.create(temp);
 
@@ -393,7 +394,7 @@ async function getLimitMatchedOrders(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.amount });
         }
 
-        const isPairIdExist: ifPairCreated | null = await PairCreated.findOne({ id: pairId, chainId: chainId }).lean();
+        const isPairIdExist: ifPairCreated | null = await PairCreated.findOne({ id: pairId, chainId: chainId, active: true }).lean();
 
         if (!isPairIdExist) {
             return res.status(404).send({ status: false, error: errorMessage.pairId });
