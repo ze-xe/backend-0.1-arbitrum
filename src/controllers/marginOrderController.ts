@@ -44,7 +44,7 @@ export async function __handleMarginOrderCreated(signature: string, data: any, c
         if (data.orderType == 2) {
 
             // check market enter or not
-            const token = await Token.findOne({ id: data.token0 }).lean()! as any;
+            const token = await Token.findOne({ id: data.token0, active: true }).lean()! as any;
 
             if (!assetIn.includes(token.cId)) {
                 return { status: false, error: errorMessage.market, statusCode: 400 }
@@ -139,7 +139,7 @@ export async function __handleMarginOrderCreated(signature: string, data: any, c
         else if (data.orderType == 3) {
 
             // check market enter or not
-            const token = await Token.findOne({ id: data.token1 }).lean()! as any;
+            const token = await Token.findOne({ id: data.token1, active: true }).lean()! as any;
 
             if (!assetIn.includes(token.cId)) {
                 return { status: false, error: errorMessage.market, statusCode: 400 }
@@ -426,7 +426,7 @@ export async function ____handleMarginOrderCreated(signature: string, data: any,
 
             // check market enter or not
             if (!ipfs) {
-                const token = await Token.findOne({ id: data.token0 }).lean()! as any;
+                const token = await Token.findOne({ id: data.token0, active: true }).lean()! as any;
 
                 if (!assetIn.includes(token.cId)) {
                     return { status: false, error: errorMessage.market, statusCode: 400 }
@@ -491,7 +491,7 @@ export async function ____handleMarginOrderCreated(signature: string, data: any,
             // check market enter or not
 
             if (!ipfs) {
-                const token = await Token.findOne({ id: data.token1 }).lean()! as any;
+                const token = await Token.findOne({ id: data.token1, active: true }).lean()! as any;
 
                 if (!assetIn.includes(token.cId)) {
                     return { status: false, error: errorMessage.market, statusCode: 400 }
@@ -752,7 +752,7 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
 
             // check market enter or not
             if (!ipfs) {
-                const token = await Token.findOne({ id: data.token0 }).lean()! as any;
+                const token = await Token.findOne({ id: data.token0, active: true }).lean()! as any;
 
                 if (!assetIn.includes(token.cId)) {
                     return { status: false, error: errorMessage.market, statusCode: 400 }
@@ -808,7 +808,7 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
             // check market enter or not
 
             if (!ipfs) {
-                const token = await Token.findOne({ id: data.token1 }).lean()! as any;
+                const token = await Token.findOne({ id: data.token1, active: true }).lean()! as any;
 
                 if (!assetIn.includes(token.cId)) {
                     return { status: false, error: errorMessage.market, statusCode: 400 }

@@ -123,8 +123,8 @@ export async function getAllPairDetails(req: any, res: any) {
 
         for (let i in allPairs) {
 
-            let token0 = Token.findOne({ id: allPairs[i].token0 }).select({ name: 1, symbol: 1, decimals: 1, _id: 0, id: 1 }).lean();
-            let token1 = Token.findOne({ id: allPairs[i].token1 }).select({ name: 1, symbol: 1, decimals: 1, _id: 0, id: 1 }).lean();
+            let token0 = Token.findOne({ id: allPairs[i].token0, active: true }).select({ name: 1, symbol: 1, decimals: 1, _id: 0, id: 1 }).lean();
+            let token1 = Token.findOne({ id: allPairs[i].token1, active: true }).select({ name: 1, symbol: 1, decimals: 1, _id: 0, id: 1 }).lean();
             promiseTokens.push(token0, token1);
         }
 

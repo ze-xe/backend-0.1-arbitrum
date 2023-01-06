@@ -11,7 +11,7 @@ async function getAllTokens(req: any, res: any) {
         if (!chainId) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
-        const getAllTokens = await Token.find({ chainId: chainId }).select({ _id: 0, name: 1, symbol: 1, decimals: 1, id: 1 }).lean();
+        const getAllTokens = await Token.find({ chainId: chainId, active: true }).select({ _id: 0, name: 1, symbol: 1, decimals: 1, id: 1 }).lean();
 
         return res.status(200).send({ status: true, data: getAllTokens });
 

@@ -365,7 +365,7 @@ export async function handleMarginEnabled(data: string[]) {
         let token: string = data[0].toLowerCase();
         let cToken = data[1].toLowerCase();
         let chainId = "421613";
-        const isTokenExist = await Token.findOne({ id: token }).lean();
+        const isTokenExist = await Token.findOne({ id: token, active: true }).lean();
         let symbol;
 
         if (isTokenExist) {
@@ -408,7 +408,7 @@ export async function handleMarginEnabled(data: string[]) {
 
         // creating pair
 
-        let allToken = await Token.find({ marginEnabled: true, id: { $nin: [token] } }).lean();
+        let allToken = await Token.find({ marginEnabled: true, id: { $nin: [token] }, active: true }).lean();
 
 
         for (let i in allToken) {

@@ -7,7 +7,7 @@ import { sentry } from "../../app";
 
 async function handleToken(token: string, chainId: string) {
     try {
-        const isTokenExist = await Token.findOne({ id: token });
+        const isTokenExist = await Token.findOne({ id: token, active: true });
 
         if (isTokenExist) {
             return { symbol: isTokenExist.symbol, marginEnabled: isTokenExist.marginEnabled, minToken0Amount: isTokenExist.minTokenAmount };
