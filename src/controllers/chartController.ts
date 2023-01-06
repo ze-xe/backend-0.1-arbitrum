@@ -346,7 +346,7 @@ export async function getBar(req: any, res: any) {
 
         if (data.length == 0) {
 
-            let isPairExist = await PairCreated.findOne({ id: pairId, chainId }).lean();
+            let isPairExist = await PairCreated.findOne({ id: pairId, chainId, active: true }).lean();
 
             if (!isPairExist) {
                 return res.status(404).send({ status: false, error: errorMessage.pairId });
@@ -573,7 +573,7 @@ export async function getSymbol(req: any, res: any) {
 
         let symbol = req.query.symbol;
 
-        let symbolDetails = await PairCreated.findOne({ symbol: symbol }).lean();
+        let symbolDetails = await PairCreated.findOne({ symbol: symbol, active: true }).lean();
 
         if (!symbolDetails) {
             return res.status(404).send({ status: false, data: errorMessage.symbol })

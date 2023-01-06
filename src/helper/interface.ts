@@ -48,6 +48,7 @@ export interface ifPairCreated {
     chainId: string
     _id: string
     marginEnabled: boolean,
+    active: boolean
 
 }
 

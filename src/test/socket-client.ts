@@ -38,7 +38,7 @@ console.log(s)
 */
 // console.log(Big(s).div(a).toString())
 
-
+/*
 function scaledByBorrowLimit(amount: any, borrowLimit: any, loop: any) {
 
     for (let i = 0; i < loop; i++) {
@@ -80,3 +80,17 @@ n = Big(Math.log(temp1)).div(Big(Math.log(x))).minus(1).toNumber().toFixed(4)
 
 console.log(n)
 console.log(421875000000000000*(0.8275)*20000)
+
+*/
+
+
+let amount = Big("1000000000000000000");
+let a = Big("1000000000000000000");
+let x = Big("500500").div(Big(10).pow(6));
+let n = Number(9) + 1;
+let balanceAmount: string | string[] = Big(a).times((Big(1).minus(Big(x).pow(n))).div(Big(1).minus(x))).minus(a).toString().split(".");
+let balanceAmount1: string | string[] = Big(a).times(((Big(x).pow(n)).minus(1)).div(Big(x).minus(1))).minus(a).toString().split(".");
+
+console.log(balanceAmount[0])
+console.log(balanceAmount1[0])
+console.log("0x103B62f68Da23f20055c572269be67fA7635f2fc".toLowerCase())

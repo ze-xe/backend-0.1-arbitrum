@@ -3,7 +3,7 @@ import Big from "big.js";
 import { ifOrderCreated, ifPairCreated, ifUserPosition } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 
-import { getDecimals, getERC20ABI, getProvider } from "../utils";
+import { getDecimals, getERC20ABI, getProvider } from "../utils/utils";
 import { ethers } from "ethers";
 import { sentry } from "../../app";
 import { getLoop, loopFillAmount } from "./helper/getLoop";
@@ -41,7 +41,7 @@ async function handleOrderExecuted(data: any, argument: any) {
             return console.log("OrderId not found @ execute", id);
         }
 
-        let getPairDetails: ifPairCreated | null = await PairCreated.findOne({ id: getOrderDetails.pair, chainId: getOrderDetails.chainId }).lean();
+        let getPairDetails: ifPairCreated | null = await PairCreated.findOne({ id: getOrderDetails.pair, chainId: getOrderDetails.chainId , active: true}).lean();
 
         if (!getPairDetails) {
             return console.log(`Pair Id not found in order Executed`);
@@ -413,7 +413,7 @@ export async function handleMarginEnabled(data: string[]) {
 
         for (let i in allToken) {
 
-            let isPairExist = await PairCreated.findOne({ token0: token, token1: allToken[i].id }).lean()
+            let isPairExist = await PairCreated.findOne({ token0: token, token1: allToken[i].id,active: true }).lean()
 
             if (isPairExist) {
                 if (isPairExist.marginEnabled == true) {
@@ -433,7 +433,7 @@ export async function handleMarginEnabled(data: string[]) {
                 let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [allToken[i].id, token]);
                 let id = ethers.utils.keccak256(encoder);
 
-                let isPairExist = await PairCreated.findOne({ id: id }).lean();
+                let isPairExist = await PairCreated.findOne({ id: id , active: true}).lean();
 
                 if (isPairExist) {
 

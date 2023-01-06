@@ -1,5 +1,5 @@
 import { Token } from "../db";
-import { getERC20ABI, getProvider } from "../utils";
+import { getERC20ABI, getProvider } from "../utils/utils";
 import { ethers } from "ethers";
 import { sentry } from "../../app";
 

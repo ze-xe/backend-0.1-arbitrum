@@ -18,7 +18,7 @@ export async function getPairTrandingPair(req: any, res: any) {
     try {
 
         // let chainId = req.query.chainId;
-        let getPairs: ifPairCreated[] = await PairCreated.find().lean()!
+        let getPairs: ifPairCreated[] = await PairCreated.find({active: true}).lean()!
 
         let interval = 24 * 60 * 60 * 1000;
 
@@ -104,15 +104,15 @@ export async function getPairTrandingPair(req: any, res: any) {
 
         for (let i in data) {
 
-            let allPairs: ifPairCreated = await PairCreated.findOne({ id: data[i].pairId }).sort({ createdAt: -1 }).lean();
+            let allPairs: ifPairCreated = await PairCreated.findOne({ id: data[i].pairId, active: true }).sort({ createdAt: -1 }).lean();
 
 
             let promiseTokens: any = [];
 
             for (let i in allPairs) {
 
-                let token0 = Token.findOne({ id: allPairs.token0 }).select({ name: 1, symbol: 1, decimals: 1, _id: 0, id: 1 }).lean();
-                let token1 = Token.findOne({ id: allPairs.token1 }).select({ name: 1, symbol: 1, decimals: 1, _id: 0, id: 1 }).lean();
+                let token0 = Token.findOne({ id: allPairs.token0, active: true }).select({ name: 1, symbol: 1, decimals: 1, _id: 0, id: 1 }).lean();
+                let token1 = Token.findOne({ id: allPairs.token1, active: true }).select({ name: 1, symbol: 1, decimals: 1, _id: 0, id: 1 }).lean();
                 promiseTokens.push(token0, token1);
             }
 

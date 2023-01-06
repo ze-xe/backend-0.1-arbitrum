@@ -11,7 +11,7 @@ const PairCreatedSchema = new mongoose.Schema({
     chainId: String,
     symbol: String,
     marginEnabled: {type: Boolean, default: false},
-    active: {type: Boolean, default: true}
+    active: {type: Boolean, dafault: true}
     
 },
     { timestamps: true }

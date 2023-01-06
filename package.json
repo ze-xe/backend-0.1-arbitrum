@@ -21,6 +21,7 @@
     "test3": "mocha -r ts-node/register --timeout 180000 ./src/test/api/AorderScriptTest.ts",
     "test4": "mocha -r ts-node/register --timeout 180000 ./src/test/api/BmarginOrderLong.ts",
     "test5": "mocha -r ts-node/register --timeout 180000 ./src/test/api/CmarginOrderShort.ts",
+    "blacklist":"mocha -r ts-node/register --timeout 180000 ./src/test/api/DblackListSignature.ts",
     "pair": "mocha -r ts-node/register --timeout 180000 ./src/test/pair/createPair.ts",
     "handler":"mocha -r ts-node/register --timeout 180000 ./src/test/handlers/handleMinTokenAmountSet.ts",
     "dep": "curl https://raw.githubusercontent.com/ze-xe/contracts-0.1/main/deployments/arbitrumGoerli/deployments.json -o ./src/deployments/deployments.json",

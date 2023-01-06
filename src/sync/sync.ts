@@ -1,7 +1,7 @@
 
 import { Sync } from "../db";
 import { ethers } from "ethers";
-import { getInterface, getProvider } from "../utils";
+import { getInterface, getProvider } from "../utils/utils";
 import { ifEventListner, ifSync } from "../helper/interface";
 import { sentry } from "../../app";
 require("dotenv").config();

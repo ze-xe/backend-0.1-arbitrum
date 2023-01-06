@@ -11,7 +11,7 @@ const TokenSchema = new mongoose.Schema({
     marginEnabled: {type:Boolean, default: false},
     cId: String,
     minTokenAmount: {type: String, default: "10000000000"},
-    active: {type: Boolean, default: true}
+    active: {type: Boolean, dafault: true}
 
 },
     { timestamps: true }

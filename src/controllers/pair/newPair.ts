@@ -16,7 +16,7 @@ export async function getNewPair(req: any, res: any) {
         if (!chainId) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
-        let allPairs: ifPairCreated[] = await PairCreated.find({ chainId: chainId }).sort({createdAt: -1}).lean();
+        let allPairs: ifPairCreated[] = await PairCreated.find({ chainId: chainId, active: true }).sort({createdAt: -1}).lean();
 
         let data = [];
 
@@ -24,8 +24,8 @@ export async function getNewPair(req: any, res: any) {
 
         for (let i in allPairs) {
 
-            let token0 = Token.findOne({ id: allPairs[i].token0 }).select({ name: 1, symbol: 1, decimals: 1, _id: 0, id: 1 }).lean();
-            let token1 = Token.findOne({ id: allPairs[i].token1 }).select({ name: 1, symbol: 1, decimals: 1, _id: 0, id: 1 }).lean();
+            let token0 = Token.findOne({ id: allPairs[i].token0, active: true }).select({ name: 1, symbol: 1, decimals: 1, _id: 0, id: 1 }).lean();
+            let token1 = Token.findOne({ id: allPairs[i].token1, active: true }).select({ name: 1, symbol: 1, decimals: 1, _id: 0, id: 1 }).lean();
             promiseTokens.push(token0, token1);
         }
 
