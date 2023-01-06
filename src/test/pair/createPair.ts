@@ -4,7 +4,7 @@ import { expect } from "chai";
 import chaiHttp from "chai-http";
 use(chaiHttp);
 import { ethers } from "ethers";
-import { getERC20ABI, getExchangeABI, getProvider} from "../../utils";
+import { getERC20ABI, getExchangeABI, getProvider} from "../../utils/utils";
 import { getExchangeAddress } from "../../helper/chain";
 import path from "path";
 import { connect, OrderCreated } from "../../db";
@@ -178,7 +178,7 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
             await OrderCreated.findOneAndDelete({ signature: signatures[i] })
             let data2 = await OrderCreated.findOne({ signature: signatures[i] }).lean()! as ifOrderCreated;
             expect(data2).to.be.null;
-            httpServer.close();
+            // httpServer.close();
 
         }
 

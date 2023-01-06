@@ -31,7 +31,7 @@ describe("handleMinTokenAmountSet, change its minToken and restore", async () =>
 
         // checking pairs updated where btc is token0;
 
-        let getPairs = await PairCreated.find({ token0: btcAddress }).lean();
+        let getPairs = await PairCreated.find({ token0: btcAddress, active: true }).lean();
 
         getPairs.forEach((x) => {
             expect(x.minToken0Order == minToken)
@@ -45,7 +45,7 @@ describe("handleMinTokenAmountSet, change its minToken and restore", async () =>
 
         expect(getTokenAfterUpdate1.minTokenAmount).to.equal(currentMinToken);
 
-        let getPairs1 = await PairCreated.find({ token0: btcAddress }).lean();
+        let getPairs1 = await PairCreated.find({ token0: btcAddress, active: true }).lean();
 
         getPairs1.forEach((x) => {
             expect(x.minToken0Order == currentMinToken)

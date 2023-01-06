@@ -1,5 +1,5 @@
 import { Token } from "../db";
-import { getERC20ABI, getProvider } from "../utils";
+import { getERC20ABI, getProvider } from "../utils/utils";
 import { ethers } from "ethers";
 import { sentry } from "../../app";
 
@@ -7,7 +7,7 @@ import { sentry } from "../../app";
 
 async function handleToken(token: string, chainId: string) {
     try {
-        const isTokenExist = await Token.findOne({ id: token });
+        const isTokenExist = await Token.findOne({ id: token, active: true });
 
         if (isTokenExist) {
             return { symbol: isTokenExist.symbol, marginEnabled: isTokenExist.marginEnabled, minToken0Amount: isTokenExist.minTokenAmount };
@@ -30,7 +30,8 @@ async function handleToken(token: string, chainId: string) {
             symbol: symbol,
             decimals: decimals,
             price: "0",
-            chainId: chainId
+            chainId: chainId,
+            active: true
         };
 
         Token.create(temp);

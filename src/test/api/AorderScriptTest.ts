@@ -10,15 +10,23 @@ import { connect, OrderCreated, OrderExecuted, Sync, UserPosition } from "../../
 import { getExchangeAddress } from "../../helper/chain";
 import { BtcAddress, ExchangeAddress, UsdcAddress } from "../helper/contractDeployment";
 import { ifOrderCreated } from "../../helper/interface";
-import { getERC20ABI, getExchangeABI, getProvider, parseEther } from "../../utils";
+import { getERC20ABI, getExchangeABI, getProvider, parseEther } from "../../utils/utils";
 import { io } from "socket.io-client";
 import path from "path";
 import { EVENT_NAME } from "../../socketIo/socket.io";
 import { contractName, getContract, version } from "../../helper/constant";
 use(chaiHttp);
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
-const socket = io("http://localhost:3010");
+const socket = io("https://api.zexe.io");
 
+
+socket.on(EVENT_NAME.PAIR_ORDER, (data) => {
+    console.log("pairOrders", data)
+});
+
+socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
+    console.log("pairHistory", data)
+})
 
 describe("Limit Order => Mint token, create order, execute order, cancel order", async () => {
 
@@ -45,7 +53,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         // httpServer
         await connect()
     });
-    
+
     it('mint 10 btc to user1, 200000 usdt to user2, approve exchange contract', async () => {
 
         let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
@@ -73,7 +81,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
 
     });
-    
+
 
     it(`user1 creates limit order to sell 1 btc @ 20000, check user inOrder Balance`, async () => {
 
@@ -128,7 +136,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
         let userInOrder = userPositionPre?.inOrderBalance ?? '0';
 
-        let res = await request("http://localhost:3010")
+        let res = await request("https://api.zexe.io")
             .post(`/v/${version}/order/create`)
             .send(
                 {
@@ -168,7 +176,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         orderId = data.id
     })
 
-    
+
     it(`user2 buy user1s 0.8 btc order`, async () => {
         // balances
         let user1BtcBalancePre = btc.balanceOf(user1.address);
@@ -257,7 +265,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         // console.log("txnId=",txnId, "orderId", orderId)
         let executeOrder = await OrderExecuted.findOne({ id: orderId }).lean();
         let userPosition = await UserPosition.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()! as any;
-        let orderCreated = await OrderCreated.findOne({id: orderId }).lean()! as any;
+        let orderCreated = await OrderCreated.findOne({ id: orderId }).lean()! as any;
 
         expect(orderCreated?.balanceAmount).to.equal(Big(orderCreated.amount).minus(btcAmount).toString())
         expect(executeOrder).not.to.be.null;
@@ -311,12 +319,12 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     // it(`it will get events`,(done)=>{
 
     //     socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
-           
+
     //         expect(data).not.to.be.null;
 
     //     })
     //     socket.on(EVENT_NAME.PAIR_ORDER, (data) => {
-           
+
     //         expect(data).not.to.be.null;
     //         done()
     //     })

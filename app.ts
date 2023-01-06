@@ -12,7 +12,7 @@ import { start } from "./src/appUtil";
 import { createServer } from "http";
 export const httpServer = createServer(app);
 import morgan from 'morgan';
-import { expressMonitorConfig } from "./src/utils";
+import { expressMonitorConfig } from "./src/utils/utils";
 import * as Sentry from "@sentry/node";
 import * as Tracing from "@sentry/tracing";
 import path from "path";

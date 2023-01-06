@@ -9,7 +9,7 @@ import mongoose from 'mongoose';
 import { httpServer } from '../../../app';
 import { backupConnection, connect } from '../../db';
 import { BtcAddress, ExchangeAddress, UsdcAddress, version } from "../../helper/constant";
-import { getERC20ABI, getExchangeABI, getProvider } from "../../utils";
+import { getERC20ABI, getExchangeABI, getProvider } from "../../utils/utils";
 
 
 describe('Testing Pair Api', () => {
