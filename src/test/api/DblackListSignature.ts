@@ -46,7 +46,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     let user1 = new ethers.Wallet(process.env.PRIVATE_KEY1! as string).connect(provider); //1 
     let signatures: any[] = [];
     let orders: any[] = [];
-    const blackList = 0 // for add in blackList, 1 for remove from blackList.
+    const blackList =0;  // for add in blackList, 1 for remove from blackList.
     before(async () => { //Before each test we empty the database   
         await connect()
     });
@@ -99,7 +99,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
             );
 
        
-        // console.log(res)
+        console.log(res.body)
         expect(res).to.have.status(200);
         expect(res.body.status).to.be.equal(true);
         expect(res.body).to.be.an('object');

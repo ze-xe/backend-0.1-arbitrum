@@ -220,7 +220,8 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
                     token1: data.token1,
                     chainId: chainId,
                     symbol: `${token0?.symbol}_${token1?.symbol}`,
-                    marginEnabled: marginEnabled
+                    marginEnabled: marginEnabled,
+                    active: true
                 }
                 createPair = await PairCreated.create(temp);
 

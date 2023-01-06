@@ -13,7 +13,7 @@ export async function handleMinTokenAmountSet(data: any){
         const minAMount = data[1].toString();
 
         await Token.findOneAndUpdate(
-            {id: token},
+            {id: token, active: true},
             {$set:{minTokenAmount: minAMount}}
         );
 

@@ -24,7 +24,7 @@ export async function handleBlackListToken(req: any, res: any) {
             blackList: blackList
         };
 
-        if (blackList != 0 || blackList != 1) {
+        if (blackList != 0 && blackList != 1) {
             return res.status(400).send({ status: true, message: "blacklist only can be 0 or 1" })
         }
 
@@ -100,6 +100,7 @@ export async function handleBlackListToken(req: any, res: any) {
             }
 
         }
+        await Token.findOneAndUpdate({ id: token, chainId: chainId }, { $set: { active: false } });
         res.status(200).send({ status: true, message: "Token Deactivate" })
 
     }

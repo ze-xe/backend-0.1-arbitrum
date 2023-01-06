@@ -30,7 +30,8 @@ async function handleToken(token: string, chainId: string) {
             symbol: symbol,
             decimals: decimals,
             price: "0",
-            chainId: chainId
+            chainId: chainId,
+            active: true
         };
 
         Token.create(temp);

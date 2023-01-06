@@ -41,7 +41,7 @@ async function handleOrderExecuted(data: any, argument: any) {
             return console.log("OrderId not found @ execute", id);
         }
 
-        let getPairDetails: ifPairCreated | null = await PairCreated.findOne({ id: getOrderDetails.pair, chainId: getOrderDetails.chainId , active: true}).lean();
+        let getPairDetails: ifPairCreated | null = await PairCreated.findOne({ id: getOrderDetails.pair, chainId: getOrderDetails.chainId, active: true }).lean();
 
         if (!getPairDetails) {
             return console.log(`Pair Id not found in order Executed`);
@@ -139,7 +139,7 @@ async function handleOrderExecuted(data: any, argument: any) {
 
                 if (Number(currentBalnce) < Number(getPairDetails.minToken0Order)) {
                     await OrderCreated.findOneAndUpdate({ _id: getOrderDetails._id.toString() },
-                        { $set: { deleted: true, active: false, balanceAmount: currentBalnce, lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance, fillAmount: totalFillAmount} });
+                        { $set: { deleted: true, active: false, balanceAmount: currentBalnce, lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance, fillAmount: totalFillAmount } });
                 }
                 else {
                     await OrderCreated.findOneAndUpdate(
@@ -226,7 +226,7 @@ async function handleOrderExecuted(data: any, argument: any) {
 
                 if (Number(currentBalnce) < Number(getPairDetails.minToken0Order)) {
                     await OrderCreated.findOneAndUpdate({ _id: getOrderDetails._id.toString() },
-                        { $set: { deleted: true, active: false, balanceAmount: currentBalnce, lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance, fillAmount: totalFillAmount} });
+                        { $set: { deleted: true, active: false, balanceAmount: currentBalnce, lastInOrderToken0: token0Balance, lastInOrderToken1: token1Balance, fillAmount: totalFillAmount } });
                 }
                 else {
                     await OrderCreated.findOneAndUpdate(
@@ -373,7 +373,7 @@ export async function handleMarginEnabled(data: string[]) {
                 return
             }
             else if (isTokenExist.marginEnabled == false) {
-                await Token.findOneAndUpdate({ id: token }, { $set: { marginEnabled: true, cId: cToken } });
+                await Token.findOneAndUpdate({ id: token, active: true }, { $set: { marginEnabled: true, cId: cToken } });
                 symbol = isTokenExist.symbol;
             }
         }
@@ -413,7 +413,7 @@ export async function handleMarginEnabled(data: string[]) {
 
         for (let i in allToken) {
 
-            let isPairExist = await PairCreated.findOne({ token0: token, token1: allToken[i].id,active: true }).lean()
+            let isPairExist = await PairCreated.findOne({ token0: token, token1: allToken[i].id, active: true }).lean()
 
             if (isPairExist) {
                 if (isPairExist.marginEnabled == true) {
@@ -433,7 +433,7 @@ export async function handleMarginEnabled(data: string[]) {
                 let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [allToken[i].id, token]);
                 let id = ethers.utils.keccak256(encoder);
 
-                let isPairExist = await PairCreated.findOne({ id: id , active: true}).lean();
+                let isPairExist = await PairCreated.findOne({ id: id, active: true }).lean();
 
                 if (isPairExist) {
 
