@@ -46,7 +46,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     let user1 = new ethers.Wallet(process.env.PRIVATE_KEY1! as string).connect(provider); //1 
     let signatures: any[] = [];
     let orders: any[] = [];
-    const blackList =0;  // for add in blackList, 1 for remove from blackList.
+    const blackList =1;  // for add in blackList, 1 for remove from blackList.
     before(async () => { //Before each test we empty the database   
         await connect()
     });
@@ -87,7 +87,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
             value, storedSignature
         ]);
 
-        let res = await request("http://localhost:3010")
+        let res = await request("https://api.zexe.io")
             .put(`/v/${version}/pair/blacklist `)
             .send(
                 {
