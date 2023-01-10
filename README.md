@@ -132,7 +132,7 @@ interval is mandatory which must be greater than 300000 miliseconds
             },
             {
                 "time": 1668002049,
-                "value": "0.906764705882352941"
+                "value": "0.906764705882352942"
             },
             ...
         ]
