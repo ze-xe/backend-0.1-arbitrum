@@ -33,7 +33,7 @@ Url : http://localhost:3010/pair/allpairs?chainId
                     "decimals": 18
                 },
                 {
-                    "id": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25792c",
+                    "id": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25793c",
                     "name": "USDC",
                     "symbol": "USDC",
                     "decimals": 18
@@ -132,7 +132,7 @@ interval is mandatory which must be greater than 300000 miliseconds
             },
             {
                 "time": 1668002049,
-                "value": "0.906764705882352941"
+                "value": "0.906764705882352942"
             },
             ...
         ]
