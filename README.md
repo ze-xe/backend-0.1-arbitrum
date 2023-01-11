@@ -23,7 +23,7 @@ Url : http://localhost:3010/pair/allpairs?chainId
             "id": "0x3b8025593f618d3dc1452325f3804f0229252f135e4eb37cc29832428b8e2475",
             "exchangeRate": "20297000000000000000000",
             "exchangeRateDecimals": "2",
-            "priceDiff": "-2675000000000000000000",
+            "priceDiff": "2675000000000000000000",
             "minToken0Order": 10000000000,
             "tokens": [
                 {
