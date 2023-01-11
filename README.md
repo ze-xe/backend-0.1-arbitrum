@@ -33,7 +33,7 @@ Url : http://localhost:3010/pair/allpairs?chainId
                     "decimals": 18
                 },
                 {
-                    "id": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25793c",
+                    "id": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25793d",
                     "name": "USDC",
                     "symbol": "USDC",
                     "decimals": 18
