@@ -8,8 +8,9 @@
   "private": true,
   "scripts": {
     "start": "ts-node build",
+    "dep": "ts-node ./script/config.ts",
     "build": "tsc -p .",
-    "dev": "ts-node app.ts",
+    "dev": "yarn dep && ts-node app.ts",
     "stage": "ts-node app.ts",
     "prod": "./node_modules/.bin/pm2 start app.ts --watch",
     "prod2": "pm2 start ecosystem.config.js",
@@ -23,10 +24,8 @@
     "test5": "mocha -r ts-node/register --timeout 180000 ./src/test/api/CmarginOrderShort.ts",
     "blacklist":"mocha -r ts-node/register --timeout 180000 ./src/test/api/DblackListSignature.ts",
     "pair": "mocha -r ts-node/register --timeout 180000 ./src/test/pair/createPair.ts",
-    "handler":"mocha -r ts-node/register --timeout 180000 ./src/test/handlers/handleMinTokenAmountSet.ts",
-    "dep": "curl https://raw.githubusercontent.com/ze-xe/contracts-0.1/main/deployments/arbitrumGoerli/deployments.json -o ./src/deployments/deployments.json",
-    "devDep": "curl https://raw.githubusercontent.com/ze-xe/contracts-0.1/dev/deployments/arbitrumGoerli/deployments.json -o ./src/deployments/deployments.json",
-    "stageDep": "curl https://raw.githubusercontent.com/ze-xe/contracts-0.1/staging/deployments/arbitrumGoerli/deployments.json -o ./src/deployments/deployments.json"
+    "handler":"mocha -r ts-node/register --timeout 180000 ./src/test/handlers/handleMinTokenAmountSet.ts"
+    
   },
   "dependencies": {
     "@sentry/node": "^7.28.1",
