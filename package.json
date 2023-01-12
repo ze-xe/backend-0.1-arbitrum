@@ -25,7 +25,7 @@
     "blacklist": "mocha -r ts-node/register --timeout 180000 ./src/test/api/DblackListSignature.ts",
     "pair": "mocha -r ts-node/register --timeout 180000 ./src/test/pair/createPair.ts",
     "handler": "mocha -r ts-node/register --timeout 180000 ./src/test/handlers/handleMinTokenAmountSet.ts",
-    "unitTest": "start-server-and-test stage http://localhost:3010 coverage"
+    "unitTest": "start-server-and-test stage http://localhost:3010 test"
   },
   "dependencies": {
     "@sentry/node": "^7.28.1",
