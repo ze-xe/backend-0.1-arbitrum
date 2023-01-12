@@ -19,7 +19,7 @@ services:
     # depends_on:
     #   - mongozexe
     ports:
-      - "8090:3010"
+      - "8050:3010"
     environment:
         # - MONGO_URL=mongodb://root:password@mongozexe:27017/?authMechanism=DEFAULT
         # - MONGO_URL=mongodb://root:password@mongozexe:27017/?directConnection=true&authSource=admin&replicaSet=replicaset&retryWrites=true
