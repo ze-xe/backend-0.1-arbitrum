@@ -7,7 +7,7 @@ import { ethers } from "ethers";
 import { connect, OrderCreated, OrderExecuted, Sync, UserPosition } from "../../db";
 import { getExchangeAddress } from "../../helper/chain";
 import { ifOrderCreated } from "../../helper/interface";
-import {  getProvider, parseEther } from "../../utils/utils";
+import { getProvider, parseEther } from "../../utils/utils";
 import { io } from "socket.io-client";
 import path from "path";
 import { EVENT_NAME } from "../../socketIo/socket.io";
@@ -17,7 +17,7 @@ use(chaiHttp);
 
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 
-const socket = io("http://localhost:3010");
+const socket = io("http://localhost:3010", { autoConnect: false });
 
 
 
@@ -44,6 +44,10 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
     before(async () => {
         await connect()
     });
+    after((done) => {
+        socket.disconnect()
+        done()
+    })
 
     it('mint 10 btc to user1, 200000 usdt to user2, approve exchange contract', async () => {
 
@@ -310,7 +314,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
 
     })
 
-    
+
 });
 
 

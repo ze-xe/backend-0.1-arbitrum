@@ -29,7 +29,10 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     before(async () => { 
         // await connect()
     });
-
+    after(done => {
+       
+        done()
+    })
 
     it(`Add link address in blacklist`, async () => {
 

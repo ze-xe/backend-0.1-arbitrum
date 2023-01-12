@@ -3,6 +3,7 @@
 import { use, request } from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
+import mongoose from "mongoose";
 use(chaiHttp);
 
 import { version } from "../../helper/constant";
@@ -11,14 +12,25 @@ import { version } from "../../helper/constant";
 
 describe('Testing Pair Api', () => {
 
-    before(async () => {
-        //await connect()
-    });
     /*
       * Test the /GET route
       */
     describe('Get(/pair/allpairs)', async () => {
+        after((done)=>{
+            mongoose.connection.close()
 
+            let wait = () => {
+                return new Promise((resolve, reject) => {
+    
+                    let timeOutId = setTimeout(() => {
+                        return resolve("Success")
+                    }, 20000)
+                })
+            }
+            done()
+            process.exit(0)
+           
+        })
         it('it should  have atleast a pair', async () => {
 
             let res = await request("http://localhost:3010")

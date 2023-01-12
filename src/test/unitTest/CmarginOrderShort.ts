@@ -20,7 +20,7 @@ require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_EN
 
 
 
-const socket = io("http://localhost:3010");
+const socket = io("http://localhost:3010", { autoConnect: false });
 
 
 
@@ -51,6 +51,11 @@ describe("Margin Order Short=> Mint token, create order, execute order, cancel o
     let loops = 5;
     let orderType = 3 // short
 
+    after((done) => {
+        // socket.emit('end')
+        socket.disconnect()
+        done()
+    })
     it(`user1 create short margin order 1 btc @ 20000}`, async () => {
         const domain = {
             name: contractName,

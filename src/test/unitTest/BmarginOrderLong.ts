@@ -20,7 +20,7 @@ require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_EN
 
 
 
-const socket = io("http://localhost:3010");
+const socket = io("http://localhost:3010", { autoConnect: false });
 
 describe("Margin Order Long => Mint token, create order, execute order, cancel order", async () => {
 
@@ -47,7 +47,11 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
     let amount = ethers.utils.parseEther('1').toString();
     let loops = 5;
     let orderType = 2 // long
-   
+
+    after((done) => {
+        socket.disconnect()
+        done()
+    })
     it("make market liquid", async () => {
 
         const btcAmount = ethers.utils.parseEther('1000');
@@ -67,7 +71,7 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
 
         await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
         await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
-        
+
     })
 
 

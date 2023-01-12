@@ -10,6 +10,10 @@ import { BtcAddress } from "../../helper/constant";
 describe("handleMinTokenAmountSet, change its minToken and restore", async () => {
     let currentMinToken = "0"
     // await connect();
+    after(done => {
+       
+        done()
+    })
     it("it will change btc minToken and then restore to previous value", async () => {
        
         const btcAddress = BtcAddress;
