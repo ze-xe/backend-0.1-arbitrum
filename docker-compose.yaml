@@ -23,8 +23,8 @@ services:
     environment:
         # - MONGO_URL=mongodb://root:password@mongozexe:27017/?authMechanism=DEFAULT
         # - MONGO_URL=mongodb://root:password@mongozexe:27017/?directConnection=true&authSource=admin&replicaSet=replicaset&retryWrites=true
-        - MONGO_URL=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/dev-zexe-arbitrum006?retryWrites=true&w=majority
-        - MONGO_URL1=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/backup-zexe-006?retryWrites=true&w=majority
+        - MONGO_URL=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/dev-zexe-arbitrum008?retryWrites=true&w=majority
+        - MONGO_URL1=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/backup-zexe-008?retryWrites=true&w=majority
         - WEB_3_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweERjZTFjMzYxYzgyNEI1ZjRFMzRGY2ZCNjUxMUYzNjkwNjc5RjhmODYiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njk4OTQyMTQ5NjMsIm5hbWUiOiJ6ZXhlLjAxIn0.YR1oAHiW_tA0lwG29tXz2wrYdTjWdCijto4yP_3uHHg
         - ADMIN_ADD=0x103b62f68da23f20055c572269be67fa7635f2fc
   #     - PORT=${PORT}
