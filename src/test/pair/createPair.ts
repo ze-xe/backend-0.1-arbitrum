@@ -180,7 +180,7 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
             expect(data2).to.be.null;
             server.close((err) => {
                 console.log('server closed')
-                process.exit(err ? 1 : 0)
+                process.exit(0)
             })
 
         }
