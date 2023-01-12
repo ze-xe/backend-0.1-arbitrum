@@ -4,14 +4,14 @@ import { expect } from "chai";
 import chaiHttp from "chai-http";
 use(chaiHttp);
 import { ethers } from "ethers";
-import { getERC20ABI, getExchangeABI, getProvider} from "../../utils/utils";
+import { getERC20ABI, getExchangeABI, getProvider } from "../../utils/utils";
 import { getExchangeAddress } from "../../helper/chain";
 import path from "path";
 import { connect, OrderCreated } from "../../db";
 import { ifOrderCreated } from "../../helper/interface";
 import { BtcAddress, contractName, EthAddress, ExchangeAddress, LinkAddress, UsdcAddress, version, ZexeAddress } from "../../helper/constant";
 import { handleOrderCancelled } from "../../handlers/exchange";
-import { httpServer } from "../../../app";
+import { httpServer, server } from "../../../app";
 
 
 // require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
@@ -178,7 +178,10 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
             await OrderCreated.findOneAndDelete({ signature: signatures[i] })
             let data2 = await OrderCreated.findOne({ signature: signatures[i] }).lean()! as ifOrderCreated;
             expect(data2).to.be.null;
-            // httpServer.close();
+            server.close((err) => {
+                console.log('server closed')
+                process.exit(err ? 1 : 0)
+            })
 
         }
 

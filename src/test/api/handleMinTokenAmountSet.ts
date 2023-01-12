@@ -1,16 +1,15 @@
 
 import { connect, PairCreated, Token } from "../../db";
 import { handleMinTokenAmountSet } from "../../handlers/handleMinTokenAmountSet";
-import { BtcAddress } from "../helper/contractDeployment"
 import { expect } from "chai";
-import { httpServer } from "../../../app";
+import { BtcAddress } from "../../helper/constant";
 
 
 // befor running this make sure btc token present in the database, and its piar created.
 
 describe("handleMinTokenAmountSet, change its minToken and restore", async () => {
     let currentMinToken = "0"
-    connect();
+    // await connect();
     it("it will change btc minToken and then restore to previous value", async () => {
        
         const btcAddress = BtcAddress;
@@ -51,7 +50,7 @@ describe("handleMinTokenAmountSet, change its minToken and restore", async () =>
             expect(x.minToken0Order == currentMinToken)
         })
 
-        // httpServer.close()
+
 
     });
 

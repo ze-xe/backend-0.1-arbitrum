@@ -99,7 +99,7 @@ app.use(function onError(err: any, req: any, res: any, next: any) {
     res.end(res.sentry + "\n");
 });
 
-httpServer.listen(process.env.PORT || 3010, function () {
+export const server = httpServer.listen(process.env.PORT || 3010, function () {
     console.log("app running on port " + (process.env.PORT || 3010));
 });
 

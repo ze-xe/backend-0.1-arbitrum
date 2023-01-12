@@ -1,7 +1,7 @@
 import express from "express";
 import { getAllTokens, getFeeSet } from "../controllers/genController";
 import { handleOrderCreated, getLimitMatchedOrders, getMatchedMarketOrders } from "../controllers/orderController";
-import { version } from "../helper/constant";
+import { latest, version } from "../helper/constant";
 
 const router = express.Router();
 
@@ -15,7 +15,10 @@ router.post(`/v/${version}/order/create`, handleOrderCreated); //ok
 router.get(`/v/${version}/get/fee`, getFeeSet);
 
 router.get("/", function (req, res) {
-  res.send("hello world");
+  res.send({
+    zexe: version,
+    latest: latest
+  });
 });
 
 export default router;

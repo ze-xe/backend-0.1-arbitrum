@@ -5,6 +5,7 @@ import { getERC20ABI, getExchangeABI, getProvider, leverageAbi } from "../utils/
 
 
 const Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/deployments.json")).toString());
+const Config = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/config.json")).toString());
 
 
 export const Decimals = {
@@ -13,7 +14,8 @@ export const Decimals = {
 };
 
 export const contractName = Deployments["contracts"]["Exchange"]["constructorArguments"][0];
-export const version = Deployments["contracts"]["Exchange"]["constructorArguments"][1];
+export const version = Config["version"];
+export const latest = Config["latest"];
 export const ExchangeAddress = getContractAddress("Exchange").toLowerCase();
 export const BtcAddress = getContractAddress("BTC").toLowerCase();
 //export const BtcAddress = getContractAddress(""); // ethereum

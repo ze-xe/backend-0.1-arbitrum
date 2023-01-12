@@ -20,13 +20,6 @@ require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_EN
 const socket = io("http://localhost:3010");
 
 
-socket.on(EVENT_NAME.PAIR_ORDER, (data) => {
-    console.log("pairOrders", data)
-});
-
-socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
-    console.log("pairHistory", data)
-})
 
 describe("Limit Order Sell => Mint token, create order, execute order, cancel order", async () => {
 
@@ -41,16 +34,14 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
     let signatures: any[] = [];
     let orders: any[] = [];
     let exchangeRate = ethers.utils.parseEther('20000').toString();
-    let txnId = "";
     let orderId = "";
     let salt = Math.floor(Math.random() * 9000000);
     let amount = ethers.utils.parseEther('1').toString();
     let orderType = 1; // 1 for sell 0 for buy
     let btcAmount = ""
+    let txnId = ""
     let userInOrderPre = '0';
-    before(async () => { //Before each test we empty the database   
-        // await mongoose.createConnection(process.env.MONGO_URL! as string).dropDatabase();
-        // httpServer
+    before(async () => {
         await connect()
     });
 
@@ -58,27 +49,30 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
 
         let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
         let user2UsdcBalancePre = (await usdc.balanceOf(user2.address)).toString();
-
-        const btcAmount = ethers.utils.parseEther('10').toString();
+        // mint btc
+        const btcAmount = ethers.utils.parseEther('100').toString();
         let tx1 = await btc.connect(user1).mint(user1.address, btcAmount);
+        await btc.connect(user2).mint(user2.address, btcAmount);
 
-        // approve for exchange
+        // approve for exchange btc 
         let approve = await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
         await btc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256)
 
-        const usdcAmount = ethers.utils.parseEther('200000').toString();
+        // mint usdc
+        const usdcAmount = ethers.utils.parseEther('2000000').toString();
         let tx2 = await usdc.connect(user2).mint(user2.address, usdcAmount);
+        await usdc.connect(user1).mint(user1.address, usdcAmount);
 
-        // approve for exchange
+        // approve for exchange usdc
         let approve1 = await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256);
         await usdc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
         await approve1.wait(1)
+
         let user1BtcBalancePost = (await btc.balanceOf(user1.address)).toString();
         let user2UsdcBalancePost = (await usdc.balanceOf(user2.address)).toString();
 
         expect(user1BtcBalancePost).to.equal(parseEther(Big(btcAmount).plus(user1BtcBalancePre).toString()));
         expect(user2UsdcBalancePost).to.equal(parseEther(Big(usdcAmount).plus(user2UsdcBalancePre).toString()));
-
 
     });
 
@@ -241,7 +235,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
 
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
-                }, 60000)
+                }, 15000)
 
                 socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
                     clearTimeout(timeOutId)
@@ -296,7 +290,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
 
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
-                }, 60000)
+                }, 15000)
 
                 socket.on(EVENT_NAME.CANCEL_ORDER, (data) => {
                     clearTimeout(timeOutId)

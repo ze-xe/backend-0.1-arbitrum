@@ -45,7 +45,7 @@ export async function handleBlackListToken(req: any, res: any) {
             if (getToken?.active == true) {
                 return res.status(200).send({ status: true, message: "Token already active" })
             };
-            
+
             await Token.findOneAndUpdate({ id: token, chainId: chainId }, { $set: { active: true } });
 
             // find token in pair token0;
@@ -54,7 +54,7 @@ export async function handleBlackListToken(req: any, res: any) {
             for (let i in getPair0) {
 
                 await PairCreated.findOneAndUpdate({ _id: getPair0[i]._id }, { $set: { active: true } });
-               
+
             }
             // find token in pair token1;
             let getPair1 = await PairCreated.find({ token1: token, chainId: chainId });
@@ -62,12 +62,12 @@ export async function handleBlackListToken(req: any, res: any) {
             for (let i in getPair1) {
 
                 await PairCreated.findOneAndUpdate({ _id: getPair1[i]._id }, { $set: { active: true } });
-               
+
             }
-            res.status(200).send({ status: true, message: "Token Activate" })
+            return res.status(200).send({ status: true, message: "Token Activate" })
 
         }
-    
+
 
         if (getToken?.active == false) {
             return res.status(200).send({ status: true, message: "Token already deactive" })
@@ -101,7 +101,7 @@ export async function handleBlackListToken(req: any, res: any) {
 
         }
         await Token.findOneAndUpdate({ id: token, chainId: chainId }, { $set: { active: false } });
-        res.status(200).send({ status: true, message: "Token Deactivate" })
+        return res.status(200).send({ status: true, message: "Token Deactivate" })
 
     }
     catch (error) {

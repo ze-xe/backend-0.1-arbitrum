@@ -5,7 +5,6 @@ import chaiHttp from "chai-http";
 use(chaiHttp);
 import { ethers } from "ethers";
 import Big from "big.js";
-import { BtcAddress, UsdcAddress, ExchangeAddress, leverAddress, cUsdcAddress, cBtcAddress } from '../helper/contractDeployment';
 import { EVENT_NAME } from "../../socketIo/socket.io";
 import { getERC20ABI, getExchangeABI, getProvider, leverageAbi, parseEther } from "../../utils/utils";
 import { getExchangeAddress } from "../../helper/chain";
@@ -15,7 +14,7 @@ import { connect, OrderCreated, Sync } from "../../db";
 import { ifOrderCreated } from "../../helper/interface";
 import { contractName, getContract, version } from "../../helper/constant";
 
- 
+
 
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 
@@ -23,16 +22,10 @@ require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_EN
 
 const socket = io("http://localhost:3010");
 
-// socket.on(EVENT_NAME.PAIR_ORDER, (data) => {
-//     console.log("pairOrders", data)
-// });
-
-// socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
-//     console.log("pairHistory", data)
-// })
 
 
-describe("Margin Order => Mint token, create order, execute order, cancel order", async () => {
+
+describe("Margin Order Short=> Mint token, create order, execute order, cancel order", async () => {
 
     // requirements
     let chainId = "421613"
@@ -58,12 +51,10 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
     let loops = 5;
     let orderType = 3 // short
 
-    before(async () => { //Before each test we empty the database   
-        // await mongoose.createConnection(process.env.MONGO_URL! as string).dropDatabase();
-        // httpServer
-        await connect()
+    before(async () => {
+        // await connect()
     });
-    
+
     it('mint 200000 btc to user1, 200000 BTC to user2', async () => {
         // ORDER IS Short means user1 want more USDC
 
@@ -104,26 +95,22 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
         const usdcAmount = ethers.utils.parseEther('20000000');
 
         // mint
-        await Promise.all(
-            [
-                btc.connect(user1).mint(user1.address, btcAmount),
-                usdc.connect(user2).mint(user2.address, usdcAmount),
-            ]
-        )
-        await Promise.all(
-            [
-                exchange.connect(user1).mint(btc.address, btcAmount),
-                exchange.connect(user2).mint(usdc.address, usdcAmount)
-            ]
-        )
+
+        await btc.connect(user1).mint(user1.address, btcAmount);
+        await usdc.connect(user2).mint(user2.address, usdcAmount);
+
+        // market mint
+        await exchange.connect(user1).mint(btc.address, btcAmount);
+        await exchange.connect(user2).mint(usdc.address, usdcAmount);
+
 
         // Approval 
-        await Promise.all([
-            btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256),
-            usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256),
-        ])
+
+        await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
+        await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256);
+
     })
-    
+
 
 
     it(`user1 create short margin order 1 btc @ 20000}`, async () => {
@@ -212,7 +199,7 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
         orderCreated.push(data)
     })
 
-    
+
     it(`user1 sell btc got from market to user2 and got 40000 usdc @ 20000 exchangeRate`, async () => {
         let user1BtcBalancePre = btc.balanceOf(user1.address);
         let user2BtcBalancePre = btc.balanceOf(user2.address);
@@ -296,8 +283,6 @@ describe("Margin Order => Mint token, create order, execute order, cancel order"
         expect(data.cancelled).to.equal(true)
 
     })
-    
-
 
 
 });

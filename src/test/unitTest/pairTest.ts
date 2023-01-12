@@ -3,18 +3,15 @@
 import { use, request } from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
-import { ethers } from "ethers";
 use(chaiHttp);
-import mongoose from 'mongoose';
-import { httpServer, server } from '../../../app';
-import { backupConnection, connect } from '../../db';
-import { BtcAddress, ExchangeAddress, UsdcAddress, version } from "../../helper/constant";
-import { getERC20ABI, getExchangeABI, getProvider } from "../../utils/utils";
+
+import { version } from "../../helper/constant";
+
 
 
 describe('Testing Pair Api', () => {
 
-    before(async () => { 
+    before(async () => {
         //await connect()
     });
     /*
