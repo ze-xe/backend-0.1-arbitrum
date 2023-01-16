@@ -2,17 +2,17 @@
 import { connect, PairCreated, Token } from "../../db";
 import { handleMinTokenAmountSet } from "../../handlers/handleMinTokenAmountSet";
 import { expect } from "chai";
-import { BtcAddress } from "../../helper/constant";
+import { getContractAddress } from "../../helper/constant";
 
 
 // befor running this make sure btc token present in the database, and its piar created.
 
 describe("handleMinTokenAmountSet, change its minToken and restore", async () => {
     let currentMinToken = "0"
-    // await connect();
+    await connect();
     it("it will change btc minToken and then restore to previous value", async () => {
        
-        const btcAddress = BtcAddress;
+        const btcAddress = getContractAddress("BTC");
         let minToken = "123456789";
 
         // get current minToken 

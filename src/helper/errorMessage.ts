@@ -17,7 +17,8 @@ export const errorMessage = {
     symbol: "symbol is not found",
     ticker: "ticker is not found",
     market: "market not approve",
-    borrowLimit: "Borrow Limit not valid borrowLimit = <0.75 or > 0.05 "
+    borrowLimit: "Borrow Limit not valid borrowLimit = <0.75 or > 0.05 ",
+    server:"internal Server error"
 
 };
 

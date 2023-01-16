@@ -3,18 +3,15 @@
 import { use, request } from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
-import { ethers } from "ethers";
 use(chaiHttp);
-import mongoose from 'mongoose';
-import { httpServer, server } from '../../../app';
-import { backupConnection, connect } from '../../db';
-import { BtcAddress, ExchangeAddress, UsdcAddress, version } from "../../helper/constant";
-import { getERC20ABI, getExchangeABI, getProvider } from "../../utils/utils";
+import { getVersion } from "../../helper/chain";
+import { } from "../../helper/constant";
+
 
 
 describe('Testing Pair Api', () => {
 
-    before(async () => { 
+    before(async () => {
         //await connect()
     });
     /*
@@ -25,7 +22,7 @@ describe('Testing Pair Api', () => {
         it('it should  have atleast a pair', async () => {
 
             let res = await request("http://localhost:3010")
-                .get(`/v/${version}/pair/allpairs?chainId=421613`)
+                .get(`/v/${getVersion(process.env.NODE_ENV!)}/pair/allpairs?chainId=421613`)
             expect(res).to.have.status(200);
             expect(res.body).to.be.an('object');
             expect(res.body.data).to.be.an('array');
@@ -36,7 +33,7 @@ describe('Testing Pair Api', () => {
 
         it('it should send error for not providing chainId', async () => {
             let res = await request("http://localhost:3010")
-                .get(`/v/${version}/pair/allpairs`)
+                .get(`/v/${getVersion(process.env.NODE_ENV!)}/pair/allpairs`)
 
             expect(res).to.have.status(400);
             expect(res.body.status).to.be.equal(false);

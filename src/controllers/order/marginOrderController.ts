@@ -14,7 +14,7 @@ import { getProvider, leverageAbi } from "../../utils/utils";
 
 
 
-export async function _handleMarginOrderCreated(signature: string, data: any, chainId: string, ipfs: boolean | undefined, id: string, exchangeRateDecimals: any) {
+export async function handleMarginOrderCreated(signature: string, data: any, chainId: string, ipfs: boolean | undefined, id: string, exchangeRateDecimals: any) {
     try {
 
         let amount = Big(data.amount);
@@ -240,6 +240,29 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
         }
         let cid = "";
 
+        let orderCreate = {
+            id: id,
+            signature: signature,
+            pair: pair,
+            token0: data.token0,
+            token1: data.token1,
+            maker: data.maker,
+            amount: data.amount,
+            salt: data.salt,
+            exchangeRate: data.exchangeRate,
+            chainId: chainId,
+            exchangeRateDecimals: exchangeRateDecimals,
+            balanceAmount: balanceAmount,
+            active: true,
+            deleted: false,
+            cid: cid,
+            borrowLimit: data.borrowLimit,
+            loops: data.loops,
+            orderType: data.orderType,
+            lastInOrderToken0: data.orderType == 2 ? amount : 0,
+            lastInOrderToken1: data.orderType == 3 ? token1Amount : 0,
+        }
+
         if (!ipfs) {
             if (!process.env.NODE_ENV?.includes('test')) {
                 cid = await mainIPFS([
@@ -251,58 +274,11 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
                 );
             }
 
-            OrderCreatedBackup.create(
-                {
-                    id: id,
-                    signature: signature,
-                    pair: pair,
-                    token0: data.token0,
-                    token1: data.token1,
-                    maker: data.maker,
-                    amount: data.amount,
-                    salt: data.salt,
-                    exchangeRate: data.exchangeRate,
-                    chainId: chainId,
-                    exchangeRateDecimals: exchangeRateDecimals,
-                    balanceAmount: balanceAmount,
-                    active: true,
-                    deleted: false,
-                    cid: cid,
-                    borrowLimit: data.borrowLimit,
-                    loops: data.loops,
-                    orderType: data.orderType,
-                    lastInOrderToken0: data.orderType == 2 ? amount : 0,
-                    lastInOrderToken1: data.orderType == 3 ? token1Amount : 0,
-                }
-            );
+            OrderCreatedBackup.create(orderCreate);
         }
 
 
-        await OrderCreated.create(
-
-            {
-                id: id,
-                signature: signature,
-                pair: pair,
-                token0: data.token0,
-                token1: data.token1,
-                maker: data.maker,
-                amount: data.amount,
-                salt: data.salt,
-                exchangeRate: data.exchangeRate,
-                chainId: chainId,
-                exchangeRateDecimals: exchangeRateDecimals,
-                balanceAmount: balanceAmount,
-                active: true,
-                deleted: false,
-                cid: cid,
-                borrowLimit: data.borrowLimit,
-                loops: data.loops,
-                orderType: data.orderType,
-                lastInOrderToken0: data.orderType == 2 ? amount : 0,
-                lastInOrderToken1: data.orderType == 3 ? token1Amount : 0,
-            }
-        );
+        await OrderCreated.create(orderCreate);
 
 
         // socket io data
@@ -318,6 +294,185 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
         console.log("MarginOrder Created ", "maker ", data.maker, "amount ", data.amount.toString(), id);
 
         return { status: true, message: "Order created successfully", statusCode: 201 };
+
+    }
+    catch (error: any) {
+        sentry.captureException(error)
+        console.log("Error @ handleOrderCreated", error);
+        return { status: false, error: error.message, statusCode: 500 };
+    }
+}
+
+export async function _handleMarginOrderCreated(signature: string, data: any, chainId: string, ipfs: boolean | undefined) {
+    try {
+
+        let amount = Big(data.amount);
+        let a = Big(data.amount);
+        let x = Big(data.borrowLimit).div(Big(10).pow(6));
+        let n = Number(data.loops) + 1;
+        let balanceAmount: string | string[] = Big(a).times((Big(1).minus(Big(x).pow(n))).div(Big(1).minus(x))).minus(a).toString().split(".");
+        // let balanceAmount: string | string[] = Big(a).times(((Big(x).pow(n)).minus(1)).div(Big(x).minus(1))).minus(a).toString().split(".");
+        balanceAmount = balanceAmount[0];
+
+        data.maker = data.maker.toLowerCase();
+        data.token0 = data.token0.toLowerCase();
+        data.token1 = data.token1.toLowerCase();
+        // console.log(arguments)
+        let borrowLimit = Big(data.borrowLimit).div(Big(10).pow(6)).toNumber();
+
+        if (borrowLimit > 0.75 || borrowLimit < 0.05) {
+            return { status: false, error: errorMessage.borrowLimit, statusCode: 400 }
+        }
+
+        let provider = getProvider(chainId);
+        let lever = new ethers.Contract((getLeverAddress(chainId)), leverageAbi, provider);
+        
+        // checking market enter or not
+        let assetIn: string[] = [];
+
+        let multicallData: number[] | null;
+        let userToken0Balance = 0;
+        let userToken1Balance = 0;
+        let allowanceToken0 = 0;
+        let allowanceToken1 = 0;
+
+        if (!ipfs) {
+
+            multicallData = await multicallFor2Tokens(data.token0, data.token1, data.maker, chainId);
+            assetIn = (await lever.getAssetsIn(data.maker)).map((x: string) => x.toLowerCase());
+            // console.log("AssetIn:", assetIn)
+            if (multicallData) {
+                userToken0Balance = multicallData[0];
+                allowanceToken0 = multicallData[1];
+                userToken1Balance = multicallData[2];
+                allowanceToken1 = multicallData[3]
+            }
+        }
+
+        const findUserPosition0: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
+        // for new order , will sell token1
+        const findUserPosition1: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token1, chainId: chainId }).lean();
+
+        let token0CurrentInOrder = Big(findUserPosition0?.inOrderBalance ?? 0).plus(amount).toNumber();
+
+        const token1Amount = data.token1Amount;
+        
+        let token1CurrentInOrder = Big(findUserPosition1?.inOrderBalance ?? 0).plus(token1Amount).toNumber();
+
+        if (data.orderType == 2) {
+
+            // check market enter or not
+            if (!ipfs) {
+                const token = await Token.findOne({ id: data.token0, active: true }).lean()! as any;
+
+                if (!assetIn.includes(token.cId)) {
+                    return { status: false, error: errorMessage.market, statusCode: 400 }
+                }
+            }
+            if (!ipfs && Number(allowanceToken0) < Number(token0CurrentInOrder)) {
+                console.log(`${errorMessage.allowance} token0`);
+                return { status: false, error: errorMessage.allowance, statusCode: 400 };
+            }
+            if (!ipfs && Number(allowanceToken1) < Number(token1CurrentInOrder)) {
+                console.log(`${errorMessage.allowance} token1`);
+                return { status: false, error: errorMessage.allowance, statusCode: 400 };
+            }
+
+            if (!ipfs && Number(userToken0Balance) < Number(token0CurrentInOrder)) {
+                console.log(`${errorMessage.balance} token0`);
+                return { status: false, error: errorMessage.balance, statusCode: 400 };
+            }
+
+            if (findUserPosition0) {
+
+                let _id = findUserPosition0._id.toString();
+                await UserPosition.findOneAndUpdate(
+                    { _id: _id },
+                    { $set: { inOrderBalance: token0CurrentInOrder } }
+                );
+            } else {
+
+                UserPosition.create(
+                    {
+                        token: data.token0,
+                        chainId: chainId,
+                        inOrderBalance: amount.toString(),
+                        id: data.maker
+                    }
+                );
+
+            }
+            if (!findUserPosition1) {
+                UserPosition.create(
+                    {
+                        token: data.token1,
+                        chainId: chainId,
+                        inOrderBalance: '0',
+                        id: data.maker
+                    }
+                );
+            }
+        }
+
+        else if (data.orderType == 3) {
+
+            // check market enter or not
+
+            if (!ipfs) {
+                const token = await Token.findOne({ id: data.token1, active: true }).lean()! as any;
+
+                if (!assetIn.includes(token.cId)) {
+                    return { status: false, error: errorMessage.market, statusCode: 400 }
+                }
+            }
+
+            if (!ipfs && Number(allowanceToken1) < Number(token1CurrentInOrder)) {
+                console.log(`${errorMessage.allowance} token1`);
+                return { status: false, error: errorMessage.allowance, statusCode: 400 };
+            }
+            if (!ipfs && Number(allowanceToken0) < Number(token0CurrentInOrder)) {
+                console.log(`${errorMessage.allowance} token0`);
+                return { status: false, error: errorMessage.allowance, statusCode: 400 };
+            }
+
+            if (!ipfs && Number(userToken1Balance) < Number(token1CurrentInOrder)) {
+                console.log(`${errorMessage.balance} token1`);
+                return { status: false, error: errorMessage.balance, statusCode: 400 };
+            }
+
+            if (findUserPosition1) {
+
+                let _id = findUserPosition1._id.toString();
+                await UserPosition.findOneAndUpdate(
+                    { _id: _id },
+                    { $set: { inOrderBalance: token1CurrentInOrder } }
+                );
+            } else {
+
+                UserPosition.create(
+                    {
+                        token: data.token1,
+                        chainId: chainId,
+                        inOrderBalance: token1Amount,
+                        id: data.maker
+                    }
+                );
+
+            }
+            if (!findUserPosition0) {
+                UserPosition.create(
+                    {
+                        token: data.token0,
+                        chainId: chainId,
+                        inOrderBalance: '0',
+                        id: data.maker
+                    }
+                );
+            }
+
+        }
+
+        return {status: true, balanceAmount: balanceAmount}
 
     }
     catch (error: any) {

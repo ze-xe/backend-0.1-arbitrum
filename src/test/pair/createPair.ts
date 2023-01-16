@@ -4,13 +4,14 @@ import { expect } from "chai";
 import chaiHttp from "chai-http";
 use(chaiHttp);
 import { ethers } from "ethers";
-import {  getProvider } from "../../utils/utils";
+import { getProvider } from "../../utils/utils";
 import { getExchangeAddress, getVersion } from "../../helper/chain";
-import {  OrderCreated } from "../../db";
+import { OrderCreated, OrderExecuted } from "../../db";
 import { ifOrderCreated } from "../../helper/interface";
 import { httpServer, run, server } from "../../../app";
 import { getConfig, getContract } from "../../helper/constant";
 import { handleOrderCancelled } from "../../handlers/orderCancelled";
+import { handleOrderExecuted } from "../../handlers/orderExecuted";
 
 
 // require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
@@ -29,7 +30,7 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
     let btc = getContract("BTC", chainId);
     let usdc = getContract("USDC", chainId);
     let eth = getContract("ETH", chainId);
-    let zexe =getContract("ZEXE", chainId);
+    let zexe = getContract("ZEXE", chainId);
     let link = getContract("LINK", chainId);
     let user1 = new ethers.Wallet("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80").connect(provider); //2
     let user2 = new ethers.Wallet("0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d").connect(provider); //1
@@ -49,6 +50,10 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
         await run(chainId)
         // await connect()
     });
+
+    after((done)=>{
+        done()
+    })
 
     it(`user1 create margin order 1 btc @ 20000}`, async () => {
         const domain = {
@@ -133,6 +138,27 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
 
     });
 
+    it("execute 0ne order and check DB", async () => {
+        let data = await OrderCreated.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
+
+        expect(data).to.be.an('object');
+        expect(data.amount).to.equal(amount);
+        expect(data.maker).to.equal(user1.address.toLowerCase());
+
+        let fillAmount = ethers.utils.parseEther('0.5').toString();
+        let input = [data.id, user2.address, fillAmount]
+        await handleOrderExecuted(input, { chainId: chainId, txnId: 1, blockNumber: 1, blockTimestamp: Date.now() });
+
+        let data1 = await OrderExecuted.findOne({ id: data.id }).lean()!;
+        expect(data1).to.be.an('object');
+        expect(data1).not.to.be.null;
+        expect(data1?.fillAmount).to.equal(fillAmount);
+
+        // delete from db executed order
+        let delExecutedData =  await OrderExecuted.deleteOne({ id: data.id });
+        expect(delExecutedData.acknowledged).to.equal(true)
+        expect(delExecutedData.deletedCount).to.equal(1)
+    });
     it(`find created order in data base, cancel and delete it`, async () => {
 
         for (let i in signatures) {
@@ -150,12 +176,14 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
             await OrderCreated.findOneAndDelete({ signature: signatures[i] })
             let data2 = await OrderCreated.findOne({ signature: signatures[i] }).lean()! as ifOrderCreated;
             expect(data2).to.be.null;
-            server.close((err) => {
-                console.log('server closed')
-                // process.exit(0)
-            })
+
 
         }
+
+        // server.close((err) => {
+        //     console.log('server closed')
+        //     process.exit(0)
+        // })
 
 
     })
