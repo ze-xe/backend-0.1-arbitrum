@@ -75,7 +75,7 @@ async function eventListner({ contractAddress, abi, handlers, chainId }: ifEvent
 
         console.log("to sync");
         console.log("Error at eventListner", error);
-        sentry.captureException(error)
+        // sentry.captureException(error)
         return historicEventListner({ contractAddress, abi, handlers, chainId });
     }
 
@@ -111,7 +111,7 @@ async function historicEventListner({ contractAddress, abi, handlers, chainId }:
 
             let logs: ethers.providers.Log[] = await provider.getLogs({ address: contractAddress, fromBlock: fromBlock });
 
-            let promiseTimestamp = [];
+            let promiseTimestamp: any = [];
             for (let i = 0; i < logs.length; i++) {
                 const blockTimestamp = (provider.getBlock(logs[i].blockNumber));
                 promiseTimestamp.push(blockTimestamp);

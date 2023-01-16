@@ -1,23 +1,28 @@
 import express from "express";
-import { getAllTokens, getFeeSet } from "../controllers/genController";
-import { handleOrderCreated, getLimitMatchedOrders, getMatchedMarketOrders } from "../controllers/orderController";
-import { latest, version } from "../helper/constant";
+import { getAllTokens } from "../controllers/genral/getAllToken";
+import { getFeeSet } from "../controllers/genral/getFeeSet";
+import { getLimitMatchedOrders } from "../controllers/order/limitMatchedOrders";
+import { getMatchedMarketOrders } from "../controllers/order/marketMatchedOrder";
+import { handleOrderCreated } from "../controllers/order/orderCreated";
+import { getVersion } from "../helper/chain";
+import { getConfig } from "../helper/constant";
+
 
 const router = express.Router();
 
 
+require("dotenv").config()
 
-
-router.get(`/v/${version}/tokens`, getAllTokens); //ok
-router.get(`/v/${version}/order/market/matched/:pairId`, getMatchedMarketOrders);//ok
-router.get(`/v/${version}/order/limit/matched/:pairId`, getLimitMatchedOrders); //ok
-router.post(`/v/${version}/order/create`, handleOrderCreated); //ok
-router.get(`/v/${version}/get/fee`, getFeeSet);
+router.get(`/v/${getVersion(process.env.NODE_ENV!)}/tokens`, getAllTokens); //ok
+router.get(`/v/${getVersion(process.env.NODE_ENV!)}/order/market/matched/:pairId`, getMatchedMarketOrders);//ok
+router.get(`/v/${getVersion(process.env.NODE_ENV!)}/order/limit/matched/:pairId`, getLimitMatchedOrders); //ok
+router.post(`/v/${getVersion(process.env.NODE_ENV!)}/order/create`, handleOrderCreated); //ok
+router.get(`/v/${getVersion(process.env.NODE_ENV!)}/get/fee`, getFeeSet);
 
 router.get("/", function (req, res) {
   res.send({
-    zexe: version,
-    latest: latest
+    zexe: getConfig("version"),
+    latest: getConfig("latest")
   });
 });
 

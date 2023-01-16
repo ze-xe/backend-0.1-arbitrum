@@ -4,19 +4,18 @@ import { expect } from "chai";
 import chaiHttp from "chai-http";
 use(chaiHttp);
 import { ethers } from "ethers";
-import { getERC20ABI, getExchangeABI, getProvider } from "../../utils/utils";
-import { getExchangeAddress } from "../../helper/chain";
-import path from "path";
-import { connect, OrderCreated } from "../../db";
+import {  getProvider } from "../../utils/utils";
+import { getExchangeAddress, getVersion } from "../../helper/chain";
+import {  OrderCreated } from "../../db";
 import { ifOrderCreated } from "../../helper/interface";
-import { BtcAddress, contractName, EthAddress, ExchangeAddress, LinkAddress, UsdcAddress, version, ZexeAddress } from "../../helper/constant";
-import { handleOrderCancelled } from "../../handlers/exchange";
-import { httpServer, server } from "../../../app";
+import { httpServer, run, server } from "../../../app";
+import { getConfig, getContract } from "../../helper/constant";
+import { handleOrderCancelled } from "../../handlers/orderCancelled";
 
 
 // require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 
-
+require("dotenv").config()
 
 // main server must be close 
 
@@ -26,14 +25,14 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
     let chainId = "421613"
     let provider = getProvider(chainId);
 
-    let exchange = new ethers.Contract(ExchangeAddress, getExchangeABI(), provider);
-    let btc = new ethers.Contract(BtcAddress, getERC20ABI(), provider);
-    let usdc = new ethers.Contract(UsdcAddress, getERC20ABI(), provider);
-    let eth = new ethers.Contract(EthAddress, getERC20ABI(), provider);
-    let zexe = new ethers.Contract(ZexeAddress, getERC20ABI(), provider);
-    let link = new ethers.Contract(LinkAddress, getERC20ABI(), provider);
-    let user1 = new ethers.Wallet(process.env.PRIVATE_KEY1! as string).connect(provider); //2
-    let user2 = new ethers.Wallet(process.env.PRIVATE_KEY2! as string).connect(provider); //1
+    let exchange = getContract("Exchange", chainId);
+    let btc = getContract("BTC", chainId);
+    let usdc = getContract("USDC", chainId);
+    let eth = getContract("ETH", chainId);
+    let zexe =getContract("ZEXE", chainId);
+    let link = getContract("LINK", chainId);
+    let user1 = new ethers.Wallet("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80").connect(provider); //2
+    let user2 = new ethers.Wallet("0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d").connect(provider); //1
 
 
     let signatures: any[] = [];
@@ -47,41 +46,14 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
 
     before(async () => { //Before each test we empty the database   
         // await mongoose.createConnection(process.env.MONGO_URL! as string).dropDatabase();
-        httpServer
+        await run(chainId)
         // await connect()
     });
 
-    it('mint token0, token1', async () => {
-
-        const btcAmount = ethers.utils.parseEther('10').toString();
-        const zexeAmount = ethers.utils.parseEther('1000000').toString();
-        const ethAmount = ethers.utils.parseEther('1000').toString();
-        const linkAmount = ethers.utils.parseEther('10000').toString();
-        const usdcAmount = ethers.utils.parseEther('1000000').toString();
-
-        // user1 and user2 mint btc 
-        await btc.connect(user1).mint(user1.address, btcAmount)
-        await eth.connect(user1).mint(user1.address, ethAmount)
-        await zexe.connect(user1).mint(user1.address, zexeAmount)
-        await link.connect(user1).mint(user1.address, linkAmount)
-        await usdc.connect(user2).mint(user2.address, usdcAmount)
-
-        // approve for exchange  
-        await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256)
-        await eth.connect(user1).approve(exchange.address, ethers.constants.MaxUint256)
-        await zexe.connect(user1).approve(exchange.address, ethers.constants.MaxUint256)
-        await link.connect(user1).approve(exchange.address, ethers.constants.MaxUint256)
-        const approve = await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256)
-
-        await approve.wait(1)
-
-    });
-
-
     it(`user1 create margin order 1 btc @ 20000}`, async () => {
         const domain = {
-            name: contractName,
-            version: version,
+            name: getConfig("name"),
+            version: getVersion(process.env.NODE_ENV!),
             chainId: chainId.toString(),
             verifyingContract: getExchangeAddress(chainId),
         };
@@ -130,7 +102,7 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
             //     value, storedSignature
             // ]);
             let res = await request("http://localhost:3010")
-                .post(`/v/${version}/order/create`)
+                .post(`/v/${getVersion(process.env.NODE_ENV!)}/order/create`)
                 .send(
                     {
                         "data": {
@@ -180,7 +152,7 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
             expect(data2).to.be.null;
             server.close((err) => {
                 console.log('server closed')
-                process.exit(0)
+                // process.exit(0)
             })
 
         }

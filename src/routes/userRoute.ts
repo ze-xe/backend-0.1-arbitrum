@@ -1,5 +1,8 @@
 import express  from "express";
-import { getUserPlacedOrders, getUserOrderHistory, getOrderCancelled, getUserInOrderBalance } from "../controllers/userController";
+import { getUserInOrderBalance } from "../controllers/user/inOrderBalance";
+import { getOrderCancelled } from "../controllers/user/orderCancelled";
+import { getUserOrderHistory } from "../controllers/user/orderHistory";
+import { getUserPlacedOrders } from "../controllers/user/placedOrders";
 const router = express.Router();
 
 

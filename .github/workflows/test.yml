@@ -7,13 +7,11 @@ on:
     branches: [ dev ]
 
 env:  
-  NODE_ENV: dev
-  MONGO_URL: mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/
-  MONGO_URL1: mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/
-  PRIVATE_KEY1: "0x7cf03fae45cb10d4e3ba00a10deeacfc8cea1be0eebcfb7277a7df2e5074a405"
-  PRIVATE_KEY2: "0xcdb7f4e35a4443b45b8316666caa396b7a9f4686fcff1901c008b15a2fa2e904"
+  NODE_ENV: test
+  MONGO_URL: mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/hardhat
+  MONGO_URL1: mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/hardhat
   WEB_3_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweERjZTFjMzYxYzgyNEI1ZjRFMzRGY2ZCNjUxMUYzNjkwNjc5RjhmODYiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njk4OTQyMTQ5NjMsIm5hbWUiOiJ6ZXhlLjAxIn0.YR1oAHiW_tA0lwG29tXz2wrYdTjWdCijto4yP_3uHHg
-  ADMIN_ADD: "0x103b62f68da23f20055c572269be67fa7635f2fc"
+  ADMIN_ADD: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
   NETWORK: arbitrumGoerli  
 
 jobs:
@@ -32,4 +30,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm install
-      - run: yarn unitTest
+      - run: cd contracts/
+      - run: npm install
+      - run: npx hardhat node

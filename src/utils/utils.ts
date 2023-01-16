@@ -1,26 +1,27 @@
 import fs from "fs";
 import { ethers } from "ethers";
 import Big from "big.js";
-import { getExchangeAddress, getRpcLink } from "../helper/chain";
-import { contractName, version } from "../helper/constant";
+import { getExchangeAddress, getRpcLink, getVersion } from "../helper/chain";
+import { getConfig } from "../helper/constant";
 
-// const exchangeDeployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Exchange.json")).toString());
+
 const Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/deployments.json")).toString());
 
-const erc20Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/ERC20.json")).toString());
 
 const MulticallAbi = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Multical.json")).toString());
 
+
 export const leverageAbi = Deployments["sources"]["Lever"];
 
-// export const ExchangeAddress1 =  Deployments["contracts"]["Exchange"]["address"]
+
 
 function getExchangeABI() {
-    return Deployments["sources"]["Exchange"];
+    return Deployments["sources"][`Exchange_${getConfig("latest")}`];
 }
+// console.log(getExchangeABI())
 
 function getERC20ABI() {
-    return erc20Deployments["abi"];
+    return Deployments["sources"]["TestERC20"];
 }
 
 function parseEther(value: number | string): string {
@@ -49,10 +50,10 @@ function getProvider(chainId: string): ethers.providers.JsonRpcProvider {
  */
 function validateSignature(maker: string, signature: string, value: object, chainId: string): (string | null) {
     try {
-
+        require("dotenv").config()
         const domain = {
-            name: contractName,
-            version: version,
+            name: getConfig("name"),
+            version: getVersion(process.env.NODE_ENV!),
             chainId: chainId,
             verifyingContract: getExchangeAddress(chainId),
         };

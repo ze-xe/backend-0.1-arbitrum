@@ -1,8 +1,11 @@
 import express from "express";
+import { getAllPairDetails } from "../controllers/pair/allPairDetails";
 import { handleBlackListToken } from "../controllers/pair/blackListPair";
+import { fetchOrders } from "../controllers/pair/fetchOrders";
 import { getNewPair } from "../controllers/pair/newPair";
+import { getPairOrderExecutedHistory } from "../controllers/pair/pairOrderExecutedHistory";
+import { getPairTradingStatus } from "../controllers/pair/pairTradingStatus";
 import { getPairTrandingPair } from "../controllers/pair/trandingPair";
-import { getAllPairDetails, getPairOrderExecutedHistory, getPairTradingStatus, fetchOrders } from "../controllers/pairController";
 const router = express.Router();
 
 

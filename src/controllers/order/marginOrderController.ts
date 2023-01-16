@@ -1,15 +1,15 @@
 import Big from "big.js";
 import { ethers } from "ethers";
-import { sentry } from "../../app";
-import { OrderCreated, OrderCreatedBackup, PairCreated, Token, UserPosition } from "../db";
-import { handleToken } from "../handlers/token";
-import { leverAddress } from "../helper/constant";
-import { errorMessage } from "../helper/errorMessage";
-import { ifPairCreated, ifUserPosition } from "../helper/interface";
-import { mainIPFS } from "../IPFS/putFiles";
-import { EVENT_NAME, socketService } from "../socketIo/socket.io";
-import { multicall, multicallFor2Tokens } from "../sync/syncBalance";
-import { getProvider, leverageAbi } from "../utils/utils";
+import { sentry } from "../../../app";
+import { OrderCreated, OrderCreatedBackup, PairCreated, Token, UserPosition } from "../../db";
+import { handleToken } from "../../handlers/token";
+import { getLeverAddress } from "../../helper/chain";
+import { errorMessage } from "../../helper/errorMessage";
+import { ifPairCreated, ifUserPosition } from "../../helper/interface";
+import { mainIPFS } from "../../IPFS/putFiles";
+import { EVENT_NAME, socketService } from "../../socketIo/socket.io";
+import { multicall, multicallFor2Tokens } from "../../sync/syncBalance";
+import { getProvider, leverageAbi } from "../../utils/utils";
 
 
 
@@ -28,7 +28,7 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
         data.maker = data.maker.toLowerCase();
         data.token0 = data.token0.toLowerCase();
         data.token1 = data.token1.toLowerCase();
-
+        // console.log(arguments)
         let borrowLimit = Big(data.borrowLimit).div(Big(10).pow(6)).toNumber();
 
         if (borrowLimit > 0.75 || borrowLimit < 0.05) {
@@ -36,8 +36,8 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
         }
 
         let provider = getProvider(chainId);
-        let lever = new ethers.Contract(leverAddress, leverageAbi, provider);
-
+        let lever = new ethers.Contract((getLeverAddress(chainId)), leverageAbi, provider);
+        
         // checking market enter or not
         let assetIn: string[] = [];
 
@@ -50,7 +50,8 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
         if (!ipfs) {
 
             multicallData = await multicallFor2Tokens(data.token0, data.token1, data.maker, chainId);
-            assetIn = (await lever.getAssetsIn(data.maker)).map((x: string) => x.toLocaleLowerCase());
+            assetIn = (await lever.getAssetsIn(data.maker)).map((x: string) => x.toLowerCase());
+            // console.log("AssetIn:", assetIn)
             if (multicallData) {
                 userToken0Balance = multicallData[0];
                 allowanceToken0 = multicallData[1];
@@ -186,7 +187,7 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
         }
 
 
-        let isPairExist: ifPairCreated = await PairCreated.findOne({ token0: data.token0, token1: data.token1, chainId: chainId , active: true}).lean();
+        let isPairExist: ifPairCreated = await PairCreated.findOne({ token0: data.token0, token1: data.token1, chainId: chainId, active: true }).lean();
         let createPair: ifPairCreated | any;
 
         if (!isPairExist) {
@@ -194,7 +195,7 @@ export async function _handleMarginOrderCreated(signature: string, data: any, ch
             let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token1, data.token0]);
             let id = ethers.utils.keccak256(encoder);
 
-            let isPairExist1: ifPairCreated = await PairCreated.findOne({ id: id ,active: true}).lean();;
+            let isPairExist1: ifPairCreated = await PairCreated.findOne({ id: id, active: true }).lean();;
 
             if (isPairExist1) {
                 createPair = isPairExist1;

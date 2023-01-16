@@ -16,11 +16,12 @@ import { expressMonitorConfig } from "./src/utils/utils";
 import * as Sentry from "@sentry/node";
 import * as Tracing from "@sentry/tracing";
 import path from "path";
-import { version } from "./src/helper/constant";
+import { getVersion } from "./src/helper/chain";
 
 export const sentry = Sentry
 
 Sentry.init({
+    //@ts-ignore
     dsn: "https://7d303c69af974f47aeb870a4537472ee@o4504400337698816.ingest.sentry.io/4504405098823680",
     integrations: [
         // enable HTTP calls tracing
@@ -46,11 +47,11 @@ app.use(require('express-status-monitor')(
     expressMonitorConfig
 ));
 
-require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
-
-if (!process.env.NODE_ENV?.includes('test')) {
+// require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
+require("dotenv").config()
+// if (!process.env.NODE_ENV?.includes('test')) {
     app.use(morgan('dev'));
-}
+// }
 
 connect();
 app.use(cors({
@@ -58,10 +59,10 @@ app.use(cors({
 }));
 app.use(helmet());
 app.use(express.json());
-app.use(`/v/${version}/pair`, pairRoutes);
-app.use(`/v/${version}/user`, userRoute);
+app.use(`/v/${getVersion(process.env.NODE_ENV!)}/pair`, pairRoutes);
+app.use(`/v/${getVersion(process.env.NODE_ENV!)}/user`, userRoute);
 
-app.use(`/v/${version}/chart`, chartRoute)
+app.use(`/v/${getVersion(process.env.NODE_ENV!)}/chart`, chartRoute)
 app.use(DBRoute)
 app.use(orderRoute);
 
@@ -78,15 +79,16 @@ app.get("/debug-sentry", function mainHandler(req, res) {
 
 
 
-async function run(chainId: string) {
+export async function run(chainId: string) {
     try {
-        start(chainId);
+       await start(chainId);
     }
     catch (error) {
         console.log("Error @ run", error);
     }
 }
-run("421613");
+
+// run("421613");
 
 
 

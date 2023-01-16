@@ -8,7 +8,7 @@ import { startOrderStatus } from "./sync/syncBalance";
 import { ifOrderCreated } from "./helper/interface";
 import { socketService } from "./socketIo/socket.io";
 import { httpServer, sentry } from "../app";
-import { version } from "./helper/constant";
+import { getVersion } from "./helper/chain";
 require("dotenv").config();
 
 
@@ -48,7 +48,7 @@ async function start(chainId: string) {
 
                     let result: AxiosResponse = await axios({
                         method: "post",
-                        url: `http://localhost:3010/v/${version}/order/create`,
+                        url: `http://localhost:3010/v/${getVersion(process.env.NODE_ENV!)}/order/create`,
                         data: {
                             signature: copyOrder[i].signature,
                             chainId: copyOrder[i].chainId.toString(),

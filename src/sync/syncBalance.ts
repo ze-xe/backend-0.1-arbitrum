@@ -5,6 +5,7 @@ import { getERC20ABI, getProvider, getInterface, MulticallAbi } from "../utils/u
 import { ifOrderCreated, ifUserPosition, orderSignature } from "../helper/interface";
 import { getExchangeAddress, MulticallAddress } from "../helper/chain";
 import { sentry } from "../../app";
+import { updateExpressionWithTypeArguments } from "typescript";
 
 /**
  * @dev this function is use to get onchain data for create order api, i.e balance and allowance
@@ -16,7 +17,7 @@ import { sentry } from "../../app";
 
 async function multicall(token: string, maker: string, chainId: string): Promise<number[] | null> {
     try {
-
+       
         const provider: ethers.providers.JsonRpcProvider = getProvider(chainId);
 
         const multicall = new ethers.Contract(
@@ -32,12 +33,13 @@ async function multicall(token: string, maker: string, chainId: string): Promise
         );
 
         let outPut: number[] = [];
-
+       
         for (let i in resp[1]) {
             outPut.push(Number(BigNumber.from(resp[1][i]).toString()))
         }
-
+        console.log(outPut);
         return outPut
+
 
     }
     catch (error) {

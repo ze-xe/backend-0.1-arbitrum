@@ -1,5 +1,5 @@
 import { OrderCreated, PairCreated, Token } from "../../db";
-import { handleOrderCancelled } from "../../handlers/exchange";
+import { handleOrderCancelled } from "../../handlers/orderCancelled";
 import { blackListTokenSignatureValidation } from "../../utils/blackListTokenSignatureVerify";
 
 

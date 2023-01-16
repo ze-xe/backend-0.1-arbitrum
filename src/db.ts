@@ -1,24 +1,22 @@
 import mongoose from "mongoose";
 
 import path from 'path';
-import { version } from "./helper/constant";
-
-require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
-
-let a = version.split('.')
-a.pop()
-let _version = a.join("_")
-
-export const backupConnection = mongoose.createConnection(process.env.MONGO_URL1+`backup-zexe-006?retryWrites=true&w=majority`! as string);
-// export const backupConnection = mongoose.createConnection(process.env.MONGO_URL1 + `dev-backup-zexe-${_version}?retryWrites=true&w=majority`! as string);
-
 import SyncSchema from "./schemas/Sync";
 import PairCreatedSchema from "./schemas/PairCreated";
 import OrderCreatedSchema from "./schemas/OrderCreated";
 import OrderExecutedSchema from "./schemas/OrderExecuted";
 import TokenSchema from "./schemas/Token";
 import UserPositionSchema from "./schemas/UserPosition";
+import { getVersion } from "./helper/chain";
 
+require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
+
+let a = getVersion(process.env.NODE_ENV!).split('.')
+a.pop()
+let _version = a.join("_")
+
+// export const backupConnection = mongoose.createConnection(process.env.MONGO_URL1+`test-backup-zexe?retryWrites=true&w=majority`! as string);
+export const backupConnection = mongoose.createConnection(process.env.MONGO_URL1 + `-backup-zexe-${_version}?retryWrites=true&w=majority`! as string);
 
 
 
@@ -36,8 +34,8 @@ const UserPosition = mongoose.model("UserPosition", UserPositionSchema);
 
 async function connect() {
 
-    mongoose.connect(process.env.MONGO_URL+`dev-zexe-arbitrum006?retryWrites=true&w=majority`! as string)
-    // mongoose.connect(process.env.MONGO_URL + `dev-zexe-${_version}?retryWrites=true&w=majority`! as string)
+    // mongoose.connect(process.env.MONGO_URL+`test-zexe-arbitrum006?retryWrites=true&w=majority`! as string)
+    mongoose.connect(process.env.MONGO_URL + `-zexe-${_version}?retryWrites=true&w=majority`! as string)
         .then(() => {
             console.log("MongoDb is connected")
         })

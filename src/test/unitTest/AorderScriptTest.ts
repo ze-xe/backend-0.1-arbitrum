@@ -7,76 +7,78 @@ import { ethers } from "ethers";
 import { connect, OrderCreated, OrderExecuted, Sync, UserPosition } from "../../db";
 import { getExchangeAddress } from "../../helper/chain";
 import { ifOrderCreated } from "../../helper/interface";
-import { getProvider, parseEther } from "../../utils/utils";
+import {  getProvider, parseEther } from "../../utils/utils";
 import { io } from "socket.io-client";
 import path from "path";
 import { EVENT_NAME } from "../../socketIo/socket.io";
-import { contractName, getContract, version } from "../../helper/constant";
+import { getConfig, getContract } from "../../helper/constant";
 use(chaiHttp);
 
 
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 
-const socket = io("http://localhost:3010", { autoConnect: false });
+const socket = io("http://localhost:3010");
 
 
+socket.on(EVENT_NAME.PAIR_ORDER, (data) => {
+    console.log("pairOrders", data)
+});
+
+socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
+    console.log("pairHistory", data)
+})
 
 describe("Limit Order Sell => Mint token, create order, execute order, cancel order", async () => {
 
     // requirements
     let chainId = "421613"
     let provider = getProvider(chainId);
-    let exchange = getContract("Exchange");
-    let btc = getContract("BTC")
-    let usdc = getContract("USDC")
+    let exchange = getContract("Exchange", chainId);
+    let btc = getContract("BTC", chainId)
+    let usdc = getContract("USDC", chainId)
     let user1 = new ethers.Wallet(process.env.PRIVATE_KEY1! as string).connect(provider); //1
     let user2 = new ethers.Wallet(process.env.PRIVATE_KEY2! as string).connect(provider); //2
     let signatures: any[] = [];
     let orders: any[] = [];
     let exchangeRate = ethers.utils.parseEther('20000').toString();
+    let txnId = "";
     let orderId = "";
     let salt = Math.floor(Math.random() * 9000000);
     let amount = ethers.utils.parseEther('1').toString();
     let orderType = 1; // 1 for sell 0 for buy
     let btcAmount = ""
-    let txnId = ""
     let userInOrderPre = '0';
-    before(async () => {
+    before(async () => { //Before each test we empty the database   
+        // await mongoose.createConnection(process.env.MONGO_URL! as string).dropDatabase();
+        // httpServer
         await connect()
     });
-    after((done) => {
-        socket.disconnect()
-        done()
-    })
 
     it('mint 10 btc to user1, 200000 usdt to user2, approve exchange contract', async () => {
 
         let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
         let user2UsdcBalancePre = (await usdc.balanceOf(user2.address)).toString();
-        // mint btc
-        const btcAmount = ethers.utils.parseEther('100').toString();
-        let tx1 = await btc.connect(user1).mint(user1.address, btcAmount);
-        await btc.connect(user2).mint(user2.address, btcAmount);
 
-        // approve for exchange btc 
+        const btcAmount = ethers.utils.parseEther('10').toString();
+        let tx1 = await btc.connect(user1).mint(user1.address, btcAmount);
+
+        // approve for exchange
         let approve = await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
         await btc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256)
 
-        // mint usdc
-        const usdcAmount = ethers.utils.parseEther('2000000').toString();
+        const usdcAmount = ethers.utils.parseEther('200000').toString();
         let tx2 = await usdc.connect(user2).mint(user2.address, usdcAmount);
-        await usdc.connect(user1).mint(user1.address, usdcAmount);
 
-        // approve for exchange usdc
+        // approve for exchange
         let approve1 = await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256);
         await usdc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
         await approve1.wait(1)
-
         let user1BtcBalancePost = (await btc.balanceOf(user1.address)).toString();
         let user2UsdcBalancePost = (await usdc.balanceOf(user2.address)).toString();
 
         expect(user1BtcBalancePost).to.equal(parseEther(Big(btcAmount).plus(user1BtcBalancePre).toString()));
         expect(user2UsdcBalancePost).to.equal(parseEther(Big(usdcAmount).plus(user2UsdcBalancePre).toString()));
+
 
     });
 
@@ -84,8 +86,8 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
     it(`user1 creates limit order to sell 1 btc @ 20000, check user inOrder Balance`, async () => {
 
         const domain = {
-            name: contractName,
-            version: version,
+            name: getConfig("name"),
+            version: getConfig("version"),
             chainId: chainId.toString(),
             verifyingContract: getExchangeAddress(chainId),
         };
@@ -135,7 +137,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
         let userInOrder = userPositionPre?.inOrderBalance ?? '0';
 
         let res = await request("http://localhost:3010")
-            .post(`/v/${version}/order/create`)
+            .post(`/v/${getConfig("version")}/order/create`)
             .send(
                 {
                     "data": {
@@ -239,7 +241,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
 
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
-                }, 15000)
+                }, 60000)
 
                 socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
                     clearTimeout(timeOutId)
@@ -294,7 +296,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
 
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
-                }, 15000)
+                }, 60000)
 
                 socket.on(EVENT_NAME.CANCEL_ORDER, (data) => {
                     clearTimeout(timeOutId)
@@ -314,7 +316,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
 
     })
 
-
+    
 });
 
 

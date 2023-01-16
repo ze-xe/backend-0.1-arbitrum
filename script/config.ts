@@ -2,12 +2,12 @@ import axios from 'axios';
 import fs from 'fs';
 import mongoose from 'mongoose';
 import path from 'path';
-import { version } from '../src/helper/constant';
+// import { version } from '../src/helper/constant';
 
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 
 const CONFIG = (file: string, env: string | undefined, network: string | undefined) => `https://raw.githubusercontent.com/ze-xe/contracts-0.1/${env}/deployments/${network}/${file}.json`;
-const _version = version.split(".");
+// const _version = version.split(".");
 async function main() {
     
     const deployments = await axios.get(CONFIG('deployments', process.env.NODE_ENV, process.env.NETWORK));

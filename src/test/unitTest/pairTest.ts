@@ -28,7 +28,7 @@ describe('Testing Pair Api', () => {
                 })
             }
             done()
-            process.exit(0)
+            // process.exit(0)
            
         })
         it('it should  have atleast a pair', async () => {
