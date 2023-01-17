@@ -12,7 +12,7 @@ import { io } from "socket.io-client";
 import path from "path";
 import { connect, OrderCreated, Sync } from "../../db";
 import { ifOrderCreated } from "../../helper/interface";
-import {  getConfig, getContract } from "../../helper/constant";
+import { getConfig, getContract } from "../../helper/constant";
 
 
 
@@ -52,63 +52,63 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
 
         await connect()
     });
-/*
-    it('mint 100 btc to user1, 100 BTC to user2', async () => {
-        // ORDER IS LONG means user1 want more btc
-
-        let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
-        let user2BtcBalancePre = (await btc.balanceOf(user2.address)).toString();
-
-        const btcAmount = ethers.utils.parseEther('100').toString();
-
-        // user1 and user2 mint btc 
-        await btc.connect(user1).mint(user1.address, btcAmount)
-        await btc.connect(user2).mint(user2.address, btcAmount)
-
-        // approve for exchange  
-        await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256)
-        await usdc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256) // as it will sell usdc to buy btc
-        await btc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256)
-
-        // approve for market
-        await btc.connect(user1).approve(cBtc.address, ethers.constants.MaxUint256)
-        await btc.connect(user2).approve(cBtc.address, ethers.constants.MaxUint256)
-        const approve = await usdc.connect(user1).approve(cUsdc.address, ethers.constants.MaxUint256)
-        await approve.wait(1)
-
-        let user1BtcBalancePost = (await btc.balanceOf(user1.address)).toString();
-        let user2BtcBalancePost = (await btc.balanceOf(user2.address)).toString();
-
-        expect(user1BtcBalancePost).to.equal(parseEther(Big(btcAmount).plus(user1BtcBalancePre).toString()));
-        expect(user2BtcBalancePost).to.equal(parseEther(Big(btcAmount).plus(user2BtcBalancePre).toString()));
-
-    });
-
-
-    it("make market liquid", async () => {
-
-        const btcAmount = ethers.utils.parseEther('1000');
-        const usdcAmount = ethers.utils.parseEther('20000000');
-
-        // mint
-
-        await btc.connect(user1).mint(user1.address, btcAmount, { gasLimit: "100000000" });
-        await usdc.connect(user2).mint(user2.address, usdcAmount, { gasLimit: "100000000" });
-
-        // to market
-        await exchange.connect(user1).mint(btc.address, btcAmount, { gasLimit: "100000000" });
-        await exchange.connect(user2).mint(usdc.address, usdcAmount, { gasLimit: "100000000" });
-
-
-        // Approval 
-
-        await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
-        await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
-        // market enter
-        await lever.connect(user1).enterMarkets([cBtc.address, cUsdc.address]);
-        await lever.connect(user2).enterMarkets([cBtc.address, cUsdc.address]);
-
-    })*/
+    /*
+        it('mint 100 btc to user1, 100 BTC to user2', async () => {
+            // ORDER IS LONG means user1 want more btc
+    
+            let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
+            let user2BtcBalancePre = (await btc.balanceOf(user2.address)).toString();
+    
+            const btcAmount = ethers.utils.parseEther('100').toString();
+    
+            // user1 and user2 mint btc 
+            await btc.connect(user1).mint(user1.address, btcAmount)
+            await btc.connect(user2).mint(user2.address, btcAmount)
+    
+            // approve for exchange  
+            await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256)
+            await usdc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256) // as it will sell usdc to buy btc
+            await btc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256)
+    
+            // approve for market
+            await btc.connect(user1).approve(cBtc.address, ethers.constants.MaxUint256)
+            await btc.connect(user2).approve(cBtc.address, ethers.constants.MaxUint256)
+            const approve = await usdc.connect(user1).approve(cUsdc.address, ethers.constants.MaxUint256)
+            await approve.wait(1)
+    
+            let user1BtcBalancePost = (await btc.balanceOf(user1.address)).toString();
+            let user2BtcBalancePost = (await btc.balanceOf(user2.address)).toString();
+    
+            expect(user1BtcBalancePost).to.equal(parseEther(Big(btcAmount).plus(user1BtcBalancePre).toString()));
+            expect(user2BtcBalancePost).to.equal(parseEther(Big(btcAmount).plus(user2BtcBalancePre).toString()));
+    
+        });
+    
+    
+        it("make market liquid", async () => {
+    
+            const btcAmount = ethers.utils.parseEther('1000');
+            const usdcAmount = ethers.utils.parseEther('20000000');
+    
+            // mint
+    
+            await btc.connect(user1).mint(user1.address, btcAmount, { gasLimit: "100000000" });
+            await usdc.connect(user2).mint(user2.address, usdcAmount, { gasLimit: "100000000" });
+    
+            // to market
+            await exchange.connect(user1).mint(btc.address, btcAmount, { gasLimit: "100000000" });
+            await exchange.connect(user2).mint(usdc.address, usdcAmount, { gasLimit: "100000000" });
+    
+    
+            // Approval 
+    
+            await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
+            await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
+            // market enter
+            await lever.connect(user1).enterMarkets([cBtc.address, cUsdc.address]);
+            await lever.connect(user2).enterMarkets([cBtc.address, cUsdc.address]);
+    
+        })*/
 
 
 
@@ -197,7 +197,7 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
         expect(Number(data.loops)).to.equal(loops)
         orderCreated.push(data)
     })
-    
+
     it(`user1 sell usdc got from market to user2 and got 2 btc @ 20000`, async () => {
         let user1BtcBalancePre = btc.balanceOf(user1.address);
         let user2BtcBalancePre = btc.balanceOf(user2.address);
@@ -210,7 +210,7 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
         user1UsdcBalancePre = promise[3].toString()
         // console.log(user1BtcBalancePre)
         const btcAmount = ethers.utils.parseEther('2').toString();
-       
+
 
         let exTxn = await exchange.connect(user2).executeT0LimitOrders(
             [signatures[0]],
@@ -245,6 +245,16 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
                         Big(btcAmount).minus(takerFeeAmount)
                             .times(exchangeRate)
                             .div(Big(10).pow(18))).toString()))
+
+        let wait = () => {
+            return new Promise((resolve, reject) => {
+
+                let timeOutId = setTimeout(() => {
+                    return resolve("Success")
+                }, 15000)
+            })
+        }
+        let res = await wait()
 
     });
 
