@@ -1,6 +1,6 @@
 
 import Big from "big.js";
-import { OrderCreated, UserPosition } from "../../db";
+import { OrderCreated, UserPosition } from "../../DB/db";
 import { ifUserPosition } from "../../helper/interface";
 import { getLoop, loopFillAmount } from "./getLoop";
 

@@ -1,6 +1,6 @@
 
 import { sentry } from "../../../app";
-import { PairCreated } from "../../db";
+import { PairCreated } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 
 

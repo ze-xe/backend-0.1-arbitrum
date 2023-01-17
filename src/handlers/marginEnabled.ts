@@ -1,4 +1,4 @@
-import { PairCreated, Token } from "../db";
+import { PairCreated, Token } from "../DB/db";
 import {  getERC20ABI, getProvider } from "../utils/utils";
 import { ethers } from "ethers";
 import { sentry } from "../../app";

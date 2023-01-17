@@ -1,5 +1,5 @@
 import express from "express";
-import { connect, backupConnection } from "./src/db";
+import { connect, backupConnection } from "./src/DB/db";
 import cors from "cors";
 const app = express();
 import orderRoute from "./src/routes/orderRoute";
@@ -8,7 +8,7 @@ import userRoute from "./src/routes/userRoute";
 import chartRoute from "./src/routes/chartRoute"
 import DBRoute from "./src/routes/DBRoute"
 import helmet from "helmet";
-import { start } from "./src/appUtil";
+import { start } from "./src/utils/appUtil";
 import { createServer } from "http";
 export const httpServer = createServer(app);
 import morgan from 'morgan';

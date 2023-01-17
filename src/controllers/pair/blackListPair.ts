@@ -1,4 +1,4 @@
-import { OrderCreated, PairCreated, Token } from "../../db";
+import { OrderCreated, PairCreated, Token } from "../../DB/db";
 import { handleOrderCancelled } from "../../handlers/orderCancelled";
 import { blackListTokenSignatureValidation } from "../../utils/blackListTokenSignatureVerify";
 

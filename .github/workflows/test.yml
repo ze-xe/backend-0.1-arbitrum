@@ -33,3 +33,5 @@ jobs:
       - run: cd contracts/
       - run: npm install
       - run: npx hardhat node
+      - run: npx hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
+

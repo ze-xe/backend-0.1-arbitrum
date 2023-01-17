@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
 
 import path from 'path';
-import SyncSchema from "./schemas/Sync";
-import PairCreatedSchema from "./schemas/PairCreated";
-import OrderCreatedSchema from "./schemas/OrderCreated";
-import OrderExecutedSchema from "./schemas/OrderExecuted";
-import TokenSchema from "./schemas/Token";
-import UserPositionSchema from "./schemas/UserPosition";
-import { getVersion } from "./helper/chain";
+import SyncSchema from "../schemas/Sync";
+import PairCreatedSchema from "../schemas/PairCreated";
+import OrderCreatedSchema from "../schemas/OrderCreated";
+import OrderExecutedSchema from "../schemas/OrderExecuted";
+import TokenSchema from "../schemas/Token";
+import UserPositionSchema from "../schemas/UserPosition";
+import { getVersion } from "../helper/chain";
 
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 

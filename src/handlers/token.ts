@@ -1,4 +1,4 @@
-import { Token } from "../db";
+import { Token } from "../DB/db";
 import { getERC20ABI, getProvider } from "../utils/utils";
 import { ethers } from "ethers";
 import { sentry } from "../../app";

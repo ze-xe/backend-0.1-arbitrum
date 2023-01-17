@@ -1,9 +1,5 @@
 
-
-
-
-import {  OrderCreated, OrderCreatedBackup } from "../../db";
-import { getDecimals, validateSignature } from "../../utils/utils";
+import {  OrderCreated, OrderCreatedBackup } from "../../DB/db";
 import Big from "big.js";
 import { ethers } from "ethers";
 import { createOrderSchema } from "../../helper/validateRequest";
@@ -14,6 +10,8 @@ import { marginValidationAndUserPosition} from "./helper/marginValidationUserPos
 import { sentry } from "../../../app";
 import { getPairId } from "./helper/pairId";
 import { validationAndUserPosition } from "./helper/validationUserPosition";
+import { validateSignature } from "../../utils/validateSignature";
+import { getDecimals } from "../../utils/getDecimal";
 
 
 
@@ -346,7 +344,7 @@ export async function handleOrderCreated(req: any, res: any) {
         data.maker = data.maker?.toLowerCase();
         data.token0 = data.token0?.toLowerCase();
         data.token1 = data.token1?.toLowerCase();
-        
+
         await createOrderSchema.validateAsync({ createOrderSchemaData: req.body.data, signature: signature, chainId: chainId });
         for (let i in addresses) {
 
@@ -368,7 +366,6 @@ export async function handleOrderCreated(req: any, res: any) {
 
         if (!id) {
             console.log(errorMessage.signature);
-
             return res.status(400).send({ status: false, error: errorMessage.signature });
         }
 
@@ -383,6 +380,7 @@ export async function handleOrderCreated(req: any, res: any) {
             Big(amount)
                 .times(data.exchangeRate)
                 .div(Big(10).pow(18)).toString();
+
         data.token1Amount = token1Amount;
         let balanceAmount = amount.toString()
 
@@ -397,7 +395,6 @@ export async function handleOrderCreated(req: any, res: any) {
                balanceAmount = response.balanceAmount!
             }
         }
-
 
         if (orderType == 1 || orderType == 0){
             let response = await validationAndUserPosition(data, chainId, ipfs);

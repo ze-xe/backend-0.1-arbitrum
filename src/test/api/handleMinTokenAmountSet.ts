@@ -1,5 +1,5 @@
 
-import { connect, PairCreated, Token } from "../../db";
+import { connect, PairCreated, Token } from "../../DB/db";
 import { handleMinTokenAmountSet } from "../../handlers/handleMinTokenAmountSet";
 import { expect } from "chai";
 import { getContractAddress } from "../../helper/constant";

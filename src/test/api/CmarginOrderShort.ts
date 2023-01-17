@@ -10,7 +10,7 @@ import { getProvider, parseEther } from "../../utils/utils";
 import { getExchangeAddress, getVersion } from "../../helper/chain";
 import { io } from "socket.io-client";
 import path from "path";
-import { connect, OrderCreated, Sync } from "../../db";
+import { connect, OrderCreated, Sync } from "../../DB/db";
 import { ifOrderCreated } from "../../helper/interface";
 import {  getConfig, getContract} from "../../helper/constant";
 

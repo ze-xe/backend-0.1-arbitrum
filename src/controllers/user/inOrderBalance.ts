@@ -1,5 +1,5 @@
 import { sentry } from "../../../app";
-import { UserPosition } from "../../db";
+import { UserPosition } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 
 

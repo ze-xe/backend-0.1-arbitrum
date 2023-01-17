@@ -1,7 +1,7 @@
 import Big from "big.js";
 import { ethers } from "ethers";
 import { sentry } from "../../../../app";
-import { Token, UserPosition } from "../../../db";
+import { Token, UserPosition } from "../../../DB/db";
 import { getLeverAddress } from "../../../helper/chain";
 import { errorMessage } from "../../../helper/errorMessage";
 import { ifUserPosition } from "../../../helper/interface";

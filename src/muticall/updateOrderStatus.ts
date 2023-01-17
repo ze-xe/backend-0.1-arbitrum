@@ -1,5 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import { UserPosition, OrderCreated } from "../db";
+import { UserPosition, OrderCreated } from "../DB/db";
 import Big from "big.js";
 import { getERC20ABI, getProvider, getInterface, MulticallAbi } from "../utils/utils";
 import { ifOrderCreated, ifUserPosition, orderSignature } from "../helper/interface";

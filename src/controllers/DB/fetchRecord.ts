@@ -1,6 +1,6 @@
 
 import { sentry } from "../../../app";
-import { OrderCreated, PairCreated } from "../../db";
+import { OrderCreated, PairCreated } from "../../DB/db";
 
 
 

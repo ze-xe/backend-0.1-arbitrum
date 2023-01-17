@@ -1,6 +1,6 @@
 
 
-import { PairCreated, OrderCreated } from "../../db";
+import { PairCreated, OrderCreated } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 import { ifOrderCreated, ifPairCreated } from "../../helper/interface";
 import { sentry } from "../../../app";

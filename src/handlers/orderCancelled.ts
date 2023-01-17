@@ -1,4 +1,4 @@
-import { OrderCreated, UserPosition } from "../db";
+import { OrderCreated, UserPosition } from "../DB/db";
 import Big from "big.js";
 import { ifOrderCreated, ifUserPosition } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";

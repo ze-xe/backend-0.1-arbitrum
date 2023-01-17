@@ -1,5 +1,5 @@
 import { sentry } from "../../app";
-import { Sync } from "../db";
+import { Sync } from "../DB/db";
 
 
 

@@ -1,7 +1,7 @@
 
 
 import { ifOrderCreated, ifPairCreated } from "../../helper/interface";
-import { PairCreated,OrderCreated } from "../../db";
+import { PairCreated,OrderCreated } from "../../DB/db";
 import { Decimals } from "../../helper/constant";
 import { errorMessage } from "../../helper/errorMessage"
 import { sentry } from "../../../app";

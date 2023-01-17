@@ -4,7 +4,7 @@ import { use, request } from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 import hre from "hardhat";
-import {  OrderCreated, OrderExecuted, Sync, UserPosition } from "../../db";
+import {  OrderCreated, OrderExecuted, Sync, UserPosition } from "../../DB/db";
 import {  getVersion } from "../../helper/chain";
 import { ifOrderCreated } from "../../helper/interface";
 import {  parseEther } from "../../utils/utils";
@@ -305,7 +305,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
 
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
-                }, 5000)
+                }, 7000)
 
                 socket.on(EVENT_NAME.CANCEL_ORDER, (data) => {
                     clearTimeout(timeOutId)

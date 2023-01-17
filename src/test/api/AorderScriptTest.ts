@@ -6,7 +6,7 @@ import chaiHttp from "chai-http";
 import { ethers } from "ethers";
 import mongoose from "mongoose";
 import { httpServer } from "../../../app";
-import { connect, OrderCreated, OrderExecuted, Sync, UserPosition } from "../../db";
+import { connect, OrderCreated, OrderExecuted, Sync, UserPosition } from "../../DB/db";
 import { getExchangeAddress, getVersion } from "../../helper/chain";
 import { getERC20ABI, getExchangeABI, getProvider, parseEther } from "../../utils/utils";
 import { io } from "socket.io-client";

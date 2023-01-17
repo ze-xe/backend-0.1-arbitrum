@@ -6,7 +6,7 @@ use(chaiHttp);
 import { ethers } from "ethers";
 import { getProvider } from "../../utils/utils";
 import { getExchangeAddress, getVersion } from "../../helper/chain";
-import { OrderCreated, OrderExecuted } from "../../db";
+import { OrderCreated, OrderExecuted } from "../../DB/db";
 import { ifOrderCreated } from "../../helper/interface";
 import { httpServer, run, server } from "../../../app";
 import { getConfig, getContract } from "../../helper/constant";

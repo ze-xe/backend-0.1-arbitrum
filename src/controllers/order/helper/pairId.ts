@@ -1,6 +1,6 @@
 
 import { ethers } from "ethers";
-import { PairCreated } from "../../../db";
+import { PairCreated } from "../../../DB/db";
 import { handleToken } from "../../../handlers/token";
 import { ifPairCreated } from "../../../helper/interface";
 

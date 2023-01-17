@@ -6,7 +6,7 @@ import { use, request } from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 import { ethers } from "ethers";
-import { connect } from "../../db";
+import { connect } from "../../DB/db";
 import { getExchangeAddress, getVersion } from "../../helper/chain";
 import { ifOrderCreated } from "../../helper/interface";
 import { getProvider } from "../../utils/utils";

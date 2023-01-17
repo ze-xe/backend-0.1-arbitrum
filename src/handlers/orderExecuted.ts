@@ -1,13 +1,12 @@
-import { PairCreated, OrderCreated, OrderExecuted, UserPosition} from "../db";
+import { PairCreated, OrderCreated, OrderExecuted, UserPosition} from "../DB/db";
 import Big from "big.js";
 import { ifOrderCreated, ifPairCreated, ifUserPosition } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
-
-import { getDecimals} from "../utils/utils";
 import { sentry } from "../../app";
 import { getLoop, loopFillAmount } from "./helper/getLoop";
 import { updateUserPosition } from "./helper/updateUserPosition";
 import { marginUpdateUserPosition } from "./helper/marginUpdateUserPosition";
+import { getDecimals } from "../utils/getDecimal";
 
 // export async function handleOrderExecuted(data: any, argument: any) {
 

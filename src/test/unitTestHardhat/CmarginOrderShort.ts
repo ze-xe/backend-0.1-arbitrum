@@ -9,7 +9,7 @@ import { getProvider, parseEther } from "../../utils/utils";
 import { getExchangeAddress, getVersion } from "../../helper/chain";
 import { io } from "socket.io-client";
 import path from "path";
-import { OrderCreated, Sync } from "../../db";
+import { OrderCreated, Sync } from "../../DB/db";
 import { ifOrderCreated } from "../../helper/interface";
 import { historicEventListner } from "../../sync/sync";
 import { ExchangeConfig } from "../../sync/configs/exchange";
@@ -278,7 +278,7 @@ describe("Margin Order Short=> Mint token, create order, execute order, cancel o
 
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
-                }, 10000)
+                }, 7000)
 
                 socket.on(EVENT_NAME.CANCEL_ORDER, (data) => {
                     clearTimeout(timeOutId)

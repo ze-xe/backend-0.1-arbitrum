@@ -1,5 +1,5 @@
 
-import { Sync } from "../db";
+import { Sync } from "../DB/db";
 import { ethers } from "ethers";
 import { getInterface, getProvider } from "../utils/utils";
 import { ifEventListner, ifSync } from "../helper/interface";

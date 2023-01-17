@@ -1,6 +1,6 @@
 import Big from "big.js";
 import { sentry } from "../../../app";
-import { OrderExecuted, PairCreated } from "../../db";
+import { OrderExecuted, PairCreated } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 import { Interval } from "../../helper/interface";
 

@@ -1,5 +1,5 @@
 import Big from "big.js";
-import { UserPosition } from "../../../db";
+import { UserPosition } from "../../../DB/db";
 import { errorMessage } from "../../../helper/errorMessage";
 import { multicall } from "../../../muticall/muticall";
 

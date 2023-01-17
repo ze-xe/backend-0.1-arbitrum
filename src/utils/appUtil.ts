@@ -1,14 +1,14 @@
 
-import { OrderCreated, OrderCreatedBackup } from "./db";
+import { OrderCreated, OrderCreatedBackup } from "../DB/db";
 import axios, { AxiosResponse } from "axios";
-import { ExchangeConfig } from "./sync/configs/exchange";
-import { historicEventListner } from "./sync/sync";
+import { ExchangeConfig } from "../sync/configs/exchange";
+import { historicEventListner } from "../sync/sync";
 import mongoose from "mongoose";
-import { startOrderStatus } from "./muticall/updateOrderStatus";
-import { ifOrderCreated } from "./helper/interface";
-import { socketService } from "./socketIo/socket.io";
-import { httpServer, sentry } from "../app";
-import { getVersion } from "./helper/chain";
+import { startOrderStatus } from "../muticall/updateOrderStatus";
+import { ifOrderCreated } from "../helper/interface";
+import { socketService } from "../socketIo/socket.io";
+import { httpServer, sentry } from "../../app";
+import { getVersion } from "../helper/chain";
 require("dotenv").config();
 
 

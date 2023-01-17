@@ -1,7 +1,7 @@
 
 
 import { sentry } from "../../../app";
-import { OrderExecuted } from "../../db";
+import { OrderExecuted } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 
 

@@ -1,6 +1,6 @@
 import Big from "big.js";
 import { sentry } from "../../../app";
-import { connect, OrderExecuted, PairCreated, Token } from "../../db";
+import { connect, OrderExecuted, PairCreated, Token } from "../../DB/db";
 import { ifPairCreated } from "../../helper/interface";
 
 

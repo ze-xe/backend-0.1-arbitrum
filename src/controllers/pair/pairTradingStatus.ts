@@ -1,4 +1,4 @@
-import { OrderExecuted } from "../../db";
+import { OrderExecuted } from "../../DB/db";
 import { sentry } from "../../../app";
 
 

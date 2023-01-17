@@ -1,7 +1,7 @@
 
 import { ifPairCreated } from "../../helper/interface";
 
-import { PairCreated, Token } from "../../db";
+import { PairCreated, Token } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage"
 import { sentry } from "../../../app";
 

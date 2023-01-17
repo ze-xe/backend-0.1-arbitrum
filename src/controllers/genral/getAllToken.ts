@@ -1,5 +1,5 @@
 import { sentry } from "../../../app";
-import { Sync, Token } from "../../db";
+import { Sync, Token } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 
 

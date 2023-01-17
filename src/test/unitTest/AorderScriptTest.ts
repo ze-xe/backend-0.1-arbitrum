@@ -4,7 +4,7 @@ import { use, request } from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 import { ethers } from "ethers";
-import { connect, OrderCreated, OrderExecuted, Sync, UserPosition } from "../../db";
+import { connect, OrderCreated, OrderExecuted, Sync, UserPosition } from "../../DB/db";
 import { getExchangeAddress } from "../../helper/chain";
 import { ifOrderCreated } from "../../helper/interface";
 import {  getProvider, parseEther } from "../../utils/utils";
