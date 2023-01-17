@@ -30,8 +30,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm install
-      - run: cd contracts/
-      - run: npm install
+      - run: cd contracts/ && npm install
+      # - run: npm install
       # - run: npx hardhat node
       # - run: npx hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
       - run: |
