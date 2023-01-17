@@ -26,15 +26,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
+  
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm install
-      - run: cd contracts/ && npm install
+      - run: cd contracts && npm install
       # - run: npm install
       # - run: npx hardhat node
       # - run: npx hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
       - run: |
-          cd contracts/ && npx hardhat node &
-          npx hardhat test ../src/test/unitTestHardhat/AorderScriptTest.ts --network localhost
+          cd contracts && npx hardhat node &
+          cd contracts && npx hardhat test ../src/test/unitTestHardhat/AorderScriptTest.ts --network localhost
 
