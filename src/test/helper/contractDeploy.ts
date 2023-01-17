@@ -3,6 +3,9 @@ import hre from "hardhat";
 import fs from "fs";
 import {  getTestConfig } from "./addresses";
 
+if (process.env.NODE_ENV == "test") {
+    process.chdir('../')
+}
 
 //@ts-ignore
 const ethers = hre.ethers;
