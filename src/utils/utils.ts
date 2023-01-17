@@ -7,7 +7,7 @@ require("dotenv").config()
 
 
 // if (process.env.NODE_ENV == "test") {
-    process.chdir('../')
+    // process.chdir('../')
 // }
 const Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/deployments.json")).toString());
 // console.log(Deployments)
