@@ -3,7 +3,7 @@ import hre from "hardhat";
 import fs from "fs";
 import {  getTestConfig } from "./addresses";
 
-
+process.chdir('../')
 //@ts-ignore
 const ethers = hre.ethers;
 const ExchangeContract = JSON.parse((fs.readFileSync(process.cwd() + "/contracts/artifacts/contracts/Exchange.sol/Exchange.json")).toString());
