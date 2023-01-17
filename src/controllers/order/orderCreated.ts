@@ -2,20 +2,16 @@
 
 
 
-import { PairCreated, OrderCreated, UserPosition, OrderCreatedBackup } from "../../db";
-import { handleToken } from "../../handlers/token";
+import {  OrderCreated, OrderCreatedBackup } from "../../db";
 import { getDecimals, validateSignature } from "../../utils/utils";
 import Big from "big.js";
 import { ethers } from "ethers";
 import { createOrderSchema } from "../../helper/validateRequest";
-import { getMultiBalance, multicall } from "../../sync/syncBalance";
 import { mainIPFS } from "../../IPFS/putFiles";
 import { errorMessage } from "../../helper/errorMessage";
-import { ifPairCreated, ifUserPosition } from "../../helper/interface";
 import { EVENT_NAME, socketService } from "../../socketIo/socket.io";
-import { _handleMarginOrderCreated } from "./marginOrderController";
+import { marginValidationAndUserPosition} from "./helper/marginValidationUserPosition";
 import { sentry } from "../../../app";
-import { getExchangeAddress } from "../../helper/chain";
 import { getPairId } from "./helper/pairId";
 import { validationAndUserPosition } from "./helper/validationUserPosition";
 
@@ -350,6 +346,7 @@ export async function handleOrderCreated(req: any, res: any) {
         data.maker = data.maker?.toLowerCase();
         data.token0 = data.token0?.toLowerCase();
         data.token1 = data.token1?.toLowerCase();
+        
         await createOrderSchema.validateAsync({ createOrderSchemaData: req.body.data, signature: signature, chainId: chainId });
         for (let i in addresses) {
 
@@ -391,7 +388,7 @@ export async function handleOrderCreated(req: any, res: any) {
 
         // if margin Order
         if (orderType == 2 || orderType == 3) {
-            let response = await _handleMarginOrderCreated(signature, data, chainId, ipfs)
+            let response = await marginValidationAndUserPosition(signature, data, chainId, ipfs)
 
             if (response.status == false) {
                 return res.status(response.statusCode).send({ status: false, error: response.error })
@@ -402,7 +399,7 @@ export async function handleOrderCreated(req: any, res: any) {
         }
 
 
-        if (data.orderType == 1 || data.orderType == 1){
+        if (orderType == 1 || orderType == 0){
             let response = await validationAndUserPosition(data, chainId, ipfs);
             if(response.status == false){
                 return res.status(response.statusCode).send({status: false, error: response.error})
@@ -434,10 +431,12 @@ export async function handleOrderCreated(req: any, res: any) {
             cid: cid,
             lastInOrderToken0: data.orderType == 2 ? amount : 0,
             lastInOrderToken1: data.orderType == 3 ? token1Amount : 0,
+            borrowLimit: data.borrowLimit,
+            loops: data.loops,
         }
         if (!ipfs) {
 
-            if (!process.env.NODE_ENV?.includes('test')) {
+            if (process.env.NODE_ENV?.includes('prod')) {
                 cid = await mainIPFS([
                     data,
                     signature,

@@ -18,7 +18,7 @@ export async function validationAndUserPosition(data: any, chainId: string, ipfs
         let token;
         let amount = data.amount;
         if (data.orderType == 1) {
-            const findUserPosition: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
+             findUserPosition = await UserPosition.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
             if (!ipfs) {
                 multicallData = await multicall(data.token0, data.maker, chainId)
                 if (multicallData) {

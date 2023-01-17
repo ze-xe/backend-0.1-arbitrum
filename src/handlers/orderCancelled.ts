@@ -1,6 +1,6 @@
-import { OrderCreated, UserPosition} from "../db";
+import { OrderCreated, UserPosition } from "../db";
 import Big from "big.js";
-import { ifOrderCreated,  ifUserPosition } from "../helper/interface";
+import { ifOrderCreated, ifUserPosition } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 import { sentry } from "../../app";
 
@@ -18,6 +18,7 @@ export async function handleOrderCancelled(data: any) {
 
         if (orderDetails.cancelled == true) {
             return console.log("Order is already cancelled");
+
         }
         // cancel order 
         // update user inOrder
@@ -26,10 +27,18 @@ export async function handleOrderCancelled(data: any) {
             if (getUser) {
                 let currentInOrderBalance = Big(getUser.inOrderBalance).minus(orderDetails.balanceAmount).toString();
 
-                await UserPosition.findOneAndUpdate(
-                    { id: orderDetails.maker, token: orderDetails.token0, chainId: orderDetails.chainId },
-                    { $set: { inOrderBalance: currentInOrderBalance } }
-                );
+                await Promise.all(
+                    [
+                        UserPosition.findOneAndUpdate(
+                            { _id: getUser._id },
+                            { $set: { inOrderBalance: currentInOrderBalance } }
+                        ),
+                        OrderCreated.findOneAndUpdate(
+                            { _id: orderDetails._id },
+                            { $set: { cancelled: true, active: false } }
+                        )
+                    ]
+                )
 
             }
 
@@ -40,10 +49,19 @@ export async function handleOrderCancelled(data: any) {
             if (getUser) {
                 let token1Amount = Big(getUser.inOrderBalance).minus(Big(orderDetails.balanceAmount).times(orderDetails.exchangeRate).div(Big(10).pow(18))).toString();
 
-                await UserPosition.findOneAndUpdate(
-                    { id: orderDetails.maker, token: orderDetails.token1, chainId: orderDetails.chainId },
-                    { $set: { inOrderBalance: token1Amount } }
-                );
+                await Promise.all(
+                    [
+                        UserPosition.findOneAndUpdate(
+                            { _id: getUser._id },
+                            { $set: { inOrderBalance: token1Amount } }
+                        ),
+                        OrderCreated.findOneAndUpdate(
+                            { _id: orderDetails._id },
+                            { $set: { cancelled: true, active: false } }
+                        )
+                    ]
+                )
+
             }
 
         }
@@ -63,13 +81,16 @@ export async function handleOrderCancelled(data: any) {
                     UserPosition.findOneAndUpdate(
                         { _id: token1Position._id },
                         { $set: { inOrderBalance: token1InOrder } }
+                    ),
+                    OrderCreated.findOneAndUpdate(
+                        { _id: orderDetails._id },
+                        { $set: { cancelled: true, active: false } }
                     )
+
                 ]
             )
 
         }
-
-        await OrderCreated.findOneAndUpdate({ _id: orderDetails._id }, { $set: { cancelled: true, active: false } });
 
         socketService.emit(EVENT_NAME.PAIR_ORDER, {
             amount: `-${orderDetails.balanceAmount}`,

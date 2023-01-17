@@ -4,7 +4,6 @@ import { PairCreated, OrderCreated } from "../../db";
 import { getMultiBalance} from "../../sync/syncBalance";
 import { errorMessage } from "../../helper/errorMessage";
 import { ifOrderCreated, ifPairCreated } from "../../helper/interface";
-import { _handleMarginOrderCreated } from "./marginOrderController";
 import { sentry } from "../../../app";
 
 

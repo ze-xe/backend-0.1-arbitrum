@@ -110,7 +110,7 @@ export async function handleOrderExecuted(data: any, argument: any) {
                 let token1Balance = "0";
                 let fillPercent = "0." + currentLoop.split('.')[1]
                 if (Number(fillPercent) > 0) {
-                    token0Balance = Big(1 - Number(fillPercent)).times(amountToFill).toString();
+                    token0Balance = Big(Big(1).minus(fillPercent)).times(amountToFill).toString();
                     token1Balance = Big(fillPercent).times(amountToFill).times(Big(getOrderDetails.exchangeRate).div(Big(10).pow(18))).toString()
                 }
 
@@ -198,7 +198,7 @@ export async function handleOrderExecuted(data: any, argument: any) {
                 let fillPercent = "0." + currentLoop.split('.')[1]
                 if (Number(fillPercent) > 0) {
                     token0Balance = Big(fillPercent).times(amountToFill).toString();
-                    token1Balance = Big(1 - Number(fillPercent)).times(amountToFill).times(Big(getOrderDetails.exchangeRate).div(Big(10).pow(18))).toString()
+                    token1Balance = Big(Big(1).minus(fillPercent)).times(amountToFill).times(Big(getOrderDetails.exchangeRate).div(Big(10).pow(18))).toString()
                 }
 
                 // updating userInOrder Balance 

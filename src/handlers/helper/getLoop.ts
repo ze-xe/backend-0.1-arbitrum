@@ -48,7 +48,7 @@ export function getLoop(totalSum:string,borrowLimit: string,orderAmount: string)
                 ).minus(orderAmount)
             )).div(orderAmount).toNumber()
     
-    let loop = Big(Math.log(temp1)).div(Big(Math.log(+borrowLimit))).minus(1).toNumber().toFixed(4);
+    let loop = Big(Math.log(temp1)).div(Big(Math.log(+borrowLimit))).minus(1).toString();
 
     return loop
 }
