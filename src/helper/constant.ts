@@ -20,17 +20,6 @@ export function getConfig(name: any) {
 }
 
 
-// export const ExchangeAddress = getContractAddress("Exchange").toLowerCase();
-// export const BtcAddress = getContractAddress("BTC").toLowerCase();
-// //export const BtcAddress = getContractAddress(""); // ethereum
-// export const UsdcAddress = getContractAddress("USDC").toLowerCase();
-// export const EthAddress = getContractAddress("ETH").toLowerCase();
-// export const leverAddress = getContractAddress("Lever").toLowerCase();
-// export const ZexeAddress = getContractAddress("ZEXE").toLowerCase();
-// export const cUsdcAddress = getContractAddress("lUSDC_Market").toLowerCase();
-// export const cBtcAddress = getContractAddress("lBTC_Market").toLowerCase();
-// export const LinkAddress = getContractAddress("LINK").toLowerCase();
-// export const multicallAddress = getContractAddress("Multicall2").toLowerCase()
 
 
 export function getContractAddress(name: string) {

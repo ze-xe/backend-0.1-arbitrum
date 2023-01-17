@@ -51,11 +51,8 @@ export async function handleMarginEnabled(data: string[], argument: any) {
             console.log("Token Added from margin enable", token, chainId, symbol);
         }
 
-
         // creating pair
-
         let allToken = await Token.find({ marginEnabled: true, id: { $nin: [token] }, active: true }).lean();
-
 
         for (let i in allToken) {
 

@@ -1,14 +1,11 @@
 import Big from "big.js";
 import { ethers } from "ethers";
 import { sentry } from "../../../../app";
-import { OrderCreated, OrderCreatedBackup, PairCreated, Token, UserPosition } from "../../../db";
-import { handleToken } from "../../../handlers/token";
+import { Token, UserPosition } from "../../../db";
 import { getLeverAddress } from "../../../helper/chain";
 import { errorMessage } from "../../../helper/errorMessage";
-import { ifPairCreated, ifUserPosition } from "../../../helper/interface";
-import { mainIPFS } from "../../../IPFS/putFiles";
-import { EVENT_NAME, socketService } from "../../../socketIo/socket.io";
-import { multicall, multicallFor2Tokens } from "../../../sync/syncBalance";
+import { ifUserPosition } from "../../../helper/interface";
+import { multicallFor2Tokens } from "../../../muticall/twoTokenMulticall";
 import { getProvider, leverageAbi } from "../../../utils/utils";
 
 
@@ -37,7 +34,7 @@ import { getProvider, leverageAbi } from "../../../utils/utils";
 
 //         let provider = getProvider(chainId);
 //         let lever = new ethers.Contract((getLeverAddress(chainId)), leverageAbi, provider);
-        
+
 //         // checking market enter or not
 //         let assetIn: string[] = [];
 
@@ -311,7 +308,7 @@ export async function marginValidationAndUserPosition(signature: string, data: a
         let x = Big(data.borrowLimit).div(Big(10).pow(6));
         let n = Number(data.loops) + 1;
         let balanceAmount: string | string[] = Big(a).times((Big(1).minus(Big(x).pow(n))).div(Big(1).minus(x))).minus(a).toString().split(".");
-       
+
         balanceAmount = balanceAmount[0];
         // console.log(arguments)
         let borrowLimit = Big(data.borrowLimit).div(Big(10).pow(6)).toNumber();
@@ -322,7 +319,7 @@ export async function marginValidationAndUserPosition(signature: string, data: a
 
         let provider = getProvider(chainId);
         let lever = new ethers.Contract((getLeverAddress(chainId)), leverageAbi, provider);
-        
+
         // checking market enter or not
         let assetIn: string[] = [];
 
@@ -352,7 +349,7 @@ export async function marginValidationAndUserPosition(signature: string, data: a
         let token0CurrentInOrder = Big(findUserPosition0?.inOrderBalance ?? 0).plus(amount).toNumber();
 
         const token1Amount = data.token1Amount;
-        
+
         let token1CurrentInOrder = Big(findUserPosition1?.inOrderBalance ?? 0).plus(token1Amount).toNumber();
 
         if (!ipfs && Number(allowanceToken0) < Number(token0CurrentInOrder)) {
@@ -367,7 +364,7 @@ export async function marginValidationAndUserPosition(signature: string, data: a
         // check market enter or not
         if (!ipfs) {
             let token = data.token0
-            if(data.orderType == 3){
+            if (data.orderType == 3) {
                 token = data.token1
             }
             const tokenData = await Token.findOne({ id: token, active: true }).lean()! as any;
@@ -378,7 +375,7 @@ export async function marginValidationAndUserPosition(signature: string, data: a
         }
 
         if (data.orderType == 2) {
-        
+
             if (!ipfs && Number(userToken0Balance) < Number(token0CurrentInOrder)) {
                 console.log(`${errorMessage.balance} token0`);
                 return { status: false, error: errorMessage.balance, statusCode: 400 };
@@ -454,7 +451,7 @@ export async function marginValidationAndUserPosition(signature: string, data: a
 
         }
 
-        return {status: true, balanceAmount: balanceAmount}
+        return { status: true, balanceAmount: balanceAmount }
 
     }
     catch (error: any) {

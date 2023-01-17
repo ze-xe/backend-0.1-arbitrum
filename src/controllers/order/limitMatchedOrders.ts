@@ -1,10 +1,10 @@
 
 
 import { PairCreated, OrderCreated } from "../../db";
-import { getMultiBalance} from "../../sync/syncBalance";
 import { errorMessage } from "../../helper/errorMessage";
 import { ifOrderCreated, ifPairCreated } from "../../helper/interface";
 import { sentry } from "../../../app";
+import { getMultiBalance } from "../../muticall/getMultiBalance";
 
 
 

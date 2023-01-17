@@ -17,21 +17,10 @@ export function loopFillAmount(amount: string, borrowLimit: any, loop: any) {
     return amount;
 }
 
-//  scaledByBorrowLimit("1000000000000000000", "750000", "2")
 
-// console.log("total amount", (0.75+0.5625-1))
-// console.log("total balance", (0.75+0.5625-1)*20000);
-
-// 0.5-0.3
-
-// let n;
-// let a = 1000000000000000000
-// let x = 0.75;
-// let s = 1000000000000000000
 
 
 // let temp = Math.log(-(s * (1 - x) + a * (1 - x) - a) / a)
-
 // n = temp / Math.log(x);
 // console.log(n)
 

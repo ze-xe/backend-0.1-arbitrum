@@ -4,7 +4,8 @@ import { errorMessage } from "../../helper/errorMessage";
 import { ifOrderCreated} from "../../helper/interface";
 import {  } from "./helper/marginValidationUserPosition";
 import { sentry } from "../../../app";
-import { getMultiBalance } from "../../sync/syncBalance";
+import { getMultiBalance } from "../../muticall/getMultiBalance";
+
 
 
 

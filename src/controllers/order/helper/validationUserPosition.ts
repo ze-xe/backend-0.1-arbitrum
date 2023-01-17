@@ -1,8 +1,8 @@
 import Big from "big.js";
 import { UserPosition } from "../../../db";
 import { errorMessage } from "../../../helper/errorMessage";
-import { ifUserPosition } from "../../../helper/interface";
-import { multicall } from "../../../sync/syncBalance";
+import { multicall } from "../../../muticall/muticall";
+
 
 
 

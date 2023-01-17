@@ -4,7 +4,7 @@ import axios, { AxiosResponse } from "axios";
 import { ExchangeConfig } from "./sync/configs/exchange";
 import { historicEventListner } from "./sync/sync";
 import mongoose from "mongoose";
-import { startOrderStatus } from "./sync/syncBalance";
+import { startOrderStatus } from "./muticall/updateOrderStatus";
 import { ifOrderCreated } from "./helper/interface";
 import { socketService } from "./socketIo/socket.io";
 import { httpServer, sentry } from "../app";

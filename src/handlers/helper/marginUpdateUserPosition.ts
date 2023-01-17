@@ -12,7 +12,6 @@ import { getLoop, loopFillAmount } from "./getLoop";
 export async function marginUpdateUserPosition(getOrderDetails: any, getPairDetails: any, fillAmount: any) {
     try {
 
-
         let userPositionToken0 = await UserPosition.findOne({ id: getOrderDetails.maker, token: getOrderDetails.token0 }).lean()! as any
         let userPositionToken1 = await UserPosition.findOne({ id: getOrderDetails.maker, token: getOrderDetails.token1 }).lean()! as any
 
@@ -39,7 +38,6 @@ export async function marginUpdateUserPosition(getOrderDetails: any, getPairDeta
                 token1Balance = Big(Big(1).minus(fillPercent)).times(amountToFill).times(Big(getOrderDetails.exchangeRate).div(Big(10).pow(18))).toString()
             }
         }
-
 
         // updating userInOrder Balance 
         let token0InOrder = Big(userPositionToken0?.inOrderBalance).minus(getOrderDetails.lastInOrderToken0).plus(token0Balance).toString();

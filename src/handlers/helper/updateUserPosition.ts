@@ -14,7 +14,6 @@ import { ifUserPosition } from "../../helper/interface";
 export async function updateUserPosition(getOrderDetails: any, getPairDetails: any, fillAmount: any) {
     try {
 
-
         let token = getPairDetails.token0;
 
         if (getOrderDetails.orderType == 0) {
