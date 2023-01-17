@@ -5,7 +5,7 @@ import fs from "fs";
 // this file work as per contract directory
 
 if (process.env.NODE_ENV == "test") {
-    process.chdir('../')
+    // process.chdir('../')
 }
 
 

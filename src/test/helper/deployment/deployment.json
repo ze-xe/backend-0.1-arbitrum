@@ -1,7 +1,7 @@
 {
   "contracts": {
     "Exchange": {
-      "address": "0xFb3A7D4cdA276f3Ed98E4ACA2D6318BCd9751859",
+      "address": "0x7511fAE41153Fad8A569d7Ebdcc76c120D3d5AAb",
       "abi": "Exchange",
       "constructorArguments": [],
       "block": "2",
@@ -23,7 +23,7 @@
       "block": "3"
     },
     "Lever": {
-      "address": "0x6d824682aA66da4e6738c6f3e16cC15fe9ce6F79",
+      "address": "0x8493F51fA07a9bB978a8AD45f7185A26C1185b9E",
       "abi": "Lever",
       "constructorArguments": [
         "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
@@ -50,7 +50,7 @@
       "block": "8"
     },
     "BTC": {
-      "address": "0xE076341997771AB62fe184d1101BCd78d18053e2",
+      "address": "0x2f1632a006039644eC58aB6846ba32BB18A0F37B",
       "abi": "TestERC20",
       "constructorArguments": [
         "Bitcoin",
@@ -86,7 +86,7 @@
       "block": "19"
     },
     "ETH": {
-      "address": "0x2EeA9517B018B2f63072a9729ceC3EE524809460",
+      "address": "0x9F5085A6C933DcD997AcE0a0676c8091e0D9e14C",
       "abi": "TestERC20",
       "constructorArguments": [
         "Ethereum",
@@ -122,7 +122,7 @@
       "block": "28"
     },
     "USDC": {
-      "address": "0x45D97250E4F261c4116b2ebDBA1b963e55B068d3",
+      "address": "0x492f33E4701D9bd42a133c1b5AB1e4ac8333c590",
       "abi": "TestERC20",
       "constructorArguments": [
         "USD Coin",
@@ -182,7 +182,7 @@
       "latest": "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318"
     },
     "Multicall2": {
-      "address": "0x009eb8A8a1B7C4d48C721E47894346477d2f6647",
+      "address": "0x708f59359530fc46bdc18f62C30e9Ee1970c19d0",
       "abi": "Multicall2",
       "constructorArguments": [],
       "block": "46"
