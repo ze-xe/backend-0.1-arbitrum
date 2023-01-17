@@ -36,5 +36,5 @@ jobs:
       # - run: npx hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
       - run: |
           yarn node &
-          npx hardhat test ../src/test/unitTestHardhat/AorderScriptTest.ts --network localhost
+          yarn test1
 
