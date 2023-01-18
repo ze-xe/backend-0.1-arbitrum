@@ -1,0 +1,3 @@
+[submodule "DbConnector"]
+	path = contracts
+	url = https://github.com/ze-xe/contracts.git
