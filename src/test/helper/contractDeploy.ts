@@ -6,7 +6,8 @@ import path from "path";
 
 
 
-//@ts-ignore
+// @ts-ignore
+
 const ethers = hre.ethers;
 
 
