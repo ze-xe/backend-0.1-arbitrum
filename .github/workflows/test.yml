@@ -22,23 +22,25 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x]
+    defaults:
+          run:
+           working-directory: ./contracts    
 
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
-  
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install
-      - run: cd contracts && git checkout dev && npm install
-      - run: cd contracts && npx hardhat compile
+      - run: cd ../ && npm install
+      - run: git checkout dev && npm install
+      - run: npx hardhat compile
       # - run: npm install
       # - run: npx hardhat node
       # - run: npx hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
       - run: |
-          ls contracts
+         ls ${{ github.workspace }}
       - run: |
-          cd contracts && npx hardhat node &
-          cd contracts && npx hardhat test ../src/test/unitTestHardhat/AorderScriptTest.ts --network localhost
+          npx hardhat node &
+          npx hardhat test ../src/test/unitTestHardhat/AorderScriptTest.ts --network localhost
 
