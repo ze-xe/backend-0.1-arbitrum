@@ -23,6 +23,7 @@
     "test3": "mocha -r ts-node/register --timeout 180000 ./src/test/api/AorderScriptTest.ts",
     "test4": "mocha -r ts-node/register --timeout 180000 ./src/test/api/BmarginOrderLong.ts",
     "test5": "mocha -r ts-node/register --timeout 180000 ./src/test/api/CmarginOrderShort.ts",
+    "test6": "ts-node  src/test/helper/contractDeploy.ts",
     "blacklist": "mocha -r ts-node/register --timeout 180000 ./src/test/api/DblackListToken.ts",
     "pair": "mocha -r ts-node/register --timeout 180000 ./src/test/pair/createPair.ts",
     "handler": "mocha -r ts-node/register --timeout 180000 ./src/test/handlers/handleMinTokenAmountSet.ts",
