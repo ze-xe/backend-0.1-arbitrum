@@ -28,12 +28,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-        with:
-         submodules: true
       - name: Use Node.js ${{ matrix.node-version }}
+     
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+    
+      - run: git submodule update --init --recursive    
       - run: npm install
       - run: cd contracts && git checkout dev && npm install
       - run: cd contracts && npx hardhat compile
