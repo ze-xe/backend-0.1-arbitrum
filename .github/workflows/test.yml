@@ -28,19 +28,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-        with:
-         submodules: true
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm install
-      - run: cd contracts && npm install
-      - run: npx hardhat compile
+      - run: cd contracts && git checkout dev && npm install
+      - run: cd contracts && npx hardhat compile
       # - run: npm install
       # - run: npx hardhat node
       # - run: npx hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
-      - run:  yarn test6
+      - run:  yarn test
           
       # - run: |
           # npx hardhat node &
