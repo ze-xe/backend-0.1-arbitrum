@@ -40,7 +40,7 @@ jobs:
       # - run: npm install
       # - run: npx hardhat node
       # - run: npx hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
-      - run:  yarn test
+      - run:  yarn test6
           
       # - run: |
           # npx hardhat node &
