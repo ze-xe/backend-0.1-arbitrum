@@ -22,9 +22,9 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x]
-    defaults:
-          run:
-           working-directory: ./contracts    
+    # defaults:
+    #       run:
+    #        working-directory: ./contracts    
 
     steps:
       - uses: actions/checkout@v3
@@ -32,15 +32,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - run: cd ../ && npm install
-      - run: git checkout dev && npm install
+      - run: npm install
+      - run: cd contracts && git checkout dev && npm install
       - run: npx hardhat compile
       # - run: npm install
       # - run: npx hardhat node
       # - run: npx hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
-      - run: |
-          ls
-      - run: |
-          npx hardhat node &
-          npx hardhat test ../src/test/unitTestHardhat/AorderScriptTest.ts --network localhost
+      - run:  yarn test6
+          
+      # - run: |
+          # npx hardhat node &
+          # npx hardhat test ../src/test/unitTestHardhat/AorderScriptTest.ts --network localhost
 
