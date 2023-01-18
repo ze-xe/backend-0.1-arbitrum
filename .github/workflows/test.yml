@@ -37,7 +37,7 @@ jobs:
       # - run: npx hardhat node
       # - run: npx hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
       - run: |
-          ls ${{github.workspace}}
+          cd contracts && ls ${{github.workspace}}
       - run: |
           cd contracts && npx hardhat node &
           cd contracts && npx hardhat test ../src/test/unitTestHardhat/AorderScriptTest.ts --network localhost
