@@ -33,7 +33,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm install
-      - run: cd contract && git checkout dev && npm install
+      - run: cd contracts && git checkout dev && npm install
       - run: npx hardhat compile
       # - run: npm install
       # - run: npx hardhat node
