@@ -192,4 +192,4 @@ function getDeployment(name: string) {
 
 }
 
-console.log(getDeployment("Exchange"))
+// console.log(getDeployment("Exchange"))
