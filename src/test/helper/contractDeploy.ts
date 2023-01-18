@@ -190,3 +190,6 @@ function getDeployment(name: string) {
     return []
 
 }
+
+
+console.log(__dirname)
