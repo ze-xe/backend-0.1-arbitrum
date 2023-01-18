@@ -3,18 +3,20 @@ import { ethers } from "ethers";
 import Big from "big.js";
 import {  getRpcLink} from "../helper/chain";
 import { getConfig } from "../helper/constant";
+import path from "path";
 require("dotenv").config()
 
 
 // if (process.env.NODE_ENV == "test") {
     // process.chdir('../')
 // }
-const Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/deployments.json")).toString());
-// console.log(Deployments)
-
-export const MulticallAbi = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Multical.json")).toString());
+// const Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/deployments.json")).toString());
+const Deployments = JSON.parse((fs.readFileSync(path.join(__dirname ,'..','deployments','deployments.json'))).toString());
 
 
+export const MulticallAbi = Deployments["sources"]["Multicall2"];
+
+// console.log(MulticallAbi)
 export const leverageAbi = Deployments["sources"]["Lever"];
 
 

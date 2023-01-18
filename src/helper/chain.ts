@@ -34,6 +34,8 @@ export function getVersion(env: string): string {
     return map[env]
 }
 
+// console.log(getVersion("dev"))
+
 export function getLeverAddress(chainId: string) {
     let map: any = {
         "421613": getContractAddress("Lever"),

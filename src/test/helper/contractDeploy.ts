@@ -1,47 +1,15 @@
 //@ts-ignore
 import hre from "hardhat";
 import fs from "fs";
-import {  getTestConfig } from "./addresses";
+import { getTestConfig } from "./addresses";
+import path from "path";
 
-if (process.env.NODE_ENV == "test") {
-    process.chdir('../')
-}
+
 
 //@ts-ignore
 const ethers = hre.ethers;
-const ExchangeContract = JSON.parse((fs.readFileSync(process.cwd() + "/contracts/artifacts/contracts/Exchange.sol/Exchange.json")).toString());
-const ERC20 = JSON.parse((fs.readFileSync(process.cwd() + "/contracts/artifacts/contracts/mocks/test/ERC20.sol/TestERC20.json")).toString());
-const Lever = JSON.parse((fs.readFileSync(process.cwd() + "/contracts/artifacts/contracts/lending/Lever.sol/Lever.json")).toString());
-const LendingMarket = JSON.parse((fs.readFileSync(process.cwd() + "/contracts/artifacts/contracts/lending/LendingMarket.sol/LendingMarket.json")).toString());
-const Zexe = JSON.parse((fs.readFileSync(process.cwd() + "/contracts/artifacts/contracts/token/ZEXE.sol/ZEXE.json")).toString());
-const SimplePriceOracle = JSON.parse((fs.readFileSync(process.cwd() + "/contracts/artifacts/contracts/lending/PriceOracle.sol/SimplePriceOracle.json")).toString());
-const JumpRateModelV2 = JSON.parse((fs.readFileSync(process.cwd() + "/contracts/artifacts/contracts/lending/InterestRateModel.sol/JumpRateModelV2.json")).toString());
-const Multicall2 = JSON.parse((fs.readFileSync(process.cwd() + "/contracts/artifacts/contracts/libraries/Multicall2.sol/Multicall2.json")).toString());
 
 
-// bytecode
-const exchangeBytecode = ExchangeContract["bytecode"];
-const erc20Bytecode = ERC20["bytecode"]
-const leverBytecode = Lever["bytecode"]
-const zexeBytecode = Zexe["bytecode"]
-const lendingMarketBytecode = LendingMarket["bytecode"]
-const simplePriceOracleBytecode = SimplePriceOracle["bytecode"]
-const jumpRateModelV2Bytecode = JumpRateModelV2["bytecode"]
-const multicall2Bytecode = Multicall2["bytecode"]
-
-
-//abi
-const exchangeABI = ExchangeContract["abi"]
-const erc20ABI = ERC20["abi"]
-const leverABI = Lever["abi"]
-const zexeABI = Zexe["abi"]
-const lendingMarketABI = LendingMarket["abi"]
-const simplePriceOracleABI = SimplePriceOracle["abi"]
-const jumpRateModelV2ABI = JumpRateModelV2["abi"]
-const multicallABI = Multicall2["abi"]
-// console.log(ERC20Bytecode)
-
-// console.log(multicall2Bytecode)
 
 
 export async function deploy(deployerAddress: string) {
@@ -49,7 +17,8 @@ export async function deploy(deployerAddress: string) {
     /* -------------------------------------------------------------------------- */
     /*                                  Exchange                                  */
     /* -------------------------------------------------------------------------- */
-    const Exchange = await hre.ethers.getContractFactory(exchangeABI, exchangeBytecode);
+    const exchnageDep = getDeployment("Exchange")
+    const Exchange = await hre.ethers.getContractFactory(exchnageDep[0], exchnageDep[1]);
     let exchange;
 
 
@@ -61,24 +30,30 @@ export async function deploy(deployerAddress: string) {
     /* -------------------------------------------------------------------------- */
     /*                                 ZEXE Token                                 */
     /* -------------------------------------------------------------------------- */
-    const ZEXE = await hre.ethers.getContractFactory(zexeABI, zexeBytecode);
+    const zexeDep = getDeployment("ZEXE")
+    const ZEXE = await hre.ethers.getContractFactory(zexeDep[0], zexeDep[1]);
     const zexe = await ZEXE.deploy();
     await zexe.deployed();
 
     /* -------------------------------------------------------------------------- */
     /*                                    Lever                                   */
     /* -------------------------------------------------------------------------- */
-    const Lever = await hre.ethers.getContractFactory(leverABI, leverBytecode);
+    const leverDep = getDeployment("Lever")
+    const Lever = await hre.ethers.getContractFactory(leverDep[0], leverDep[1]);
     const lever = await Lever.deploy(exchange.address, zexe.address);
     await lever.deployed();
 
     /* -------------------------------------------------------------------------- */
     /*                                    Tokens                                  */
     /* -------------------------------------------------------------------------- */
-    const ERC20 = await hre.ethers.getContractFactory(erc20ABI, erc20Bytecode);
-    const LendingMarket = await hre.ethers.getContractFactory(lendingMarketABI, lendingMarketBytecode);
-    const PriceOracle = await hre.ethers.getContractFactory(simplePriceOracleABI, simplePriceOracleBytecode);
-    const InterestRateModel = await hre.ethers.getContractFactory(jumpRateModelV2ABI, jumpRateModelV2Bytecode);
+    const erc20Dep = getDeployment("TestERC20")
+    const ERC20 = await hre.ethers.getContractFactory(erc20Dep[0], erc20Dep[1]);
+    const lendingMarketDep = getDeployment("LendingMarket")
+    const LendingMarket = await hre.ethers.getContractFactory(lendingMarketDep[0], lendingMarketDep[1]);
+    const priceOracleDep = getDeployment("SimplePriceOracle")
+    const PriceOracle = await hre.ethers.getContractFactory(priceOracleDep[0], priceOracleDep[1]);
+    const nterestRateModelDep = getDeployment("JumpRateModelV2")
+    const InterestRateModel = await hre.ethers.getContractFactory(nterestRateModelDep[0], nterestRateModelDep[1]);
     const irm = await InterestRateModel.deploy(inEth('0.05'), inEth('0.25'), inEth('0.05'), inEth('0.90'), '0x22F221b77Cd7770511421c8E0636940732016Dcd');
     await irm.deployed();
 
@@ -148,29 +123,70 @@ export async function deploy(deployerAddress: string) {
     /* -------------------------------------------------------------------------- */
     /*                                    Multicall                                  */
     /* -------------------------------------------------------------------------- */
-
-    const Multicall = await hre.ethers.getContractFactory(multicallABI, multicall2Bytecode);
+    const multicallDep = getDeployment("Multicall2")
+    const Multicall = await hre.ethers.getContractFactory(multicallDep[0], multicallDep[1]);
     const multicall = await Multicall.deploy();
     await multicall.deployed();
 
 
 
     // update deployment 
-    let Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/test/helper/deployment/deployment.json")).toString());
+    let Deployments = JSON.parse((fs.readFileSync(__dirname + "/deployment/deployment.json")).toString());
 
+    let name = ["Exchange", "Multicall2", "Lever", "BTC", "USDC", "ETH"];
+    let contract = [exchange, multicall, lever, btc, usdc, eth];
 
-    Deployments["contracts"]["Exchange"]["address"] = exchange.address;
-    Deployments["contracts"]["Multicall2"]["address"] = multicall.address;
-    Deployments["contracts"]["Lever"]["address"] = lever.address;
-    Deployments["contracts"]["BTC"]["address"] = btc.address;
-    Deployments["contracts"]["USDC"]["address"] = usdc.address;
-    Deployments["contracts"]["ETH"]["address"] = eth.address;
+    for (let i in name) {
+        Deployments["contracts"][name[i]]["address"] = contract[i].address
+    }
+
     fs.writeFileSync(
-		process.cwd() + "/src/test/helper/deployment/deployment.json",
-		JSON.stringify(Deployments, null, 2)
-	);
-   
+        __dirname + "/deployment/deployment.json",
+        JSON.stringify(Deployments, null, 2)
+    );
+
     return { exchange, lever, usdc, cusdc, btc, cbtc, eth, ceth, oracle, irm, multicall };
 }
 
 const inEth = (amount: string) => ethers.utils.parseEther(amount);
+
+
+
+function getDeployment(name: string) {
+
+    let string = ""
+    switch (name) {
+        case "Exchange":
+            string = '/Exchange.sol/Exchange.json'
+            break;
+        case "TestERC20":
+            string = '/mocks/test/ERC20.sol/TestERC20.json'
+            break;
+        case "Lever":
+            string = '/lending/Lever.sol/Lever.json'
+            break;
+        case "LendingMarket":
+            string = '/lending/LendingMarket.sol/LendingMarket.json'
+            break;
+        case "ZEXE":
+            string = '/token/ZEXE.sol/ZEXE.json'
+            break;
+        case "SimplePriceOracle":
+            string = '/lending/PriceOracle.sol/SimplePriceOracle.json'
+            break;
+        case "JumpRateModelV2":
+            string = '/lending/InterestRateModel.sol/JumpRateModelV2.json'
+            break;
+        case "Multicall2":
+            string = '/libraries/Multicall2.sol/Multicall2.json'
+            break;
+
+    }
+    if (string != "") {
+        let deployment = JSON.parse((fs.readFileSync(path.join(__dirname, '../../../contracts/artifacts/contracts' + string))).toString());
+        return [deployment["abi"], deployment["bytecode"]]
+    }
+    console.log("request is not valid")
+    return []
+
+}
