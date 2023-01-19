@@ -45,5 +45,5 @@ jobs:
           
       - run: |
          cd contracts && npx hardhat node &
-         cd contracts && yarn deploy && px hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
+         cd contracts && yarn deploy && npx hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
 
