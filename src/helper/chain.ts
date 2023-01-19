@@ -45,11 +45,13 @@ export function getLeverAddress(chainId: string) {
     return map[chainId]
 }
 
-// console.log(getExchangeAddress("421613"))
 
-export const MulticallAddress: any = {
-    "1313161555": "0x266CCfe718EAac46ABF8589Dc8833f3A73a0Bd1c",
-    "421613": getContractAddress("Multicall2"),
-    "31337": getTestContractAddress("Multicall2")
-};
-// console.log(getContractAddress("Multicall2"))
+export function getMulticallAddress(chainId: string) {
+    let map: any = {
+        "1313161555": "0x266CCfe718EAac46ABF8589Dc8833f3A73a0Bd1c",
+        "421613": getContractAddress("Multicall2"),
+        "31337": getTestContractAddress("Multicall2")
+    }
+
+    return map[chainId]
+}

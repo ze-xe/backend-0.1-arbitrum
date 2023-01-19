@@ -52,9 +52,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
         let deployment = await deploy(owner.address);
         usdc = deployment.usdc;
         btc = deployment.btc;
-        exchange = deployment.exchange
-        console.log(exchange.address, "from test---------------------------------------------------------------")
-        
+        exchange = deployment.exchange 
         await run(chainId);
     });
     after((done) => {
@@ -166,7 +164,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
                     },
                     "signature": storedSignature.toLowerCase(),
                     "chainId": chainId,
-                    "ipfs": true,
+                    // "ipfs": true,
                 }
             );
 

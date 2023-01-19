@@ -2,7 +2,7 @@
 
 import { BigNumber, ethers } from "ethers";
 import { getERC20ABI, getProvider, getInterface, MulticallAbi } from "../utils/utils";
-import { getExchangeAddress, MulticallAddress } from "../helper/chain";
+import { getExchangeAddress, getMulticallAddress } from "../helper/chain";
 import { sentry } from "../../app";
 
 
@@ -24,11 +24,10 @@ export async function multicall(token: string, maker: string, chainId: string): 
         const provider: ethers.providers.JsonRpcProvider = getProvider(chainId);
 
         const multicall = new ethers.Contract(
-            MulticallAddress[`${chainId}`],
+            getMulticallAddress(chainId),
             MulticallAbi,
             provider
         );
-            console.log(getExchangeAddress(chainId), "from multicall========================================================")
         const itf: ethers.utils.Interface = getInterface(getERC20ABI());
         const input: string[][] = [[token, itf.encodeFunctionData("balanceOf", [maker])], [token, itf.encodeFunctionData("allowance", [maker, getExchangeAddress(chainId)])]]
         let resp = await multicall.callStatic.aggregate(
@@ -42,8 +41,6 @@ export async function multicall(token: string, maker: string, chainId: string): 
         }
         console.log(outPut);
         return outPut
-
-
     }
     catch (error) {
         sentry.captureException(error)

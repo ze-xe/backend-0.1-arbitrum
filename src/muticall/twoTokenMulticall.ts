@@ -1,6 +1,6 @@
 import { BigNumber, ethers } from "ethers";
 import { getERC20ABI, getProvider, getInterface, MulticallAbi } from "../utils/utils";
-import { getExchangeAddress, MulticallAddress } from "../helper/chain";
+import { getExchangeAddress, getMulticallAddress } from "../helper/chain";
 import { sentry } from "../../app";
 
 
@@ -11,9 +11,8 @@ export async function multicallFor2Tokens(token0: string, token1: string, maker:
     try {
 
         const provider: ethers.providers.JsonRpcProvider = getProvider(chainId);
-        console.log(getExchangeAddress(chainId), "from multicall margin========================================================")
         const multicall = new ethers.Contract(
-            MulticallAddress[`${chainId}`],
+            getMulticallAddress(chainId),
             MulticallAbi,
             provider
         );

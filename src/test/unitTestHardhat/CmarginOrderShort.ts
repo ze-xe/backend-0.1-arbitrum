@@ -59,7 +59,6 @@ describe("Margin Order Short=> Mint token, create order, execute order, cancel o
         cUsdc = deployment.cusdc;
         cBtc = deployment.cbtc;
         exchange = deployment.exchange
-        console.log(exchange.address, "from test---------------------------------------------------------------")
         await historicEventListner(ExchangeConfig(chainId));
 
     });
