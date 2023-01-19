@@ -12,7 +12,7 @@ export async function handleMarginEnabled(data: string[], argument: any) {
         let cToken = data[1].toLowerCase();
         let chainId = argument.chainId;
         const isTokenExist = await Token.findOne({ id: token, active: true }).lean();
-        let symbol;
+        let symbol:string| undefined;
 
         if (isTokenExist) {
             if (isTokenExist.marginEnabled == true) {
@@ -59,16 +59,14 @@ export async function handleMarginEnabled(data: string[], argument: any) {
             let isPairExist = await PairCreated.findOne({ token0: token, token1: allToken[i].id, active: true }).lean()
 
             if (isPairExist) {
-                if (isPairExist.marginEnabled == true) {
-                    continue
-                }
-                else if (isPairExist.marginEnabled == false) {
+               
+                if (isPairExist.marginEnabled == false) {
 
                     await PairCreated.findOneAndUpdate(
                         { _id: isPairExist._id },
                         { $set: { marginEnabled: true } }
                     )
-                    continue
+                    
                 }
             }
             else {
@@ -80,15 +78,12 @@ export async function handleMarginEnabled(data: string[], argument: any) {
 
                 if (isPairExist) {
 
-                    if (isPairExist.marginEnabled == true) {
-                        continue
-                    }
-                    else if (isPairExist.marginEnabled == false) {
+                    if (isPairExist.marginEnabled == false) {
                         await PairCreated.findOneAndUpdate(
                             { _id: isPairExist._id },
                             { $set: { marginEnabled: true } }
                         )
-                        continue
+                        
                     }
 
                 }

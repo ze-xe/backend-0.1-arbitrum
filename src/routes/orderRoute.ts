@@ -4,25 +4,22 @@ import { getFeeSet } from "../controllers/genral/getFeeSet";
 import { getLimitMatchedOrders } from "../controllers/order/limitMatchedOrders";
 import { getMatchedMarketOrders } from "../controllers/order/marketMatchedOrder";
 import { handleOrderCreated } from "../controllers/order/orderCreated";
-import { getVersion } from "../helper/chain";
-import { getConfig } from "../helper/constant";
-
-
+import { getLatest, getVersion } from "../helper/chain";
 const router = express.Router();
 
 
 require("dotenv").config()
-const version = process.env.NODE_ENV!
-router.get(`/v/${getVersion(version)}/tokens`, getAllTokens); //ok
-router.get(`/v/${getVersion(version)}/order/market/matched/:pairId`, getMatchedMarketOrders);//ok
-router.get(`/v/${getVersion(version)}/order/limit/matched/:pairId`, getLimitMatchedOrders); //ok
-router.post(`/v/${getVersion(version)}/order/create`, handleOrderCreated); //ok
-router.get(`/v/${getVersion(version)}/get/fee`, getFeeSet);
+const version = getVersion(process.env.NODE_ENV!)
+router.get(`/v/${version}/tokens`, getAllTokens); //ok
+router.get(`/v/${version}/order/market/matched/:pairId`, getMatchedMarketOrders);//ok
+router.get(`/v/${version}/order/limit/matched/:pairId`, getLimitMatchedOrders); //ok
+router.post(`/v/${version}/order/create`, handleOrderCreated); //ok
+router.get(`/v/${version}/get/fee`, getFeeSet);
 
 router.get("/", function (req, res) {
   res.send({
-    zexe: getConfig("version"),
-    latest: getConfig("latest")
+    zexe: version,
+    latest: getLatest(process.env.NODE_ENV!)
   });
 });
 

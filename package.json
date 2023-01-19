@@ -16,7 +16,7 @@
     "prod": "./node_modules/.bin/pm2 start app.ts --watch",
     "prod2": "pm2 start ecosystem.config.js",
     "test": "mocha -r ts-node/register --timeout 180000 ./src/test/unitTestHardhat/**/*.ts",
-    "coverage": "nyc npm run test",
+    "coverage": "nyc npm run test0",
     "test0": "mocha -r ts-node/register --timeout 60000 ./src/test/api/**.ts",
     "test1": "mocha -r ts-node/register --timeout 60000 ./src/test/margin_test.ts",
     "test2": "mocha -r ts-node/register --timeout 60000 ./src/test/api/pairTest.ts",
