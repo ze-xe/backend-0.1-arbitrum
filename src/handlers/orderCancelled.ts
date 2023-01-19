@@ -1,4 +1,4 @@
-import { OrderCreated, UserPosition } from "../DB/db";
+import { Order, User } from "../DB/db";
 import Big from "big.js";
 import { ifOrderCreated, ifUserPosition } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
@@ -11,7 +11,7 @@ export async function handleOrderCancelled(data: any) {
     try {
         let id = data[0].toLowerCase();
 
-        let orderDetails: ifOrderCreated | null = await OrderCreated.findOne({ id: id }).lean();
+        let orderDetails: ifOrderCreated | null = await Order.findOne({ id: id }).lean();
 
         if (!orderDetails) {
             return console.log(`Order cancelled OrderId not found ${data[0]}`);
@@ -29,7 +29,7 @@ export async function handleOrderCancelled(data: any) {
             if (orderDetails.orderType == 0) {
                 token = orderDetails.token1
             }
-            let getUser: ifUserPosition | null = await UserPosition.findOne({ id: orderDetails.maker, token: token, chainId: orderDetails.chainId }).lean();
+            let getUser: ifUserPosition | null = await User.findOne({ id: orderDetails.maker, token: token, chainId: orderDetails.chainId }).lean();
             if (getUser) {
 
                 let currentInOrderBalance = Big(getUser.inOrderBalance).minus(orderDetails.balanceAmount).toString();
@@ -40,11 +40,11 @@ export async function handleOrderCancelled(data: any) {
 
                 await Promise.all(
                     [
-                        UserPosition.findOneAndUpdate(
+                        User.findOneAndUpdate(
                             { _id: getUser._id },
                             { $set: { inOrderBalance: currentInOrderBalance } }
                         ),
-                        OrderCreated.findOneAndUpdate(
+                        Order.findOneAndUpdate(
                             { _id: orderDetails._id },
                             { $set: { cancelled: true, active: false } }
                         )
@@ -54,22 +54,22 @@ export async function handleOrderCancelled(data: any) {
         }
         else if (orderDetails.orderType == 2 || orderDetails.orderType == 3) {
 
-            let token0Position = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token0 }).lean()! as any;
-            let token1Position = await UserPosition.findOne({ id: orderDetails.maker, token: orderDetails.token1 }).lean()! as any;
+            let token0Position = await User.findOne({ id: orderDetails.maker, token: orderDetails.token0 }).lean()! as any;
+            let token1Position = await User.findOne({ id: orderDetails.maker, token: orderDetails.token1 }).lean()! as any;
             let token0InOrder = Big(token0Position?.inOrderBalance).minus(orderDetails.lastInOrderToken0).toString();
             let token1InOrder = Big(token1Position?.inOrderBalance).minus(orderDetails.lastInOrderToken1).toString();
 
             await Promise.all(
                 [
-                    UserPosition.findOneAndUpdate(
+                    User.findOneAndUpdate(
                         { _id: token0Position._id },
                         { $set: { inOrderBalance: token0InOrder } }
                     ),
-                    UserPosition.findOneAndUpdate(
+                    User.findOneAndUpdate(
                         { _id: token1Position._id },
                         { $set: { inOrderBalance: token1InOrder } }
                     ),
-                    OrderCreated.findOneAndUpdate(
+                    Order.findOneAndUpdate(
                         { _id: orderDetails._id },
                         { $set: { cancelled: true, active: false } }
                     )

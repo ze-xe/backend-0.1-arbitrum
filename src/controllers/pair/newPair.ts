@@ -1,7 +1,7 @@
 import { sentry } from "../../../app";
-import { PairCreated, Token } from "../../DB/db";
+import { Pair, Token } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
-import { ifPairCreated } from "../../helper/interface";
+import { ifPair } from "../../helper/interface";
 
 
 
@@ -16,7 +16,7 @@ export async function getNewPair(req: any, res: any) {
         if (!chainId) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
-        let allPairs: ifPairCreated[] = await PairCreated.find({ chainId: chainId, active: true }).sort({createdAt: -1}).lean();
+        let allPairs: ifPair[] = await Pair.find({ chainId: chainId, active: true }).sort({createdAt: -1}).lean();
 
         let data: any = [];
 

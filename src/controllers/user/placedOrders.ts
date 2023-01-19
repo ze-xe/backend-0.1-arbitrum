@@ -1,5 +1,5 @@
 import { sentry } from "../../../app";
-import { OrderCreated} from "../../DB/db";
+import { Order} from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 
 export async function getUserPlacedOrders(req: any, res: any) {
@@ -21,9 +21,9 @@ export async function getUserPlacedOrders(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
 
-        const getMakerOrders = await OrderCreated.find({ maker: maker, pair: pairId, deleted: false, cancelled: false, active: true, chainId: chainId }).sort({ blockTimestamp: -1, createdAt: -1 }).lean();
+        const getMakerOrders = await Order.find({ maker: maker, pair: pairId, deleted: false, cancelled: false, active: true, chainId: chainId }).sort({ blockTimestamp: -1, createdAt: -1 }).lean();
 
-        let data = getMakerOrders.map((order) => {
+        let data = getMakerOrders.map((order: any) => {
             return {
                 signature: order.signature,
                 id: order.id,

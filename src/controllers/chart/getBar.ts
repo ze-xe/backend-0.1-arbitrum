@@ -1,6 +1,6 @@
 import Big from "big.js";
 import { sentry } from "../../../app";
-import { OrderExecuted, PairCreated } from "../../DB/db";
+import { OrderExecuted, Pair } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 import { Interval } from "../../helper/interface";
 
@@ -59,7 +59,7 @@ export async function getBar(req: any, res: any) {
 
         if (data.length == 0) {
 
-            let isPairExist = await PairCreated.findOne({ id: pairId, chainId, active: true }).lean();
+            let isPairExist = await Pair.findOne({ id: pairId, chainId, active: true }).lean();
 
             if (!isPairExist) {
                 return res.status(404).send({ status: false, error: errorMessage.pairId });

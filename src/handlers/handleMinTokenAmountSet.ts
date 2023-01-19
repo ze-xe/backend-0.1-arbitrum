@@ -1,5 +1,5 @@
 import { sentry } from "../../app";
-import { PairCreated, Token } from "../DB/db";
+import { Pair, Token } from "../DB/db";
 
 
 
@@ -17,10 +17,10 @@ export async function handleMinTokenAmountSet(data: any){
             {$set:{minTokenAmount: minAMount}}
         );
 
-        let pairs = await PairCreated.find({token0: token, active: true}).lean();
+        let pairs = await Pair.find({token0: token, active: true}).lean();
         
         pairs.forEach(async (x)=>{
-            await PairCreated.findOneAndUpdate(
+            await Pair.findOneAndUpdate(
                 {_id: x._id},
                 {$set:{minToken0Order: minAMount}}
             )

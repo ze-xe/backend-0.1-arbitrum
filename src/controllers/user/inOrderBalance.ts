@@ -1,5 +1,5 @@
 import { sentry } from "../../../app";
-import { UserPosition } from "../../DB/db";
+import { User } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 
 
@@ -23,7 +23,7 @@ export async function getUserInOrderBalance(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.maker });
         }
 
-        let userInOrder: any[] = await UserPosition.find({ token: token, id: maker, chainId: chainId }).select({ _id: 0, __v: 0, createdAt: 0, updatedAt: 0, balance: 0 }).lean();
+        let userInOrder: any[] = await User.find({ token: token, id: maker, chainId: chainId }).select({ _id: 0, __v: 0, createdAt: 0, updatedAt: 0, balance: 0 }).lean();
         if (userInOrder.length > 0) {
 
             userInOrder[0].inOrderBalance = userInOrder[0].inOrderBalance;

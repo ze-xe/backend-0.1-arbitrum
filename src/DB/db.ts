@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 
 import path from 'path';
 import SyncSchema from "../schemas/Sync";
-import PairCreatedSchema from "../schemas/PairCreated";
-import OrderCreatedSchema from "../schemas/OrderCreated";
+import PairSchema from "../schemas/Pair";
+import OrderSchema from "../schemas/Order";
 import OrderExecutedSchema from "../schemas/OrderExecuted";
 import TokenSchema from "../schemas/Token";
-import UserPositionSchema from "../schemas/UserPosition";
+import UserSchema from "../schemas/User";
 import { getVersion } from "../helper/chain";
 
 // require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
@@ -19,13 +19,13 @@ let _version = a.join("_")
 
 export const backupConnection = mongoose.createConnection(process.env.MONGO_URL1 + `-backup-zexe-${_version}?retryWrites=true&w=majority`! as string);
 
-const OrderCreatedBackup: any = backupConnection.model("OrderCreated", OrderCreatedSchema);
+const OrderCreatedBackup: any = backupConnection.model("Order", OrderSchema);
 const Sync = mongoose.model("Sync", SyncSchema);
-const PairCreated = mongoose.model("PairCreated", PairCreatedSchema);
-const OrderCreated = mongoose.model("OrderCreated", OrderCreatedSchema);
+const Pair = mongoose.model("Pair", PairSchema);
+const Order = mongoose.model("Order", OrderSchema);
 const OrderExecuted = mongoose.model("OrderExecuted", OrderExecutedSchema);
 const Token = mongoose.model("Token", TokenSchema);
-const UserPosition = mongoose.model("UserPosition", UserPositionSchema);
+const User = mongoose.model("User", UserSchema);
 
 
 
@@ -50,4 +50,4 @@ async function connect() {
 
 
 
-export { Sync, connect, PairCreated, OrderCreated, OrderExecuted, Token, UserPosition, OrderCreatedBackup };
+export { Sync, connect, Pair, Order, OrderExecuted, Token, User, OrderCreatedBackup };

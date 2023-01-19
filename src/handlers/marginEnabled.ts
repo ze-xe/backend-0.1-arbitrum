@@ -1,4 +1,4 @@
-import { PairCreated, Token } from "../DB/db";
+import { Pair, Token } from "../DB/db";
 import {  getABI, getProvider } from "../utils/utils";
 import { ethers } from "ethers";
 import { sentry } from "../../app";
@@ -56,13 +56,13 @@ export async function handleMarginEnabled(data: string[], argument: any) {
 
         for (let i in allToken) {
 
-            let isPairExist = await PairCreated.findOne({ token0: token, token1: allToken[i].id, active: true }).lean()
+            let isPairExist = await Pair.findOne({ token0: token, token1: allToken[i].id, active: true }).lean()
 
             if (isPairExist) {
                
                 if (isPairExist.marginEnabled == false) {
 
-                    await PairCreated.findOneAndUpdate(
+                    await Pair.findOneAndUpdate(
                         { _id: isPairExist._id },
                         { $set: { marginEnabled: true } }
                     )
@@ -74,12 +74,12 @@ export async function handleMarginEnabled(data: string[], argument: any) {
                 let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [allToken[i].id, token]);
                 let id = ethers.utils.keccak256(encoder);
 
-                let isPairExist = await PairCreated.findOne({ id: id, active: true }).lean();
+                let isPairExist = await Pair.findOne({ id: id, active: true }).lean();
 
                 if (isPairExist) {
 
                     if (isPairExist.marginEnabled == false) {
-                        await PairCreated.findOneAndUpdate(
+                        await Pair.findOneAndUpdate(
                             { _id: isPairExist._id },
                             { $set: { marginEnabled: true } }
                         )

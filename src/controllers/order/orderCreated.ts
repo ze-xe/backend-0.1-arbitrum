@@ -1,5 +1,5 @@
 
-import {  OrderCreated, OrderCreatedBackup } from "../../DB/db";
+import {  Order, OrderCreatedBackup } from "../../DB/db";
 import Big from "big.js";
 import { ethers } from "ethers";
 import { createOrderSchema } from "../../helper/validateRequest";
@@ -221,15 +221,15 @@ export async function _handleOrderCreated(req: any, res: any) {
             }
         }
 
-        let isPairExist: ifPairCreated = await PairCreated.findOne({ token0: data.token0, token1: data.token1, chainId: chainId, active: true }).lean();
-        let createPair: ifPairCreated | any;
+        let isPairExist: ifPair = await Pair.findOne({ token0: data.token0, token1: data.token1, chainId: chainId, active: true }).lean();
+        let createPair: ifPair | any;
 
         if (!isPairExist) {
             // cheking for opposite pair
             let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token1, data.token0]);
             let id = ethers.utils.keccak256(encoder);
 
-            let isPairExist1: ifPairCreated = await PairCreated.findOne({ id: id, active: true }).lean();;
+            let isPairExist1: ifPair = await Pair.findOne({ id: id, active: true }).lean();;
 
             if (isPairExist1) {
                 createPair = isPairExist1;
@@ -258,7 +258,7 @@ export async function _handleOrderCreated(req: any, res: any) {
                     marginEnabled: marginEnabled,
                     active: true
                 }
-                createPair = await PairCreated.create(temp);
+                createPair = await Pair.create(temp);
 
                 console.log("Pair Created ", "T0 ", data.token0, "T1 ", data.token1, "CId ", chainId);
 
@@ -369,7 +369,7 @@ export async function handleOrderCreated(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.signature });
         }
 
-        const isOrderPresent = await OrderCreated.findOne({ id: id, chainId: chainId }).lean();
+        const isOrderPresent = await Order.findOne({ id: id, chainId: chainId }).lean();
 
         if (isOrderPresent) {
             return res.status(201).send({ status: true, message: "Order Already Created" });
@@ -446,7 +446,7 @@ export async function handleOrderCreated(req: any, res: any) {
             OrderCreatedBackup.create(orderCreate);
         }
 
-        await OrderCreated.create(orderCreate);
+        await Order.create(orderCreate);
 
         // socket io data
         if (!ipfs) {

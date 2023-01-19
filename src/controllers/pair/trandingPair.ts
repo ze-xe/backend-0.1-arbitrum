@@ -1,7 +1,7 @@
 import Big from "big.js";
 import { sentry } from "../../../app";
-import { connect, OrderExecuted, PairCreated, Token } from "../../DB/db";
-import { ifPairCreated } from "../../helper/interface";
+import { connect, OrderExecuted, Pair, Token } from "../../DB/db";
+import { ifPair } from "../../helper/interface";
 
 
 
@@ -18,7 +18,7 @@ export async function getPairTrandingPair(req: any, res: any) {
     try {
 
         // let chainId = req.query.chainId;
-        let getPairs: ifPairCreated[] = await PairCreated.find({active: true}).lean()!
+        let getPairs: ifPair[] = await Pair.find({active: true}).lean()!
 
         let interval = 24 * 60 * 60 * 1000;
 
@@ -104,7 +104,7 @@ export async function getPairTrandingPair(req: any, res: any) {
 
         for (let i in data) {
 
-            let allPairs: ifPairCreated = await PairCreated.findOne({ id: data[i].pairId, active: true }).sort({ createdAt: -1 }).lean();
+            let allPairs: ifPair = await Pair.findOne({ id: data[i].pairId, active: true }).sort({ createdAt: -1 }).lean();
 
 
             let promiseTokens: any = [];

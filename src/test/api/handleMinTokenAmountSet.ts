@@ -1,5 +1,5 @@
 
-import { connect, PairCreated, Token } from "../../DB/db";
+import { connect, Pair, Token } from "../../DB/db";
 import { handleMinTokenAmountSet } from "../../handlers/handleMinTokenAmountSet";
 import { expect } from "chai";
 import { getContractAddress } from "../../helper/constant";
@@ -30,7 +30,7 @@ describe("handleMinTokenAmountSet, change its minToken and restore", async () =>
 
         // checking pairs updated where btc is token0;
 
-        let getPairs = await PairCreated.find({ token0: btcAddress, active: true }).lean();
+        let getPairs = await Pair.find({ token0: btcAddress, active: true }).lean();
 
         getPairs.forEach((x) => {
             expect(x.minToken0Order == minToken)
@@ -44,7 +44,7 @@ describe("handleMinTokenAmountSet, change its minToken and restore", async () =>
 
         expect(getTokenAfterUpdate1.minTokenAmount).to.equal(currentMinToken);
 
-        let getPairs1 = await PairCreated.find({ token0: btcAddress, active: true }).lean();
+        let getPairs1 = await Pair.find({ token0: btcAddress, active: true }).lean();
 
         getPairs1.forEach((x) => {
             expect(x.minToken0Order == currentMinToken)

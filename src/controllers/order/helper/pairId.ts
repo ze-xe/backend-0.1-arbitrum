@@ -1,8 +1,8 @@
 
 import { ethers } from "ethers";
-import { PairCreated } from "../../../DB/db";
+import { Pair } from "../../../DB/db";
 import { handleToken } from "../../../handlers/token";
-import { ifPairCreated } from "../../../helper/interface";
+import { ifPair } from "../../../helper/interface";
 
 
 
@@ -12,15 +12,15 @@ import { ifPairCreated } from "../../../helper/interface";
 export async function getPairId(data: any, chainId: any){
     try{
 
-        let isPairExist: ifPairCreated = await PairCreated.findOne({ token0: data.token0, token1: data.token1, chainId: chainId, active: true }).lean();
-        let createPair: ifPairCreated | any;
+        let isPairExist: ifPair = await Pair.findOne({ token0: data.token0, token1: data.token1, chainId: chainId, active: true }).lean();
+        let createPair: ifPair | any;
 
         if (!isPairExist) {
             // cheking for opposite pair
             let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token1, data.token0]);
             let id = ethers.utils.keccak256(encoder);
 
-            let isPairExist1: ifPairCreated = await PairCreated.findOne({ id: id, active: true }).lean();;
+            let isPairExist1: ifPair = await Pair.findOne({ id: id, active: true }).lean();;
 
             if (isPairExist1) {
                 createPair = isPairExist1;
@@ -49,7 +49,7 @@ export async function getPairId(data: any, chainId: any){
                     marginEnabled: marginEnabled,
                     active: true
                 }
-                createPair = await PairCreated.create(temp);
+                createPair = await Pair.create(temp);
 
                 console.log("Pair Created ", "T0 ", data.token0, "T1 ", data.token1, "CId ", chainId);
 

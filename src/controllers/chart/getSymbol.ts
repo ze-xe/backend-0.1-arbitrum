@@ -1,6 +1,6 @@
 
 import { sentry } from "../../../app";
-import { PairCreated } from "../../DB/db";
+import { Pair } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 
 
@@ -10,7 +10,7 @@ export async function getSymbol(req: any, res: any) {
 
         let symbol = req.query.symbol;
 
-        let symbolDetails = await PairCreated.findOne({ symbol: symbol, active: true }).lean();
+        let symbolDetails = await Pair.findOne({ symbol: symbol, active: true }).lean();
 
         if (!symbolDetails) {
             return res.status(404).send({ status: false, data: errorMessage.symbol })

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const PairCreatedSchema = new mongoose.Schema({
+const PairSchema = new mongoose.Schema({
     id: { type: String, required: true, trim: true },
     token0: { type: String, required: true, trim: true },
     token1: { type: String, required: true, trim: true },
@@ -18,4 +18,4 @@ const PairCreatedSchema = new mongoose.Schema({
 );
 
 
-export default PairCreatedSchema;
+export default PairSchema;

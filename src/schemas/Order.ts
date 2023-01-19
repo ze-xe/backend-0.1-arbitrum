@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const OrderCreatedSchema = new mongoose.Schema({
+const OrderSchema = new mongoose.Schema({
     id: { type: String, required: true, trim: true },
     signature: { type: String, required: true, trim: true },
     pair: { type: String, required: true, trim: true },
@@ -28,4 +28,4 @@ const OrderCreatedSchema = new mongoose.Schema({
 );
 
 
-export default OrderCreatedSchema;
+export default OrderSchema;

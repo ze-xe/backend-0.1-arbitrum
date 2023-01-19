@@ -6,7 +6,7 @@ use(chaiHttp);
 import { ethers } from "ethers";
 import { getProvider } from "../../utils/utils";
 import { getExchangeAddress, getVersion } from "../../helper/chain";
-import { connect, OrderCreated, OrderExecuted } from "../../DB/db";
+import { connect, Order, OrderExecuted } from "../../DB/db";
 import { ifOrderCreated } from "../../helper/interface";
 import { run } from "../../../app";
 import { getConfig, getContract } from "../../helper/constant";
@@ -137,7 +137,7 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
     });
 
     it("execute 0ne order and check DB", async () => {
-        let data = await OrderCreated.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
+        let data = await Order.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
 
         expect(data).to.be.an('object');
         expect(data.amount).to.equal(amount);
@@ -160,19 +160,19 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
     it(`find created order in data base, cancel and delete it`, async () => {
 
         for (let i in signatures) {
-            let data = await OrderCreated.findOne({ signature: signatures[i] }).lean()! as ifOrderCreated;
+            let data = await Order.findOne({ signature: signatures[i] }).lean()! as ifOrderCreated;
 
             expect(data).to.be.an('object');
             expect(data.amount).to.equal(amount);
             expect(data.maker).to.equal(user1.address.toLowerCase());
             await handleOrderCancelled([data.id]);
 
-            let data1 = await OrderCreated.findOne({ signature: signatures[i] }).lean()! as ifOrderCreated;
+            let data1 = await Order.findOne({ signature: signatures[i] }).lean()! as ifOrderCreated;
             expect(data1).to.be.an('object');
             expect(data1.amount).to.equal(amount);
             expect(data1.cancelled).to.equal(true);
-            await OrderCreated.findOneAndDelete({ signature: signatures[i] })
-            let data2 = await OrderCreated.findOne({ signature: signatures[i] }).lean()! as ifOrderCreated;
+            await Order.findOneAndDelete({ signature: signatures[i] })
+            let data2 = await Order.findOne({ signature: signatures[i] }).lean()! as ifOrderCreated;
             expect(data2).to.be.null;
 
 

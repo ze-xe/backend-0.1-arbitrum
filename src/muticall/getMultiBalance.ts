@@ -1,7 +1,7 @@
 
 
 import { BigNumber, ethers } from "ethers";
-import { UserPosition, OrderCreated } from "../DB/db";
+import { User, Order } from "../DB/db";
 import Big from "big.js";
 import { getProvider, getInterface, getABI } from "../utils/utils";
 import { ifOrderCreated, ifUserPosition, orderSignature } from "../helper/interface";
@@ -53,16 +53,16 @@ export async function getMultiBalance(token: string, addresses: string[], ids: s
             for (let i = 0; i < resp[1].length; i++) {
 
                 let balance = BigNumber.from(resp[1][i]).toString();
-                let userPosition: ifUserPosition = await UserPosition.findOne({ token: token, id: addresses[i], chainId: chainId }).lean();
+                let userPosition: ifUserPosition = await User.findOne({ token: token, id: addresses[i], chainId: chainId }).lean();
                 let inOrderBalance = Big(userPosition.inOrderBalance);
 
                 if (Number(balance) < Number(inOrderBalance)) {
                     inActiveIds.push(ids[i]);
                     let currentInOrderBalance = Big(inOrderBalance).minus(amounts[i]).toString();
 
-                    let updateUserPosition = UserPosition.findOneAndUpdate({ token: token, id: addresses[i], chainId: chainId }, { $set: { inOrderBalance: currentInOrderBalance } });
+                    let updateUserPosition = User.findOneAndUpdate({ token: token, id: addresses[i], chainId: chainId }, { $set: { inOrderBalance: currentInOrderBalance } });
                     console.log("Order Deactivate", data[i].id)
-                    let deleteOrder = OrderCreated.findOneAndUpdate({ _id: ids[i] }, { $set: { active: false } });
+                    let deleteOrder = Order.findOneAndUpdate({ _id: ids[i] }, { $set: { active: false } });
                     await Promise.all([updateUserPosition, deleteOrder]);
                 }
 
