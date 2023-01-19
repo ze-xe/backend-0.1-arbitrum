@@ -6,9 +6,9 @@ use(chaiHttp);
 import { ethers } from "ethers";
 import { getProvider } from "../../utils/utils";
 import { getExchangeAddress, getVersion } from "../../helper/chain";
-import { OrderCreated, OrderExecuted } from "../../DB/db";
+import { connect, OrderCreated, OrderExecuted } from "../../DB/db";
 import { ifOrderCreated } from "../../helper/interface";
-import { httpServer, run, server } from "../../../app";
+import { run } from "../../../app";
 import { getConfig, getContract } from "../../helper/constant";
 import { handleOrderCancelled } from "../../handlers/orderCancelled";
 import { handleOrderExecuted } from "../../handlers/orderExecuted";
@@ -45,13 +45,11 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
     let amount = ethers.utils.parseEther('1').toString();
     let orderType = 1 // sell
 
-    before(async () => { //Before each test we empty the database   
-        // await mongoose.createConnection(process.env.MONGO_URL! as string).dropDatabase();
-        await run(chainId)
-        // await connect()
+    before(async () => {   
+        await run()
     });
 
-    after((done)=>{
+    after((done) => {
         done()
     })
 
@@ -155,7 +153,7 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
         expect(data1?.fillAmount).to.equal(fillAmount);
 
         // delete from db executed order
-        let delExecutedData =  await OrderExecuted.deleteOne({ id: data.id });
+        let delExecutedData = await OrderExecuted.deleteOne({ id: data.id });
         expect(delExecutedData.acknowledged).to.equal(true)
         expect(delExecutedData.deletedCount).to.equal(1)
     });

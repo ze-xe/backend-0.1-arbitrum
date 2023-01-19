@@ -1,5 +1,5 @@
 
-import { getExchangeABI } from "../../utils/utils";
+import { getABI} from "../../utils/utils";
 import { getExchangeAddress } from "../../helper/chain";
 import { handleFeesSet } from "../../handlers/handleFeeSet";
 import { handleMinTokenAmountSet } from "../../handlers/handleMinTokenAmountSet";
@@ -15,7 +15,7 @@ function ExchangeConfig(chainId: string) {
 
     return {
         contractAddress: getExchangeAddress(chainId),
-        abi: getExchangeABI(),
+        abi: getABI("Exchange"),
         handlers: {
             "OrderExecuted": handleOrderExecuted,
             "OrderCancelled": handleOrderCancelled,
@@ -27,6 +27,6 @@ function ExchangeConfig(chainId: string) {
     };
 }
 
-
+// console.log(ExchangeConfig("31337"))
 
 export { ExchangeConfig };

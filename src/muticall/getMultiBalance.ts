@@ -3,10 +3,10 @@
 import { BigNumber, ethers } from "ethers";
 import { UserPosition, OrderCreated } from "../DB/db";
 import Big from "big.js";
-import { getERC20ABI, getProvider, getInterface, MulticallAbi } from "../utils/utils";
+import { getProvider, getInterface, getABI } from "../utils/utils";
 import { ifOrderCreated, ifUserPosition, orderSignature } from "../helper/interface";
-import { MulticallAddress } from "../helper/chain";
 import { sentry } from "../../app";
+import { getMulticallAddress } from "../helper/chain";
 
 
 
@@ -29,17 +29,14 @@ export async function getMultiBalance(token: string, addresses: string[], ids: s
 
     const _getMultiBalance = async () => {
         try {
-            const provider: ethers.providers.JsonRpcProvider = getProvider(chainId);
-
+           
             const multicall: ethers.Contract = new ethers.Contract(
-                MulticallAddress[`${chainId}`],
-                MulticallAbi,
-                provider
+               getMulticallAddress(chainId),
+               getABI("Multicall2"),
+               getProvider(chainId)
             );
 
-
-            const itf: ethers.utils.Interface = getInterface(getERC20ABI());
-
+            const itf: ethers.utils.Interface = getInterface(getABI("TestERC20"));
 
             const resp: any = await multicall.callStatic.aggregate(
 

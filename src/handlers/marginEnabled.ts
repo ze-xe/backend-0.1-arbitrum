@@ -1,5 +1,5 @@
 import { PairCreated, Token } from "../DB/db";
-import {  getERC20ABI, getProvider } from "../utils/utils";
+import {  getABI, getProvider } from "../utils/utils";
 import { ethers } from "ethers";
 import { sentry } from "../../app";
 
@@ -26,7 +26,7 @@ export async function handleMarginEnabled(data: string[], argument: any) {
 
         if (!isTokenExist) {
             let provider = getProvider(chainId);
-            let getTokenDetails = new ethers.Contract(token, getERC20ABI(), provider);
+            let getTokenDetails = new ethers.Contract(token, getABI("TestERC20"), provider);
             let name = getTokenDetails["name"]();
             symbol = getTokenDetails["symbol"]();
             let decimals = getTokenDetails["decimals"]();

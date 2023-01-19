@@ -6,9 +6,6 @@ import { getSymbol } from "../controllers/chart/getSymbol";
 
 const router = express.Router();
 
-
-
-
 router.get("/bar/history/:ticker", getBar); 
 router.get("/symbol", getSymbol)
 

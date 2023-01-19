@@ -34,7 +34,14 @@ export function getVersion(env: string): string {
     return map[env]
 }
 
-// console.log(getVersion("dev"))
+export function getLatest(env: string){
+    let map: any = {
+        "dev": getConfig("latest"),
+        "test": getTestConfig("latest")
+    }
+    return map[env]
+}
+
 
 export function getLeverAddress(chainId: string) {
     let map: any = {

@@ -27,7 +27,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     let orders: any[] = [];
 
     before(async () => {
-        // await connect()
+        await connect()
     });
 
 

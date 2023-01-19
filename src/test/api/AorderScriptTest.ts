@@ -4,11 +4,9 @@ import { use, request } from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 import { ethers } from "ethers";
-import mongoose from "mongoose";
-import { httpServer } from "../../../app";
 import { connect, OrderCreated, OrderExecuted, Sync, UserPosition } from "../../DB/db";
 import { getExchangeAddress, getVersion } from "../../helper/chain";
-import { getERC20ABI, getExchangeABI, getProvider, parseEther } from "../../utils/utils";
+import {  getProvider, parseEther } from "../../utils/utils";
 import { io } from "socket.io-client";
 import path from "path";
 import { EVENT_NAME } from "../../socketIo/socket.io";
@@ -16,7 +14,7 @@ import { getConfig, getContract, } from "../../helper/constant";
 import { ifOrderCreated } from "../../helper/interface";
 use(chaiHttp);
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
-const socket = io("https://api.zexe.io");
+const socket = io("http://localhost:3010");
 
 
 socket.on(EVENT_NAME.PAIR_ORDER, (data) => {

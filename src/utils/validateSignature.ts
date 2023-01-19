@@ -1,9 +1,7 @@
 
 
-import fs from "fs";
 import { ethers } from "ethers";
-import Big from "big.js";
-import { getExchangeAddress, getRpcLink, getVersion } from "../helper/chain";
+import { getExchangeAddress, getVersion } from "../helper/chain";
 import { getConfig } from "../helper/constant";
 
 

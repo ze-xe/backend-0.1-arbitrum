@@ -12,16 +12,12 @@ import { getVersion } from "../helper/chain";
 // require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 // require("dotenv").config()
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') })
-console.log(process.env.NODE_ENV,"ENV")
-console.log(process.env.MONGO_URL1)
+console.log(process.env.NODE_ENV,"ENV from DB")
 let a = getVersion(process.env.NODE_ENV!).split('.')
 a.pop()
 let _version = a.join("_")
 
-// export const backupConnection = mongoose.createConnection(process.env.MONGO_URL1+`test-backup-zexe?retryWrites=true&w=majority`! as string);
 export const backupConnection = mongoose.createConnection(process.env.MONGO_URL1 + `-backup-zexe-${_version}?retryWrites=true&w=majority`! as string);
-
-
 
 const OrderCreatedBackup: any = backupConnection.model("OrderCreated", OrderCreatedSchema);
 const Sync = mongoose.model("Sync", SyncSchema);

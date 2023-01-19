@@ -3,6 +3,7 @@
 import { use, request } from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
+import { connect } from "../../DB/db";
 use(chaiHttp);
 import { getVersion } from "../../helper/chain";
 import { } from "../../helper/constant";
@@ -12,7 +13,7 @@ import { } from "../../helper/constant";
 describe('Testing Pair Api', () => {
 
     before(async () => {
-        //await connect()
+        await connect()
     });
     /*
       * Test the /GET route

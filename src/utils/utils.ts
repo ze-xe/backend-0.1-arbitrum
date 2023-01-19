@@ -1,33 +1,23 @@
 import fs from "fs";
 import { ethers } from "ethers";
 import Big from "big.js";
-import {  getRpcLink} from "../helper/chain";
+import { getRpcLink } from "../helper/chain";
 import { getConfig } from "../helper/constant";
 import path from "path";
 require("dotenv").config()
 
 
-// if (process.env.NODE_ENV == "test") {
-    // process.chdir('../')
-// }
-// const Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/deployments.json")).toString());
-const Deployments = JSON.parse((fs.readFileSync(path.join(__dirname ,'..','deployments','deployments.json'))).toString());
-
-
-export const MulticallAbi = Deployments["sources"]["Multicall2"];
-
-// console.log(MulticallAbi)
-export const leverageAbi = Deployments["sources"]["Lever"];
-
-
-
-export function getExchangeABI() {
-    return Deployments["sources"][`Exchange_${getConfig("latest")}`];
-}
-// console.log(getExchangeABI())
-
-export function getERC20ABI() {
-    return Deployments["sources"]["TestERC20"];
+export function getABI(name: any) {
+    const Deployments = JSON.parse((fs.readFileSync(path.join(__dirname, '..', 'deployments', 'deployments.json'))).toString())["sources"];
+    let abis = ["Lever", "TestERC20","Multicall2"]
+    if (name == "Exchange") {
+        return Deployments[`Exchange_${getConfig("latest")}`];
+    }
+    else if (abis.includes(name)) {
+        return Deployments[name]
+    }  
+    console.log(`request not valid`)
+    return []
 }
 
 export function parseEther(value: number | string): string {

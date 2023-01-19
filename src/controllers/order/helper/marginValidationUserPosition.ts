@@ -6,7 +6,7 @@ import { getLeverAddress } from "../../../helper/chain";
 import { errorMessage } from "../../../helper/errorMessage";
 import { ifUserPosition } from "../../../helper/interface";
 import { multicallFor2Tokens } from "../../../muticall/twoTokenMulticall";
-import { getProvider, leverageAbi } from "../../../utils/utils";
+import { getABI, getProvider } from "../../../utils/utils";
 
 
 
@@ -317,8 +317,7 @@ export async function marginValidationAndUserPosition(signature: string, data: a
             return { status: false, error: errorMessage.borrowLimit, statusCode: 400 }
         }
 
-        let provider = getProvider(chainId);
-        let lever = new ethers.Contract((getLeverAddress(chainId)), leverageAbi, provider);
+        let lever = new ethers.Contract((getLeverAddress(chainId)), getABI("Lever"), getProvider(chainId));
 
         // checking market enter or not
         let assetIn: string[] = [];

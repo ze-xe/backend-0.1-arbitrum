@@ -154,7 +154,7 @@ const inEth = (amount: string) => ethers.utils.parseEther(amount);
 
 function getDeployment(name: string) {
 
-    let string = ""
+    let string = "empty"
     switch (name) {
         case "Exchange":
             string = '/Exchange.sol/Exchange.json'
@@ -182,12 +182,12 @@ function getDeployment(name: string) {
             break;
 
     }
-    if (string != "") {
+    if (string != "empty") {
         let deployment = JSON.parse((fs.readFileSync(path.join(__dirname, '../../../contracts/artifacts/contracts' + string))).toString());
         return [deployment["abi"], deployment["bytecode"]]
     }
     console.log("request is not valid")
-    return []
+    return ["request is not valid"]
 
 }
 

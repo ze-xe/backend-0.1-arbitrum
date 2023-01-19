@@ -18,7 +18,7 @@ export async function getNewPair(req: any, res: any) {
         }
         let allPairs: ifPairCreated[] = await PairCreated.find({ chainId: chainId, active: true }).sort({createdAt: -1}).lean();
 
-        let data = [];
+        let data: any = [];
 
         let promiseTokens: any = [];
 
@@ -35,7 +35,7 @@ export async function getNewPair(req: any, res: any) {
 
             let token0 = promiseTokens[2 * i];
             let token1 = promiseTokens[2 * i + 1];
-            let temp = {
+            let temp= {
 
                 id: allPairs[i].id,
                 exchangeRate: allPairs[i].exchangeRate,

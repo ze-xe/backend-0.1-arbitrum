@@ -53,7 +53,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
         usdc = deployment.usdc;
         btc = deployment.btc;
         exchange = deployment.exchange 
-        await run(chainId);
+        await run();
     });
     after((done) => {
         socket.disconnect()
@@ -65,7 +65,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
         let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
         let user2UsdcBalancePre = (await usdc.balanceOf(user2.address)).toString();
         // mint btc
-        const btcAmount = ethers.utils.parseEther('10').toString();
+        let btcAmount = ethers.utils.parseEther('10').toString();
         let tx1 = await btc.connect(user1).mint(user1.address, btcAmount);
         await btc.connect(user2).mint(user2.address, btcAmount);
 

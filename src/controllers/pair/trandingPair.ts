@@ -22,7 +22,7 @@ export async function getPairTrandingPair(req: any, res: any) {
 
         let interval = 24 * 60 * 60 * 1000;
 
-        let data = [];
+        let data: any = [];
 
         for (let i in getPairs) {
 
@@ -99,8 +99,8 @@ export async function getPairTrandingPair(req: any, res: any) {
 
         }
 
-        data = data.sort((a, b) => b.trade - a.trade)
-        let trandingPair = []
+        data = data.sort((a: any, b: any) => b.trade - a.trade)
+        let trandingPair: any = []
 
         for (let i in data) {
 

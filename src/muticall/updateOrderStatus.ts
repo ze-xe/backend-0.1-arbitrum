@@ -1,10 +1,10 @@
 import { BigNumber, ethers } from "ethers";
 import { UserPosition, OrderCreated } from "../DB/db";
 import Big from "big.js";
-import { getERC20ABI, getProvider, getInterface, MulticallAbi } from "../utils/utils";
-import { ifOrderCreated, ifUserPosition, orderSignature } from "../helper/interface";
-import { getExchangeAddress, MulticallAddress } from "../helper/chain";
+import { getABI, getProvider, getInterface} from "../utils/utils";
+import { ifOrderCreated, ifUserPosition } from "../helper/interface";
 import { sentry } from "../../app";
+import { getMulticallAddress } from "../helper/chain";
 
 
 
@@ -19,15 +19,13 @@ import { sentry } from "../../app";
 async function orderStatus(chainId: string) {
     try {
 
-        const provider: ethers.providers.JsonRpcProvider = getProvider(chainId);
-
         const multicall: ethers.Contract = new ethers.Contract(
-            MulticallAddress[`${chainId}`],
-            MulticallAbi,
-            provider
+            getMulticallAddress(chainId),
+            getABI("Multicall2"),
+            getProvider(chainId)
         );
 
-        const itf: ethers.utils.Interface = getInterface(getERC20ABI());
+        const itf: ethers.utils.Interface = getInterface(getABI("TestERC20"));
         let hasOrder: boolean = true;
         let page: number = 0;
         const _limit = 20;

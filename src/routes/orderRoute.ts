@@ -12,12 +12,12 @@ const router = express.Router();
 
 
 require("dotenv").config()
-
-router.get(`/v/${getVersion(process.env.NODE_ENV!)}/tokens`, getAllTokens); //ok
-router.get(`/v/${getVersion(process.env.NODE_ENV!)}/order/market/matched/:pairId`, getMatchedMarketOrders);//ok
-router.get(`/v/${getVersion(process.env.NODE_ENV!)}/order/limit/matched/:pairId`, getLimitMatchedOrders); //ok
-router.post(`/v/${getVersion(process.env.NODE_ENV!)}/order/create`, handleOrderCreated); //ok
-router.get(`/v/${getVersion(process.env.NODE_ENV!)}/get/fee`, getFeeSet);
+const version = process.env.NODE_ENV!
+router.get(`/v/${getVersion(version)}/tokens`, getAllTokens); //ok
+router.get(`/v/${getVersion(version)}/order/market/matched/:pairId`, getMatchedMarketOrders);//ok
+router.get(`/v/${getVersion(version)}/order/limit/matched/:pairId`, getLimitMatchedOrders); //ok
+router.post(`/v/${getVersion(version)}/order/create`, handleOrderCreated); //ok
+router.get(`/v/${getVersion(version)}/get/fee`, getFeeSet);
 
 router.get("/", function (req, res) {
   res.send({
