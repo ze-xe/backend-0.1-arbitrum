@@ -28,7 +28,7 @@ export async function multicall(token: string, maker: string, chainId: string): 
             MulticallAbi,
             provider
         );
-            // console.log(getExchangeAddress(chainId), "from multicall")
+            console.log(getExchangeAddress(chainId), "from multicall========================================================")
         const itf: ethers.utils.Interface = getInterface(getERC20ABI());
         const input: string[][] = [[token, itf.encodeFunctionData("balanceOf", [maker])], [token, itf.encodeFunctionData("allowance", [maker, getExchangeAddress(chainId)])]]
         let resp = await multicall.callStatic.aggregate(
@@ -40,7 +40,7 @@ export async function multicall(token: string, maker: string, chainId: string): 
         for (let i in resp[1]) {
             outPut.push(Number(BigNumber.from(resp[1][i]).toString()))
         }
-        // console.log(outPut);
+        console.log(outPut);
         return outPut
 
 

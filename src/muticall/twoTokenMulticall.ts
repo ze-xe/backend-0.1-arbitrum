@@ -11,7 +11,7 @@ export async function multicallFor2Tokens(token0: string, token1: string, maker:
     try {
 
         const provider: ethers.providers.JsonRpcProvider = getProvider(chainId);
-
+        console.log(getExchangeAddress(chainId), "from multicall margin========================================================")
         const multicall = new ethers.Contract(
             MulticallAddress[`${chainId}`],
             MulticallAbi,
@@ -34,12 +34,12 @@ export async function multicallFor2Tokens(token0: string, token1: string, maker:
         for (let i in resp[1]) {
             outPut.push(Number(BigNumber.from(resp[1][i]).toString()))
         }
-
+        console.log(outPut)
         return outPut
     }
     catch (error) {
         sentry.captureException(error)
-        console.log(`Error @ Multicall`, error)
+        console.log(`Error @ multicallFor2Tokens`, error)
         return null
     }
 }

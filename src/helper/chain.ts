@@ -49,6 +49,7 @@ export function getLeverAddress(chainId: string) {
 
 export const MulticallAddress: any = {
     "1313161555": "0x266CCfe718EAac46ABF8589Dc8833f3A73a0Bd1c",
-    "421613": "0xf59FC07352b5043b3Ab74f737cDe776181eD0D59",
+    "421613": getContractAddress("Multicall2"),
     "31337": getTestContractAddress("Multicall2")
 };
+// console.log(getContractAddress("Multicall2"))

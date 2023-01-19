@@ -46,14 +46,15 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
     let txnId = ""
     let userInOrderPre = '0';
     before(async () => {
-        // await mongoose.createConnection(process.env.MONGO_URL + `-backup-zexe-${_version}?retryWrites=true&w=majority`! as string).dropDatabase();
-        // await mongoose.createConnection(process.env.MONGO_URL1 + `-zexe-${_version}?retryWrites=true&w=majority`! as string).dropDatabase();
+        await mongoose.createConnection(process.env.MONGO_URL + `-backup-zexe-${_version}?retryWrites=true&w=majority`! as string).dropDatabase();
+        await mongoose.createConnection(process.env.MONGO_URL1 + `-zexe-${_version}?retryWrites=true&w=majority`! as string).dropDatabase();
         [owner, user1, user2] = await ethers.getSigners();
         let deployment = await deploy(owner.address);
         usdc = deployment.usdc;
         btc = deployment.btc;
         exchange = deployment.exchange
-        console.log(exchange.address, "from test")
+        console.log(exchange.address, "from test---------------------------------------------------------------")
+        
         await run(chainId);
     });
     after((done) => {
@@ -91,6 +92,21 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
         console.log("balance", user2UsdcBalancePost)
         expect(user1BtcBalancePost).to.equal(parseEther(Big(btcAmount).plus(user1BtcBalancePre).toString()));
         expect(user2UsdcBalancePost).to.equal(parseEther(Big(usdcAmount).plus(user2UsdcBalancePre).toString()));
+
+        let wait = () => {
+            return new Promise((resolve, reject) => {
+
+                let timeOutId = setTimeout(() => {
+                    return resolve("Success")
+                }, 5000)
+
+                socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
+                    clearTimeout(timeOutId)
+                    return resolve("Success")
+                })
+            })
+        }
+        let res = await wait()
 
     });
 
