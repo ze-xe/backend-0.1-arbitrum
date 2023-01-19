@@ -1,7 +1,7 @@
 
 
-import { ifOrderCreated, ifPairCreated } from "../../helper/interface";
-import { PairCreated,OrderCreated } from "../../DB/db";
+import { ifOrderCreated, ifPair } from "../../helper/interface";
+import { Pair, Order } from "../../DB/db";
 import { Decimals } from "../../helper/constant";
 import { errorMessage } from "../../helper/errorMessage"
 import { sentry } from "../../../app";
@@ -28,14 +28,14 @@ export async function fetchOrders(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
 
-        const isPairIdExist: ifPairCreated | null = await PairCreated.findOne({ id: pairId , active: true}).lean();
+        const isPairIdExist: ifPair | null = await Pair.findOne({ id: pairId, active: true }).lean();
 
         if (!isPairIdExist) {
             return res.status(404).send({ status: false, error: errorMessage.pairId });
         }
 
-        let buyOrder: any | ifOrderCreated[] = OrderCreated.find({ pair: pairId, chainId: chainId, orderType: { $in: [0, 2] }, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
-        let sellOrder: any | ifOrderCreated[] = OrderCreated.find({ pair: pairId, chainId: chainId, orderType: { $in: [1, 3] }, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+        let buyOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, chainId: chainId, orderType: { $in: [0, 2] }, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+        let sellOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, chainId: chainId, orderType: { $in: [1, 3] }, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
 
         let promise = await Promise.all([buyOrder, sellOrder]);
         buyOrder = promise[0];

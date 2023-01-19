@@ -1,8 +1,8 @@
 
 
-import { PairCreated, OrderCreated } from "../../DB/db";
+import { Pair, Order } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
-import { ifOrderCreated, ifPairCreated } from "../../helper/interface";
+import { ifOrderCreated, ifPair } from "../../helper/interface";
 import { sentry } from "../../../app";
 import { getMultiBalance } from "../../muticall/getMultiBalance";
 
@@ -62,7 +62,7 @@ export async function getLimitMatchedOrders(req: any, res: any) {
             return res.status(400).send({ status: false, error: errorMessage.amount });
         }
 
-        const isPairIdExist: ifPairCreated | null = await PairCreated.findOne({ id: pairId, chainId: chainId, active: true }).lean();
+        const isPairIdExist: ifPair | null = await Pair.findOne({ id: pairId, chainId: chainId, active: true }).lean();
 
         if (!isPairIdExist) {
             return res.status(404).send({ status: false, error: errorMessage.pairId });
@@ -71,7 +71,7 @@ export async function getLimitMatchedOrders(req: any, res: any) {
         let getMatchedDoc: ifOrderCreated[] = [];
 
         if (orderType == 0 || orderType == 2) {
-            getMatchedDoc = await OrderCreated.aggregate(
+            getMatchedDoc = await Order.aggregate(
                 [
                     {
                         $match: {
@@ -99,7 +99,7 @@ export async function getLimitMatchedOrders(req: any, res: any) {
             );
         }
         else if (orderType == 1 || orderType == 3) {
-            getMatchedDoc = await OrderCreated.aggregate(
+            getMatchedDoc = await Order.aggregate(
                 [
                     {
                         $match: {

@@ -1,5 +1,5 @@
 
-import { OrderCreated, OrderCreatedBackup } from "../DB/db";
+import { Order, OrderCreatedBackup } from "../DB/db";
 import axios, { AxiosResponse } from "axios";
 import { ExchangeConfig } from "../sync/configs/exchange";
 import { historicEventListner } from "../sync/sync";
@@ -18,7 +18,7 @@ require("dotenv").config();
  */
 async function start(chainId: string) {
     try {
-        let getCreateRecords: ifOrderCreated[] = await OrderCreated.find();
+        let getCreateRecords: ifOrderCreated[] = await Order.find();
 
         if (getCreateRecords.length == 0) {
 

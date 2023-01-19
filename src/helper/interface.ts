@@ -37,7 +37,7 @@ export interface ifUserPosition {
     _id: string
 }
 
-export interface ifPairCreated {
+export interface ifPair {
     id: string
     token0: string
     token1: string

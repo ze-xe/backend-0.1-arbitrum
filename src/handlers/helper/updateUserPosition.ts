@@ -1,5 +1,5 @@
 import Big from "big.js";
-import { OrderCreated, UserPosition } from "../../DB/db";
+import { Order, User } from "../../DB/db";
 import { ifUserPosition } from "../../helper/interface";
 
 
@@ -20,7 +20,7 @@ export async function updateUserPosition(getOrderDetails: any, getPairDetails: a
             token = getPairDetails.token1;
         }
 
-        let getUserPosition: ifUserPosition | null = await UserPosition.findOne({ id: getOrderDetails.maker, token: token });
+        let getUserPosition: ifUserPosition | null = await User.findOne({ id: getOrderDetails.maker, token: token });
 
         if (!getUserPosition) {
             return console.log(`user position not found for token0 ${token}, maker ${getOrderDetails.maker}`)
@@ -32,7 +32,7 @@ export async function updateUserPosition(getOrderDetails: any, getPairDetails: a
             currentInOrderBalance = Big(getUserPosition.inOrderBalance).minus(Big(fillAmount).times(getOrderDetails.exchangeRate).div(Big(10).pow(18))).toString();
         }
 
-        await UserPosition.findOneAndUpdate(
+        await User.findOneAndUpdate(
             { _id: getUserPosition._id },
             { $set: { inOrderBalance: currentInOrderBalance } }
         );
@@ -40,13 +40,13 @@ export async function updateUserPosition(getOrderDetails: any, getPairDetails: a
         let currentBalanceAmount = new Big(getOrderDetails.balanceAmount).minus(fillAmount);
 
         if (Number(currentBalanceAmount) <= Number(getPairDetails.minToken0Order)) {
-            await OrderCreated.findOneAndUpdate(
+            await Order.findOneAndUpdate(
                 { _id: getOrderDetails._id.toString() },
                 { $set: { balanceAmount: currentBalanceAmount, deleted: true, active: false } }
             );
         }
         else {
-            await OrderCreated.findOneAndUpdate(
+            await Order.findOneAndUpdate(
                 { _id: getOrderDetails._id.toString() },
                 { $set: { balanceAmount: currentBalanceAmount } }
             );

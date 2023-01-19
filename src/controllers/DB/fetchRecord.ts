@@ -1,6 +1,6 @@
 
 import { sentry } from "../../../app";
-import { OrderCreated, PairCreated } from "../../DB/db";
+import { Order, Pair } from "../../DB/db";
 
 
 
@@ -12,7 +12,7 @@ export async function fetchDBRecords(req: any, res: any) {
 
     try {
 
-        const orders = await PairCreated.findOne();
+        const orders = await Pair.findOne();
 
         if (!orders) {
             return res.status(200).send({ status: true, data: null });

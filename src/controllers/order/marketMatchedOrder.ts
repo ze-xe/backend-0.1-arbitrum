@@ -1,4 +1,4 @@
-import { OrderCreated } from "../../DB/db";
+import { Order } from "../../DB/db";
 import Big from "big.js";
 import { errorMessage } from "../../helper/errorMessage";
 import { ifOrderCreated} from "../../helper/interface";
@@ -42,10 +42,10 @@ export async function getMatchedMarketOrders(req: any, res: any) {
         let getMatchedDoc: ifOrderCreated[] = [];
 
         if (orderType == 0 || orderType == 2) {
-            getMatchedDoc = await OrderCreated.find({ pair: pairId, orderType: { $in: [1, 3] }, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+            getMatchedDoc = await Order.find({ pair: pairId, orderType: { $in: [1, 3] }, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
         }
         else if (orderType == 1 || orderType == 3) {
-            getMatchedDoc = await OrderCreated.find({ pair: pairId, orderType: { $in: [0, 2] }, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+            getMatchedDoc = await Order.find({ pair: pairId, orderType: { $in: [0, 2] }, chainId: chainId, deleted: false, active: true, cancelled: false }).sort({ exchangeRate: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
         }
 
         let data: ifOrderCreated[] = [];

@@ -4,7 +4,7 @@ import { use, request } from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 import { ethers } from "ethers";
-import { connect, OrderCreated, OrderExecuted, Sync, UserPosition } from "../../DB/db";
+import { connect, Order, OrderExecuted, Sync, User } from "../../DB/db";
 import { getExchangeAddress, getVersion } from "../../helper/chain";
 import {  getProvider, parseEther } from "../../utils/utils";
 import { io } from "socket.io-client";
@@ -129,7 +129,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
             value, storedSignature
         ]);
 
-        let userPositionPre = await UserPosition.findOne({ token: btc.address.toLowerCase(), id: user1.address.toLowerCase() }).lean();
+        let userPositionPre = await User.findOne({ token: btc.address.toLowerCase(), id: user1.address.toLowerCase() }).lean();
 
         let userInOrder = userPositionPre?.inOrderBalance ?? '0';
 
@@ -153,7 +153,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
                 }
             );
 
-        let userPositionPost = await UserPosition.findOne({ token: btc.address.toLowerCase(), id: user1.address.toLowerCase() }).lean()
+        let userPositionPost = await User.findOne({ token: btc.address.toLowerCase(), id: user1.address.toLowerCase() }).lean()
         // console.log(res)
         expect(res).to.have.status(201);
         expect(res.body.status).to.be.equal(true);
@@ -166,7 +166,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
     it(`find created order in data base`, async () => {
 
-        let data = await OrderCreated.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
+        let data = await Order.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
         expect(data).to.be.an('object');
         expect(data.amount).to.equal(amount);
         expect(data.maker).to.equal(user1.address.toLowerCase());
@@ -187,7 +187,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         user1UsdcBalancePre = promise[3].toString()
 
         // inOrder Balance
-        let userPositionPre = await UserPosition.findOne({ token: btc.address.toLowerCase(), id: user1.address.toLowerCase() }).lean();
+        let userPositionPre = await User.findOne({ token: btc.address.toLowerCase(), id: user1.address.toLowerCase() }).lean();
 
         userInOrderPre = userPositionPre?.inOrderBalance ?? '0';
 
@@ -261,8 +261,8 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     it(`find executed Order, check inOrderBalance`, async () => {
         // console.log("txnId=",txnId, "orderId", orderId)
         let executeOrder = await OrderExecuted.findOne({ id: orderId }).lean();
-        let userPosition = await UserPosition.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()! as any;
-        let orderCreated = await OrderCreated.findOne({ id: orderId }).lean()! as any;
+        let userPosition = await User.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()! as any;
+        let orderCreated = await Order.findOne({ id: orderId }).lean()! as any;
 
         expect(orderCreated?.balanceAmount).to.equal(Big(orderCreated.amount).minus(btcAmount).toString())
         expect(executeOrder).not.to.be.null;
@@ -278,7 +278,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
     it(`user1 cancell order 0.2 btc, check order, inOrderbalance `, async () => {
 
-        let userPositionPre = await UserPosition.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()
+        let userPositionPre = await User.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()
 
         let exTxn = await exchange.connect(user1).cancelOrder(
             signatures[0],
@@ -303,8 +303,8 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         }
         let res = await wait()
         expect(res).to.equal("Success")
-        let order = await OrderCreated.findOne({ id: orderId }).lean();
-        let userPositionPost = await UserPosition.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()
+        let order = await Order.findOne({ id: orderId }).lean();
+        let userPositionPost = await User.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()
         expect(order).to.be.an('object');
         expect(order?.cancelled).to.equal(true);
         expect(userPositionPost).to.be.an('object');

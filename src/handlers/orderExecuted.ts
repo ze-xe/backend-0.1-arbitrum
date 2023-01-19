@@ -1,6 +1,6 @@
-import { PairCreated, OrderCreated, OrderExecuted, UserPosition} from "../DB/db";
+import { Pair, Order, OrderExecuted, } from "../DB/db";
 import Big from "big.js";
-import { ifOrderCreated, ifPairCreated, ifUserPosition } from "../helper/interface";
+import { ifOrderCreated, ifPair} from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 import { sentry } from "../../app";
 import { getLoop, loopFillAmount } from "./helper/getLoop";
@@ -32,13 +32,13 @@ export async function handleOrderExecuted(data: any, argument: any) {
         argument.taker = taker;
         argument.fillAmount = fillAmount;
 
-        let getOrderDetails: ifOrderCreated = await OrderCreated.findOne({ id: id, chainId: argument.chainId }).lean();
+        let getOrderDetails: ifOrderCreated = await Order.findOne({ id: id, chainId: argument.chainId }).lean();
 
         if (!getOrderDetails) {
             return console.log("OrderId not found @ execute", id);
         }
 
-        let getPairDetails: ifPairCreated | null = await PairCreated.findOne({ id: getOrderDetails.pair, chainId: getOrderDetails.chainId, active: true }).lean();
+        let getPairDetails: ifPair | null = await Pair.findOne({ id: getOrderDetails.pair, chainId: getOrderDetails.chainId, active: true }).lean();
 
         if (!getPairDetails) {
             return console.log(`Pair Id not found in order Executed`);
@@ -58,7 +58,7 @@ export async function handleOrderExecuted(data: any, argument: any) {
         await OrderExecuted.create(argument);
         let priceDiff = new Big(getOrderDetails.exchangeRate).minus(getPairDetails.exchangeRate).toString();
 
-        await PairCreated.findOneAndUpdate(
+        await Pair.findOneAndUpdate(
             { _id: getPairDetails._id.toString() },
             { $set: { exchangeRate: getOrderDetails.exchangeRate, priceDiff: priceDiff, exchangeRateDecimals: argument.exchangeRateDecimals } }
         );

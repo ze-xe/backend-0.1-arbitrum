@@ -1,5 +1,5 @@
 import Big from "big.js";
-import { UserPosition } from "../../../DB/db";
+import { User } from "../../../DB/db";
 import { errorMessage } from "../../../helper/errorMessage";
 import { multicall } from "../../../muticall/muticall";
 
@@ -18,7 +18,7 @@ export async function validationAndUserPosition(data: any, chainId: string, ipfs
         let token;
         let amount = data.amount;
         if (data.orderType == 1) {
-             findUserPosition = await UserPosition.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
+             findUserPosition = await User.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
             if (!ipfs) {
                 multicallData = await multicall(data.token0, data.maker, chainId)
                 if (multicallData) {
@@ -29,7 +29,7 @@ export async function validationAndUserPosition(data: any, chainId: string, ipfs
             token = data.token0
         }
         else if (data.orderType == 0) {
-            findUserPosition = await UserPosition.findOne({ id: data.maker, token: data.token1, chainId: chainId }).lean();
+            findUserPosition = await User.findOne({ id: data.maker, token: data.token1, chainId: chainId }).lean();
             if (!ipfs) {
                 multicallData = await multicall(data.token1, data.maker, chainId)
                 if (multicallData) {
@@ -57,7 +57,7 @@ export async function validationAndUserPosition(data: any, chainId: string, ipfs
                 return { status: false, error: errorMessage.balance, statusCode: 400 };
             }
 
-            await UserPosition.findOneAndUpdate(
+            await User.findOneAndUpdate(
                 { _id: _id },
                 { $set: { inOrderBalance: currentInOrderBalance } }
             );
@@ -73,7 +73,7 @@ export async function validationAndUserPosition(data: any, chainId: string, ipfs
                 return { status: false, error: errorMessage.balance, statusCode: 400 };
             }
 
-            UserPosition.create(
+            User.create(
                 {
                     token: token,
                     chainId: chainId,

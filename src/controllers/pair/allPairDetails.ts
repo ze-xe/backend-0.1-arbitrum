@@ -1,7 +1,7 @@
 
-import { ifPairCreated } from "../../helper/interface";
+import { ifPair } from "../../helper/interface";
 
-import { PairCreated, Token } from "../../DB/db";
+import { Pair, Token } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage"
 import { sentry } from "../../../app";
 
@@ -22,7 +22,7 @@ export async function getAllPairDetails(req: any, res: any) {
         if (!chainId) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
-        let allPairs: ifPairCreated[] = await PairCreated.find({ chainId: chainId, active: true }).lean();
+        let allPairs: ifPair[] = await Pair.find({ chainId: chainId, active: true }).lean();
 
         let data: any = [];
 

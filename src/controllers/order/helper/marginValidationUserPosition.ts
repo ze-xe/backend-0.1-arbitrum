@@ -1,7 +1,7 @@
 import Big from "big.js";
 import { ethers } from "ethers";
 import { sentry } from "../../../../app";
-import { Token, UserPosition } from "../../../DB/db";
+import { Token, User } from "../../../DB/db";
 import { getLeverAddress } from "../../../helper/chain";
 import { errorMessage } from "../../../helper/errorMessage";
 import { ifUserPosition } from "../../../helper/interface";
@@ -184,15 +184,15 @@ import { getABI, getProvider } from "../../../utils/utils";
 //         }
 
 
-//         let isPairExist: ifPairCreated = await PairCreated.findOne({ token0: data.token0, token1: data.token1, chainId: chainId, active: true }).lean();
-//         let createPair: ifPairCreated | any;
+//         let isPairExist: ifPair = await Pair.findOne({ token0: data.token0, token1: data.token1, chainId: chainId, active: true }).lean();
+//         let createPair: ifPair | any;
 
 //         if (!isPairExist) {
 //             // cheking for opposite pair
 //             let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], [data.token1, data.token0]);
 //             let id = ethers.utils.keccak256(encoder);
 
-//             let isPairExist1: ifPairCreated = await PairCreated.findOne({ id: id, active: true }).lean();;
+//             let isPairExist1: ifPair = await Pair.findOne({ id: id, active: true }).lean();;
 
 //             if (isPairExist1) {
 //                 createPair = isPairExist1;
@@ -221,7 +221,7 @@ import { getABI, getProvider } from "../../../utils/utils";
 //                     marginEnabled: marginEnabled,
 //                     active: true
 //                 }
-//                 createPair = await PairCreated.create(temp);
+//                 createPair = await Pair.create(temp);
 
 //                 console.log("Pair Created ", "T0 ", data.token0, "T1 ", data.token1, "CId ", chainId);
 
@@ -341,9 +341,9 @@ export async function marginValidationAndUserPosition(signature: string, data: a
             }
         }
 
-        const findUserPosition0: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
+        const findUserPosition0: ifUserPosition | null = await User.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
         // for new order , will sell token1
-        const findUserPosition1: ifUserPosition | null = await UserPosition.findOne({ id: data.maker, token: data.token1, chainId: chainId }).lean();
+        const findUserPosition1: ifUserPosition | null = await User.findOne({ id: data.maker, token: data.token1, chainId: chainId }).lean();
 
         let token0CurrentInOrder = Big(findUserPosition0?.inOrderBalance ?? 0).plus(amount).toNumber();
 
@@ -383,13 +383,13 @@ export async function marginValidationAndUserPosition(signature: string, data: a
             if (findUserPosition0) {
 
                 let _id = findUserPosition0._id.toString();
-                await UserPosition.findOneAndUpdate(
+                await User.findOneAndUpdate(
                     { _id: _id },
                     { $set: { inOrderBalance: token0CurrentInOrder } }
                 );
             } else {
 
-                UserPosition.create(
+                User.create(
                     {
                         token: data.token0,
                         chainId: chainId,
@@ -400,7 +400,7 @@ export async function marginValidationAndUserPosition(signature: string, data: a
 
             }
             if (!findUserPosition1) {
-                UserPosition.create(
+                User.create(
                     {
                         token: data.token1,
                         chainId: chainId,
@@ -421,13 +421,13 @@ export async function marginValidationAndUserPosition(signature: string, data: a
             if (findUserPosition1) {
 
                 let _id = findUserPosition1._id.toString();
-                await UserPosition.findOneAndUpdate(
+                await User.findOneAndUpdate(
                     { _id: _id },
                     { $set: { inOrderBalance: token1CurrentInOrder } }
                 );
             } else {
 
-                UserPosition.create(
+                User.create(
                     {
                         token: data.token1,
                         chainId: chainId,
@@ -438,7 +438,7 @@ export async function marginValidationAndUserPosition(signature: string, data: a
 
             }
             if (!findUserPosition0) {
-                UserPosition.create(
+                User.create(
                     {
                         token: data.token0,
                         chainId: chainId,
