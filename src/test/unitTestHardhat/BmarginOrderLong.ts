@@ -190,7 +190,8 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
 
                     },
                     "signature": storedSignature,
-                    "chainId": chainId
+                    "chainId": chainId,
+                    "ipfs": true,
                 }
             );
         console.log(res.body)

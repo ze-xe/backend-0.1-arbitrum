@@ -93,21 +93,6 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
         expect(user1BtcBalancePost).to.equal(parseEther(Big(btcAmount).plus(user1BtcBalancePre).toString()));
         expect(user2UsdcBalancePost).to.equal(parseEther(Big(usdcAmount).plus(user2UsdcBalancePre).toString()));
 
-        let wait = () => {
-            return new Promise((resolve, reject) => {
-
-                let timeOutId = setTimeout(() => {
-                    return resolve("Success")
-                }, 5000)
-
-                socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
-                    clearTimeout(timeOutId)
-                    return resolve("Success")
-                })
-            })
-        }
-        let res = await wait()
-
     });
 
 
@@ -181,6 +166,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
                     },
                     "signature": storedSignature.toLowerCase(),
                     "chainId": chainId,
+                    "ipfs": true,
                 }
             );
 
