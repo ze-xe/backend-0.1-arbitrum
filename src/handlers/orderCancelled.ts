@@ -2,7 +2,7 @@ import { Order, User } from "../DB/db";
 import Big from "big.js";
 import { ifOrderCreated, ifUserPosition } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
-import { sentry } from "../../app";
+import * as sentry from "@sentry/node";
 
 
 

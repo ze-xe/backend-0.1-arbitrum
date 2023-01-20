@@ -2,7 +2,7 @@ import { Pair, Order, OrderExecuted, } from "../DB/db";
 import Big from "big.js";
 import { ifOrderCreated, ifPair} from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
-import { sentry } from "../../app";
+import * as sentry from "@sentry/node";
 import { getLoop, loopFillAmount } from "./helper/getLoop";
 import { updateUserPosition } from "./helper/updateUserPosition";
 import { marginUpdateUserPosition } from "./helper/marginUpdateUserPosition";

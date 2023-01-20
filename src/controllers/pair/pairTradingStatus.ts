@@ -1,5 +1,5 @@
 import { OrderExecuted } from "../../DB/db";
-import { sentry } from "../../../app";
+import * as sentry from "@sentry/node";
 
 
 

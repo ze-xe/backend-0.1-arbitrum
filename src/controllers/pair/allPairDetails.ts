@@ -3,7 +3,7 @@ import { ifPair } from "../../helper/interface";
 
 import { Pair, Token } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage"
-import { sentry } from "../../../app";
+import * as sentry from "@sentry/node";
 
 
 

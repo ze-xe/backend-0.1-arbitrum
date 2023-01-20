@@ -51,6 +51,7 @@ describe("Margin Order Short=> Mint token, create order, execute order, cancel o
     let orderType = 3 // long
 
     before(async () => {
+        
         [owner, user1, user2] = await ethers.getSigners();
         let deployment = await deploy(owner.address);
         usdc = deployment.usdc;
@@ -260,12 +261,18 @@ describe("Margin Order Short=> Mint token, create order, execute order, cancel o
                         Big(btcAmount)
                             .times(exchangeRate)
                             .div(Big(10).pow(18))).toString()))
+        let wait = () => {
+            return new Promise((resolve, reject) => {
 
+                let timeOutId = setTimeout(() => {
+                    return resolve("Success")
+                }, 7000)
+            })
+        }
+        let res = await wait()
     });
 
     it(`cancelled  order `, async () => {
-
-
 
         let exTxn = await exchange.connect(user1).cancelOrder(
             signatures[0],
@@ -279,11 +286,6 @@ describe("Margin Order Short=> Mint token, create order, execute order, cancel o
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
                 }, 7000)
-
-                socket.on(EVENT_NAME.CANCEL_ORDER, (data) => {
-                    clearTimeout(timeOutId)
-                    return resolve("Success")
-                })
             })
         }
         let res = await wait()

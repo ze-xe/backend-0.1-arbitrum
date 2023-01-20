@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { sentry } from "../../../app";
+import * as sentry from "@sentry/node";
 
 
 

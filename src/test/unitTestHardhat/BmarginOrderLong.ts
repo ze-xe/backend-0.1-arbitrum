@@ -9,7 +9,7 @@ import { getProvider, parseEther } from "../../utils/utils";
 import { getExchangeAddress, getVersion } from "../../helper/chain";
 import { io } from "socket.io-client";
 import path from "path";
-import {  Order, Sync } from "../../DB/db";
+import { Order, Sync } from "../../DB/db";
 import { ifOrderCreated } from "../../helper/interface";
 import { getConfig } from "../../helper/constant";
 import { deploy } from "../helper/contractDeploy";
@@ -62,9 +62,10 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
 
     });
 
-    after((done) => {
+    after(async () => {
         socket.disconnect()
-        done()
+        
+        
     })
 
     it('mint 10 btc to user1, 10 btc to user2, approve exchange contract', async () => {
@@ -259,6 +260,15 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
                             .times(exchangeRate)
                             .div(Big(10).pow(18))).toString()))
 
+        let wait = () => {
+            return new Promise((resolve, reject) => {
+
+                let timeOutId = setTimeout(() => {
+                    return resolve("Success")
+                }, 7000)
+            })
+        }
+        let res = await wait()
     });
 
     it(`cancelled  order `, async () => {
@@ -275,11 +285,6 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
                 }, 7000)
-
-                socket.on(EVENT_NAME.CANCEL_ORDER, (data) => {
-                    clearTimeout(timeOutId)
-                    return resolve("Success")
-                })
             })
         }
         let res = await wait()

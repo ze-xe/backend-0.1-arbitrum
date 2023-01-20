@@ -4,7 +4,7 @@ import { ifOrderCreated, ifPair } from "../../helper/interface";
 import { Pair, Order } from "../../DB/db";
 import { Decimals } from "../../helper/constant";
 import { errorMessage } from "../../helper/errorMessage"
-import { sentry } from "../../../app";
+import * as sentry from "@sentry/node";
 
 
 

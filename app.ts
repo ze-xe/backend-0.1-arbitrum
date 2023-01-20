@@ -1,5 +1,5 @@
 import express from "express";
-import { connect, backupConnection } from "./src/DB/db";
+import { connect } from "./src/DB/db";
 import cors from "cors";
 const app = express();
 import orderRoute from "./src/routes/orderRoute";
@@ -10,14 +10,14 @@ import DBRoute from "./src/routes/DBRoute"
 import helmet from "helmet";
 import { start } from "./src/utils/appUtil";
 import { createServer } from "http";
-export const httpServer = createServer(app);
 import morgan from 'morgan';
-import { expressMonitorConfig } from "./src/utils/utils";
 import * as Sentry from "@sentry/node";
 import * as Tracing from "@sentry/tracing";
 import { getVersion } from "./src/helper/chain";
+import compression from "compression";
+import { expressMonitorConfig } from "./src/utils/expressMonitorConfig";
+const httpServer = createServer(app);
 
-export const sentry = Sentry
 
 Sentry.init({
     // @ts-ignore
@@ -36,6 +36,8 @@ Sentry.init({
 app.use(Sentry.Handlers.requestHandler());
 
 app.use(Sentry.Handlers.tracingHandler());
+
+app.use(compression());
 
 app.use(require('express-status-monitor')(
     expressMonitorConfig
@@ -66,18 +68,13 @@ app.get("/debug-sentry", function mainHandler(req, res) {
 });
 
 
-export async function run() {
-    try {
-        if (process.env.NODE_ENV == "test") {
-            await start("31337")
-        } else {
-            await start("421613")
-        }
-    }
-    catch (error) {
-        console.log("Error @ run", error);
-    }
+
+if (process.env.NODE_ENV == "test") {
+    start("31337", httpServer)
+} else {
+    start("421613", httpServer)
 }
+
 
 
 // The error handler must be before any other error middleware and after all controllers
@@ -89,10 +86,16 @@ app.use(function onError(err: any, req: any, res: any, next: any) {
     res.end(res.sentry + "\n");
 });
 
-httpServer.listen(3010, function () {
+
+
+let server = httpServer.listen(3010, function () {
     console.log("app running on port " + (3010));
 });
 
+function stop() {
+    server.close();
+}
 
-
+module.exports = server;
+module.exports.stop = stop;
 // set NODE_ENV=test && mocha -r ts-node/register --timeout 180000 ./src/test/api/BmarginOrderLong.ts

@@ -7,7 +7,7 @@ import { mainIPFS } from "../../IPFS/putFiles";
 import { errorMessage } from "../../helper/errorMessage";
 import { EVENT_NAME, socketService } from "../../socketIo/socket.io";
 import { marginValidationAndUserPosition} from "./helper/marginValidationUserPosition";
-import { sentry } from "../../../app";
+import * as sentry from "@sentry/node";
 import { getPairId } from "./helper/pairId";
 import { validationAndUserPosition } from "./helper/validationUserPosition";
 import { validateSignature } from "../../utils/validateSignature";

@@ -7,8 +7,8 @@ import mongoose from "mongoose";
 import { startOrderStatus } from "../muticall/updateOrderStatus";
 import { ifOrderCreated } from "../helper/interface";
 import { socketService } from "../socketIo/socket.io";
-import { httpServer, sentry } from "../../app";
 import { getVersion } from "../helper/chain";
+import * as sentry from "@sentry/node";
 require("dotenv").config();
 
 
@@ -16,7 +16,7 @@ require("dotenv").config();
  * @dev this function would check if there is any data in OrderCreated collection of main DB, if there is any data then it will  call historicEventListner and startOrderStatus. if there is no data in OrderCreated collection then it will search in backup collection and if there is any data then it will get signature and value and call order create api and call historicEventListner startOrderStatus functions.
  * @param {*} chainId (string) numeric chainId
  */
-async function start(chainId: string) {
+async function start(chainId: string, httpServer: any) {
     try {
         let getCreateRecords: ifOrderCreated[] = await Order.find();
 
@@ -76,16 +76,6 @@ async function start(chainId: string) {
         console.log("Error @ start", error);
     }
 }
-
-// setTimeout(()=>{
-//     setInterval(async ()=>{
-//         let result: AxiosResponse = await axios({
-//             method: "get",
-//             url: "http://localhost:3010/pair/allpairs?chainId=421613",
-//         });
-//     },10)
-// },10000)
-
 
 
 export { start };

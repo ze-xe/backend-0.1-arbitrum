@@ -6,11 +6,11 @@ use(chaiHttp);
 import { ethers } from "ethers";
 import Big from "big.js";
 import { EVENT_NAME } from "../../socketIo/socket.io";
-import { getERC20ABI, getExchangeABI, getProvider, leverageAbi, parseEther } from "../../utils/utils";
+import {  getProvider, parseEther } from "../../utils/utils";
 import { getExchangeAddress } from "../../helper/chain";
 import { io } from "socket.io-client";
 import path from "path";
-import { connect, OrderCreated, Sync } from "../../DB/db";
+import { connect, Order, Sync } from "../../DB/db";
 import { ifOrderCreated } from "../../helper/interface";
 import { getConfig, getContract } from "../../helper/constant";
 
@@ -154,7 +154,7 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
 
     it(`find created order in data base`, async () => {
 
-        let data = await OrderCreated.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
+        let data = await Order.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
         expect(data).to.be.an('object');
         expect(data.amount).to.equal(amount);
         expect(data.maker).to.equal(user1.address.toLowerCase());
@@ -239,7 +239,7 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
         }
         let res = await wait()
         expect(res).to.equal("Success")
-        let data = await OrderCreated.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
+        let data = await Order.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
         expect(data).to.be.an('object')
         expect(data).not.to.be.null;
         expect(data.cancelled).to.equal(true)

@@ -6,13 +6,13 @@ use(chaiHttp);
 import { ethers } from "ethers";
 import Big from "big.js";
 import { EVENT_NAME } from "../../socketIo/socket.io";
-import { getERC20ABI, getExchangeABI, getProvider, leverageAbi, parseEther } from "../../utils/utils";
+import {  getProvider, parseEther } from "../../utils/utils";
 import { getExchangeAddress } from "../../helper/chain";
 import { io } from "socket.io-client";
 import path from "path";
-import { connect, OrderCreated, Sync } from "../../DB/db";
+import { connect, Order, Sync } from "../../DB/db";
 import { ifOrderCreated } from "../../helper/interface";
-import { contractName, getContract, version } from "../../helper/constant";
+import {  getConfig, getContract } from "../../helper/constant";
 
 
 
@@ -31,12 +31,12 @@ describe("Margin Order Short=> Mint token, create order, execute order, cancel o
     let chainId = "421613"
     let provider = getProvider(chainId);
 
-    let exchange = getContract("Exchange")
-    let btc = getContract("BTC")
-    let usdc = getContract("USDC")
-    let lever = getContract("Lever")
-    let cUsdc = getContract("lUSDC_Market")
-    let cBtc = getContract("lBTC_Market")
+    let exchange = getContract("Exchange", chainId)
+    let btc = getContract("BTC", chainId)
+    let usdc = getContract("USDC", chainId)
+    let lever = getContract("Lever", chainId)
+    let cUsdc = getContract("lUSDC_Market", chainId)
+    let cBtc = getContract("lBTC_Market", chainId)
     let user1 = new ethers.Wallet(process.env.PRIVATE_KEY1! as string).connect(provider); //2
     let user2 = new ethers.Wallet(process.env.PRIVATE_KEY2! as string).connect(provider); //1
 
@@ -58,8 +58,8 @@ describe("Margin Order Short=> Mint token, create order, execute order, cancel o
     })
     it(`user1 create short margin order 1 btc @ 20000}`, async () => {
         const domain = {
-            name: contractName,
-            version: version,
+            name: getConfig("name"),
+            version: getConfig("version"),
             chainId: chainId.toString(),
             verifyingContract: getExchangeAddress(chainId),
         };
@@ -105,7 +105,7 @@ describe("Margin Order Short=> Mint token, create order, execute order, cancel o
             value, storedSignature
         ]);
         let res = await request("http://localhost:3010")
-            .post(`/v/${version}/order/create`)
+            .post(`/v/${getConfig("version")}/order/create`)
             .send(
                 {
                     "data": {
@@ -134,7 +134,7 @@ describe("Margin Order Short=> Mint token, create order, execute order, cancel o
 
     it(`find created order in data base`, async () => {
 
-        let data = await OrderCreated.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
+        let data = await Order.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
         expect(data).to.be.an('object');
         expect(data.amount).to.equal(amount);
         expect(data.maker).to.equal(user1.address.toLowerCase());
@@ -210,7 +210,7 @@ describe("Margin Order Short=> Mint token, create order, execute order, cancel o
 
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
-                }, 15000)
+                }, 10000)
 
                 socket.on(EVENT_NAME.CANCEL_ORDER, (data) => {
                     clearTimeout(timeOutId)
@@ -220,7 +220,7 @@ describe("Margin Order Short=> Mint token, create order, execute order, cancel o
         }
         let res = await wait()
         expect(res).to.equal("Success")
-        let data = await OrderCreated.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
+        let data = await Order.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
         expect(data).to.be.an('object')
         expect(data).not.to.be.null;
         expect(data.cancelled).to.equal(true)

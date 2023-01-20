@@ -15,8 +15,8 @@ import { getConfig, getContract } from "../../helper/constant";
 use(chaiHttp);
 
 
-require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
-
+// require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
+require("dotenv").config();
 const socket = io("http://localhost:3010");
 
 
@@ -48,10 +48,8 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
     let orderType = 1; // 1 for sell 0 for buy
     let btcAmount = ""
     let userInOrderPre = '0';
-    before(async () => { //Before each test we empty the database   
-        // await mongoose.createConnection(process.env.MONGO_URL! as string).dropDatabase();
-        // httpServer
-        await connect()
+    before(async () => { 
+        await require('../../../app')
     });
 
     it('mint 10 btc to user1, 200000 usdt to user2, approve exchange contract', async () => {
@@ -241,7 +239,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
 
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
-                }, 60000)
+                }, 10000)
 
                 socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
                     clearTimeout(timeOutId)
@@ -296,7 +294,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
 
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
-                }, 60000)
+                }, 15000)
 
                 socket.on(EVENT_NAME.CANCEL_ORDER, (data) => {
                     clearTimeout(timeOutId)

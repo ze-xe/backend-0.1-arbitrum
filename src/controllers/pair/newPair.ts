@@ -1,4 +1,4 @@
-import { sentry } from "../../../app";
+import * as sentry from "@sentry/node";
 import { Pair, Token } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 import { ifPair } from "../../helper/interface";

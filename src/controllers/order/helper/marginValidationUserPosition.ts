@@ -1,6 +1,6 @@
 import Big from "big.js";
 import { ethers } from "ethers";
-import { sentry } from "../../../../app";
+import * as sentry from "@sentry/node";
 import { Token, User } from "../../../DB/db";
 import { getLeverAddress } from "../../../helper/chain";
 import { errorMessage } from "../../../helper/errorMessage";

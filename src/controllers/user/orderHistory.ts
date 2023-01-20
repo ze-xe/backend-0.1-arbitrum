@@ -1,6 +1,6 @@
 
 
-import { sentry } from "../../../app";
+import * as sentry from "@sentry/node";
 import { OrderExecuted } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 

@@ -20,10 +20,6 @@ export function loopFillAmount(amount: string, borrowLimit: any, loop: any) {
 
 
 
-// let temp = Math.log(-(s * (1 - x) + a * (1 - x) - a) / a)
-// n = temp / Math.log(x);
-// console.log(n)
-
 
 export function getLoop(totalSum:string,borrowLimit: string,orderAmount: string){
 
@@ -42,4 +38,10 @@ export function getLoop(totalSum:string,borrowLimit: string,orderAmount: string)
     return loop
 }
 
-// getLoop('1000000000000000000',"750000", "1000000000000000000" )
+
+// formula for calculating loop
+// let temp = Math.log(-(s * (1 - x) + a * (1 - x) - a) / a)
+// n = temp / Math.log(x);
+// console.log(n)
+
+

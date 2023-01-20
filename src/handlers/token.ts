@@ -1,7 +1,7 @@
 import { Token } from "../DB/db";
 import { getABI, getProvider } from "../utils/utils";
 import { ethers } from "ethers";
-import { sentry } from "../../app";
+import * as sentry from "@sentry/node";
 
 
 

@@ -1,5 +1,5 @@
 
-import { sentry } from "../../../app";
+import * as sentry from "@sentry/node";
 import { Pair } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 

@@ -11,7 +11,7 @@ import { ifOrderCreated } from "../../helper/interface";
 import { getConfig, getContract } from "../../helper/constant";
 import { handleOrderCancelled } from "../../handlers/orderCancelled";
 import { handleOrderExecuted } from "../../handlers/orderExecuted";
-import mongoose from "mongoose";
+
 
 
 // require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
@@ -46,11 +46,11 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
     let orderType = 1 // sell
 
     before(async () => {   
-        require('../../../app')
+    //     require('../../../app')
     });
 
     after((done) => {
-        require('../../../app').stop()
+        // require('../../../app').stop()
         done()
     })
 

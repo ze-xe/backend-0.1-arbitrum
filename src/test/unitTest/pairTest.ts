@@ -6,7 +6,7 @@ import chaiHttp from "chai-http";
 import mongoose from "mongoose";
 use(chaiHttp);
 
-import { version } from "../../helper/constant";
+import { getConfig } from "../../helper/constant";
 
 
 
@@ -34,7 +34,7 @@ describe('Testing Pair Api', () => {
         it('it should  have atleast a pair', async () => {
 
             let res = await request("http://localhost:3010")
-                .get(`/v/${version}/pair/allpairs?chainId=421613`)
+                .get(`/v/${getConfig("version")}/pair/allpairs?chainId=421613`)
             expect(res).to.have.status(200);
             expect(res.body).to.be.an('object');
             expect(res.body.data).to.be.an('array');
@@ -45,7 +45,7 @@ describe('Testing Pair Api', () => {
 
         it('it should send error for not providing chainId', async () => {
             let res = await request("http://localhost:3010")
-                .get(`/v/${version}/pair/allpairs`)
+                .get(`/v/${getConfig("version")}/pair/allpairs`)
 
             expect(res).to.have.status(400);
             expect(res.body.status).to.be.equal(false);

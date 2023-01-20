@@ -1,7 +1,7 @@
 import { Pair, Token } from "../DB/db";
 import {  getABI, getProvider } from "../utils/utils";
 import { ethers } from "ethers";
-import { sentry } from "../../app";
+import * as sentry from "@sentry/node";
 
 
 
@@ -21,6 +21,7 @@ export async function handleMarginEnabled(data: string[], argument: any) {
             else if (isTokenExist.marginEnabled == false) {
                 await Token.findOneAndUpdate({ id: token, active: true }, { $set: { marginEnabled: true, cId: cToken } });
                 symbol = isTokenExist.symbol;
+                console.log("Margin Enabled ", token, chainId, symbol);
             }
         }
 
@@ -47,7 +48,6 @@ export async function handleMarginEnabled(data: string[], argument: any) {
             };
 
             await Token.create(temp);
-
             console.log("Token Added from margin enable", token, chainId, symbol);
         }
 
@@ -65,8 +65,7 @@ export async function handleMarginEnabled(data: string[], argument: any) {
                     await Pair.findOneAndUpdate(
                         { _id: isPairExist._id },
                         { $set: { marginEnabled: true } }
-                    )
-                    
+                    )               
                 }
             }
             else {
@@ -82,16 +81,12 @@ export async function handleMarginEnabled(data: string[], argument: any) {
                         await Pair.findOneAndUpdate(
                             { _id: isPairExist._id },
                             { $set: { marginEnabled: true } }
-                        )
-                        
+                        )              
                     }
-
                 }
-
             }
-
         }
-
+        
     }
     catch (error) {
         sentry.captureException(error)

@@ -13,9 +13,11 @@ import path from "path";
 import { EVENT_NAME } from "../../socketIo/socket.io";
 import {  } from "../../helper/constant";
 import { deploy } from "../helper/contractDeploy";
-import { run } from "../../../app";
 import mongoose from "mongoose";
 import { getTestConfig } from "../helper/addresses";
+import { historicEventListner } from "../../sync/sync";
+import { ExchangeConfig } from "../../sync/configs/exchange";
+
 use(chaiHttp);
 //@ts-ignore
 const ethers = hre.ethers;
@@ -46,6 +48,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
     let txnId = ""
     let userInOrderPre = '0';
     before(async () => {
+        await require('../../../app')
         await mongoose.createConnection(process.env.MONGO_URL + `-backup-zexe-${_version}?retryWrites=true&w=majority`! as string).dropDatabase();
         await mongoose.createConnection(process.env.MONGO_URL1 + `-zexe-${_version}?retryWrites=true&w=majority`! as string).dropDatabase();
         [owner, user1, user2] = await ethers.getSigners();
@@ -53,11 +56,10 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
         usdc = deployment.usdc;
         btc = deployment.btc;
         exchange = deployment.exchange 
-        await run();
+        await historicEventListner(ExchangeConfig(chainId));
     });
-    after((done) => {
-        socket.disconnect()
-        done()
+    after(async () => {
+        socket.disconnect()  
     })
 
     it('mint 10 btc to user1, 200000 usdt to user2, approve exchange contract', async () => {
@@ -252,12 +254,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
 
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
-                }, 5000)
-
-                socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
-                    clearTimeout(timeOutId)
-                    return resolve("Success")
-                })
+                }, 7000)
             })
         }
 
@@ -284,7 +281,15 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
         expect(executeOrder?.exchangeRate).to.equal(exchangeRate);
         expect(userPosition).not.to.be.null;
         expect(userPosition?.inOrderBalance).to.equal(Big(userInOrderPre).minus(btcAmount).toString())
+        let wait = () => {
+            return new Promise((resolve, reject) => {
 
+                let timeOutId = setTimeout(() => {
+                    return resolve("Success")
+                }, 5000)
+            })
+        }
+        let res = await wait()
     })
 
 

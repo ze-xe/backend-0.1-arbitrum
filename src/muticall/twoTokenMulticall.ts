@@ -1,7 +1,7 @@
 import { BigNumber, ethers } from "ethers";
 import {  getProvider, getInterface, getABI } from "../utils/utils";
 import { getExchangeAddress, getMulticallAddress } from "../helper/chain";
-import { sentry } from "../../app";
+import * as sentry from "@sentry/node";
 
 
 

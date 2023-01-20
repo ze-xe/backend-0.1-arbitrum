@@ -3,7 +3,7 @@ import { User, Order } from "../DB/db";
 import Big from "big.js";
 import { getABI, getProvider, getInterface} from "../utils/utils";
 import { ifOrderCreated, ifUserPosition } from "../helper/interface";
-import { sentry } from "../../app";
+import * as sentry from "@sentry/node";
 import { getMulticallAddress } from "../helper/chain";
 
 

@@ -3,7 +3,7 @@
 import { Pair, Order } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 import { ifOrderCreated, ifPair } from "../../helper/interface";
-import { sentry } from "../../../app";
+import * as sentry from "@sentry/node";
 import { getMultiBalance } from "../../muticall/getMultiBalance";
 
 

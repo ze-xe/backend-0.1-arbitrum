@@ -1,5 +1,5 @@
 import Big from "big.js";
-import { sentry } from "../../../app";
+import * as sentry from "@sentry/node";
 import { connect, OrderExecuted, Pair, Token } from "../../DB/db";
 import { ifPair } from "../../helper/interface";
 

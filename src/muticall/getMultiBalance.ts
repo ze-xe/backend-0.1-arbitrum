@@ -5,7 +5,7 @@ import { User, Order } from "../DB/db";
 import Big from "big.js";
 import { getProvider, getInterface, getABI } from "../utils/utils";
 import { ifOrderCreated, ifUserPosition, orderSignature } from "../helper/interface";
-import { sentry } from "../../app";
+import * as sentry from "@sentry/node";
 import { getMulticallAddress } from "../helper/chain";
 
 
