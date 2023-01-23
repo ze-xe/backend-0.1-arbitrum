@@ -55,10 +55,11 @@ app.use(cors({
 app.use(helmet());
 app.use(express.json());
 
-let version = getVersion(process.env.NODE_ENV!)
-app.use(`/v/${version}/pair`, pairRoutes);
-app.use(`/v/${version}/user`, userRoute);
-app.use(`/v/${version}/chart`, chartRoute)
+// let version = getVersion(process.env.NODE_ENV!);
+// console.log("version", version)
+app.use(`/v/${getVersion(process.env.NODE_ENV!)}/pair`, pairRoutes);
+app.use(`/v/${getVersion(process.env.NODE_ENV!)}/user`, userRoute);
+app.use(`/v/${getVersion(process.env.NODE_ENV!)}/chart`, chartRoute)
 app.use(DBRoute)
 app.use(orderRoute);
 

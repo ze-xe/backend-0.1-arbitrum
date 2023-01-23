@@ -49,7 +49,8 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
     let btcAmount = ""
     let userInOrderPre = '0';
     before(async () => { 
-        await require('../../../app')
+        // await require('../../../app')
+        await connect()
     });
 
     it('mint 10 btc to user1, 200000 usdt to user2, approve exchange contract', async () => {

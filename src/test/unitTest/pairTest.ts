@@ -17,16 +17,6 @@ describe('Testing Pair Api', () => {
       */
     describe('Get(/pair/allpairs)', async () => {
         after((done)=>{
-            mongoose.connection.close()
-
-            let wait = () => {
-                return new Promise((resolve, reject) => {
-    
-                    let timeOutId = setTimeout(() => {
-                        return resolve("Success")
-                    }, 20000)
-                })
-            }
             done()
             // process.exit(0)
            

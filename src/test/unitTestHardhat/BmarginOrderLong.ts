@@ -15,6 +15,7 @@ import { getConfig } from "../../helper/constant";
 import { deploy } from "../helper/contractDeploy";
 import { historicEventListner } from "../../sync/sync";
 import { ExchangeConfig } from "../../sync/configs/exchange";
+import hre from "hardhat";
 
 
 

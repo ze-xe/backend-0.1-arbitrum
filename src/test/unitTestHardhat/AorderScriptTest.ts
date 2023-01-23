@@ -20,6 +20,7 @@ import { ExchangeConfig } from "../../sync/configs/exchange";
 
 use(chaiHttp);
 //@ts-ignore
+
 const ethers = hre.ethers;
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 
@@ -48,14 +49,18 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
     let txnId = ""
     let userInOrderPre = '0';
     before(async () => {
-        await require('../../../app')
+        
         await mongoose.createConnection(process.env.MONGO_URL + `-backup-zexe-${_version}?retryWrites=true&w=majority`! as string).dropDatabase();
         await mongoose.createConnection(process.env.MONGO_URL1 + `-zexe-${_version}?retryWrites=true&w=majority`! as string).dropDatabase();
+        await require('../../../app');
         [owner, user1, user2] = await ethers.getSigners();
         let deployment = await deploy(owner.address);
         usdc = deployment.usdc;
         btc = deployment.btc;
         exchange = deployment.exchange 
+        console.log("Mulicall", deployment.multicall.address)
+        console.log("Exchange", exchange.address)
+        console.log("btc", btc.address)
         await historicEventListner(ExchangeConfig(chainId));
     });
     after(async () => {
