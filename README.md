@@ -121,7 +121,7 @@ interval is mandatory which must be greater than 300000 miliseconds
                 "open": "16600",
                 "high": "18000",
                 "close": "18000",
-                "low": "16600"
+                "low": "16601"
             },
             ...
         ],
