@@ -1,7 +1,7 @@
 import { BigNumber, ethers } from "ethers";
 import { User, Order } from "../DB/db";
 import Big from "big.js";
-import { getABI, getProvider, getInterface} from "../utils/utils";
+import { getABI, getProvider, getInterface } from "../utils/utils";
 import { ifOrderCreated, ifUserPosition } from "../helper/interface";
 import * as sentry from "@sentry/node";
 import { getMulticallAddress } from "../helper/chain";
@@ -67,6 +67,7 @@ async function orderStatus(chainId: string) {
                 if (getOrderCreated[i].orderType == 1 || getOrderCreated[i].orderType == 3) {
                     token = getOrderCreated[i].token0;
                     amount = Big(getOrderCreated[i].balanceAmount);
+                    
                     if (getOrderCreated[i].orderType == 3) {
                         amount = Big(getOrderCreated[i].amount);
                     }
@@ -74,6 +75,7 @@ async function orderStatus(chainId: string) {
                 else if (getOrderCreated[i].orderType == 0 || getOrderCreated[i].orderType == 2) {
                     token = getOrderCreated[i].token1;
                     amount = Big(getOrderCreated[i].balanceAmount).times(getOrderCreated[i].exchangeRate).div(Big(10).pow(18));
+
                     if (getOrderCreated[i].orderType == 2) {
                         amount = Big(getOrderCreated[i].amount).times(getOrderCreated[i].exchangeRate).div(Big(10).pow(18));
                     }
@@ -88,8 +90,10 @@ async function orderStatus(chainId: string) {
                     if (Number(inOrderBalance) > Number(balance)) {
                         let currentInOrderBalance = Big(inOrderBalance).minus(amount).toString();
                         // updating inOrderBalance and active
-                        await Promise.all([Order.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: false } }),
-                        User.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: currentInOrderBalance } })]);
+                        await Promise.all([
+                            Order.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: false } }),
+                            User.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: currentInOrderBalance } })
+                        ]);
                         console.log("inactive", getOrderCreated[i].id, getUserPos.id);
                     }
                 }
@@ -101,8 +105,10 @@ async function orderStatus(chainId: string) {
 
                     if (Number(inOrderBalance) < Number(balance)) {
 
-                        await Promise.all([Order.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: true } }),
-                        User.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: inOrderBalance } })]);
+                        await Promise.all([
+                            Order.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: true } }),
+                            User.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: inOrderBalance } })
+                        ]);
                         console.log("active", getOrderCreated[i].id, getUserPos.id);
                     }
                 }
