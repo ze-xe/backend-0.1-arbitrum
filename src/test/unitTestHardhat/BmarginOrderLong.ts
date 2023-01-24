@@ -1,4 +1,5 @@
-
+//@ts-ignore
+import { ethers } from "hardhat";
 import { use, request } from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
@@ -15,12 +16,10 @@ import { getConfig } from "../../helper/constant";
 import { deploy } from "../helper/contractDeploy";
 import { historicEventListner } from "../../sync/sync";
 import { ExchangeConfig } from "../../sync/configs/exchange";
-import hre from "hardhat";
 
 
 
-//@ts-ignore
-const ethers = hre.ethers;
+
 
 
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });

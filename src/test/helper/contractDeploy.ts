@@ -1,13 +1,12 @@
-//@ts-ignore
-import hre, { ethers } from "hardhat";
+// @ts-ignore
+import { ethers } from "hardhat";
 import fs from "fs";
 import { getTestConfig } from "./addresses";
 import path from "path";
 
 
 
-//@ts-ignore
-const ethers = hre.ethers;
+
 
 
 
@@ -18,7 +17,7 @@ export async function deploy(deployerAddress: string) {
     /*                                  Exchange                                  */
     /* -------------------------------------------------------------------------- */
     const exchnageDep = getDeployment("Exchange")
-    const Exchange = await hre.ethers.getContractFactory(exchnageDep[0], exchnageDep[1]);
+    const Exchange = await ethers.getContractFactory(exchnageDep[0], exchnageDep[1]);
     let exchange;
 
 
@@ -31,7 +30,7 @@ export async function deploy(deployerAddress: string) {
     /*                                 ZEXE Token                                 */
     /* -------------------------------------------------------------------------- */
     const zexeDep = getDeployment("ZEXE")
-    const ZEXE = await hre.ethers.getContractFactory(zexeDep[0], zexeDep[1]);
+    const ZEXE = await ethers.getContractFactory(zexeDep[0], zexeDep[1]);
     const zexe = await ZEXE.deploy();
     await zexe.deployed();
 
@@ -39,7 +38,7 @@ export async function deploy(deployerAddress: string) {
     /*                                    Lever                                   */
     /* -------------------------------------------------------------------------- */
     const leverDep = getDeployment("Lever")
-    const Lever = await hre.ethers.getContractFactory(leverDep[0], leverDep[1]);
+    const Lever = await ethers.getContractFactory(leverDep[0], leverDep[1]);
     const lever = await Lever.deploy(exchange.address, zexe.address);
     await lever.deployed();
 
@@ -47,13 +46,13 @@ export async function deploy(deployerAddress: string) {
     /*                                    Tokens                                  */
     /* -------------------------------------------------------------------------- */
     const erc20Dep = getDeployment("TestERC20")
-    const ERC20 = await hre.ethers.getContractFactory(erc20Dep[0], erc20Dep[1]);
+    const ERC20 = await ethers.getContractFactory(erc20Dep[0], erc20Dep[1]);
     const lendingMarketDep = getDeployment("LendingMarket")
-    const LendingMarket = await hre.ethers.getContractFactory(lendingMarketDep[0], lendingMarketDep[1]);
+    const LendingMarket = await ethers.getContractFactory(lendingMarketDep[0], lendingMarketDep[1]);
     const priceOracleDep = getDeployment("SimplePriceOracle")
-    const PriceOracle = await hre.ethers.getContractFactory(priceOracleDep[0], priceOracleDep[1]);
+    const PriceOracle = await ethers.getContractFactory(priceOracleDep[0], priceOracleDep[1]);
     const nterestRateModelDep = getDeployment("JumpRateModelV2")
-    const InterestRateModel = await hre.ethers.getContractFactory(nterestRateModelDep[0], nterestRateModelDep[1]);
+    const InterestRateModel = await ethers.getContractFactory(nterestRateModelDep[0], nterestRateModelDep[1]);
     const irm = await InterestRateModel.deploy(inEth('0.05'), inEth('0.25'), inEth('0.05'), inEth('0.90'), '0x22F221b77Cd7770511421c8E0636940732016Dcd');
     await irm.deployed();
 
@@ -124,7 +123,7 @@ export async function deploy(deployerAddress: string) {
     /*                                    Multicall                                  */
     /* -------------------------------------------------------------------------- */
     const multicallDep = getDeployment("Multicall2")
-    const Multicall = await hre.ethers.getContractFactory(multicallDep[0], multicallDep[1]);
+    const Multicall = await ethers.getContractFactory(multicallDep[0], multicallDep[1]);
     const multicall = await Multicall.deploy();
     await multicall.deployed();
 

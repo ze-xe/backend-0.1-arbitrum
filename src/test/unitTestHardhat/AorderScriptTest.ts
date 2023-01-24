@@ -1,9 +1,9 @@
-
+// @ts-ignore
+import hre, {ethers } from "hardhat";
 import Big from "big.js";
 import { use, request } from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
-import hre from "hardhat";
 import { Order, OrderExecuted, Sync, User } from "../../DB/db";
 import { getVersion } from "../../helper/chain";
 import { ifOrderCreated } from "../../helper/interface";
@@ -19,9 +19,9 @@ import { historicEventListner } from "../../sync/sync";
 import { ExchangeConfig } from "../../sync/configs/exchange";
 
 use(chaiHttp);
-//@ts-ignore
 
-const ethers = hre.ethers;
+
+
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 
 const socket = io("http://localhost:3010", { autoConnect: false });
