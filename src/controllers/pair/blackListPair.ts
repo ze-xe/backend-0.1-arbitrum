@@ -1,5 +1,5 @@
-import { OrderCreated, PairCreated, Token } from "../../db";
-import { handleOrderCancelled } from "../../handlers/exchange";
+import { Order, Pair, Token } from "../../DB/db";
+import { handleOrderCancelled } from "../../handlers/orderCancelled";
 import { blackListTokenSignatureValidation } from "../../utils/blackListTokenSignatureVerify";
 
 
@@ -45,41 +45,41 @@ export async function handleBlackListToken(req: any, res: any) {
             if (getToken?.active == true) {
                 return res.status(200).send({ status: true, message: "Token already active" })
             };
-            
+
             await Token.findOneAndUpdate({ id: token, chainId: chainId }, { $set: { active: true } });
 
             // find token in pair token0;
-            let getPair0 = await PairCreated.find({ token0: token, chainId: chainId });
+            let getPair0 = await Pair.find({ token0: token, chainId: chainId });
 
             for (let i in getPair0) {
 
-                await PairCreated.findOneAndUpdate({ _id: getPair0[i]._id }, { $set: { active: true } });
-               
+                await Pair.findOneAndUpdate({ _id: getPair0[i]._id }, { $set: { active: true } });
+
             }
             // find token in pair token1;
-            let getPair1 = await PairCreated.find({ token1: token, chainId: chainId });
+            let getPair1 = await Pair.find({ token1: token, chainId: chainId });
 
             for (let i in getPair1) {
 
-                await PairCreated.findOneAndUpdate({ _id: getPair1[i]._id }, { $set: { active: true } });
-               
+                await Pair.findOneAndUpdate({ _id: getPair1[i]._id }, { $set: { active: true } });
+
             }
-            res.status(200).send({ status: true, message: "Token Activate" })
+            return res.status(200).send({ status: true, message: "Token Activate" })
 
         }
-    
+
 
         if (getToken?.active == false) {
             return res.status(200).send({ status: true, message: "Token already deactive" })
         };
         // find token in pair token0;
-        let getPair0 = await PairCreated.find({ token0: token });
+        let getPair0 = await Pair.find({ token0: token });
 
         for (let i in getPair0) {
 
-            await PairCreated.findOneAndUpdate({ _id: getPair0[i]._id }, { $set: { active: false } });
+            await Pair.findOneAndUpdate({ _id: getPair0[i]._id }, { $set: { active: false } });
             // cancel Orders;
-            let getOrders = await OrderCreated.find({ pair: getPair0[i].id, active: true }).lean();
+            let getOrders = await Order.find({ pair: getPair0[i].id, active: true }).lean();
 
             for (let j in getOrders) {
                 await handleOrderCancelled([getOrders[j].id])
@@ -87,13 +87,13 @@ export async function handleBlackListToken(req: any, res: any) {
 
         }
         // find token in pair token1;
-        let getPair1 = await PairCreated.find({ token1: token });
+        let getPair1 = await Pair.find({ token1: token });
 
         for (let i in getPair1) {
 
-            await PairCreated.findOneAndUpdate({ _id: getPair1[i]._id }, { active: false });
+            await Pair.findOneAndUpdate({ _id: getPair1[i]._id }, { active: false });
             // cancel Orders;
-            let getOrders = await OrderCreated.find({ pair: getPair1[i].id, active: true }).lean();
+            let getOrders = await Order.find({ pair: getPair1[i].id, active: true }).lean();
 
             for (let j in getOrders) {
                 await handleOrderCancelled([getOrders[j].id])
@@ -101,7 +101,7 @@ export async function handleBlackListToken(req: any, res: any) {
 
         }
         await Token.findOneAndUpdate({ id: token, chainId: chainId }, { $set: { active: false } });
-        res.status(200).send({ status: true, message: "Token Deactivate" })
+        return res.status(200).send({ status: true, message: "Token Deactivate" })
 
     }
     catch (error) {

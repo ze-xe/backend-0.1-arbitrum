@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import path from "path";
-import { getExchangeAddress } from "../helper/chain";
-import { contractName, version } from "../helper/constant";
+import { getExchangeAddress, getVersion } from "../helper/chain";
+import { getConfig } from "../helper/constant";
 
 
 
@@ -15,8 +15,8 @@ export function blackListTokenSignatureValidation( signature: string, value: obj
     try {
 
         const domain = {
-            name: contractName,
-            version: version,
+            name: getConfig("name"),
+            version: getVersion(process.env.NODE_ENV!),
             chainId: chainId,
             verifyingContract: getExchangeAddress(chainId),
         };

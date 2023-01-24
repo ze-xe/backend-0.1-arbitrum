@@ -23,7 +23,7 @@ Url : http://localhost:3010/pair/allpairs?chainId
             "id": "0x3b8025593f618d3dc1452325f3804f0229252f135e4eb37cc29832428b8e2475",
             "exchangeRate": "20297000000000000000000",
             "exchangeRateDecimals": "2",
-            "priceDiff": "-2675000000000000000000",
+            "priceDiff": "2675000000000000000000",
             "minToken0Order": 10000000000,
             "tokens": [
                 {
@@ -33,7 +33,7 @@ Url : http://localhost:3010/pair/allpairs?chainId
                     "decimals": 18
                 },
                 {
-                    "id": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25792c",
+                    "id": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25793d",
                     "name": "USDC",
                     "symbol": "USDC",
                     "decimals": 18
@@ -121,7 +121,7 @@ interval is mandatory which must be greater than 300000 miliseconds
                 "open": "16600",
                 "high": "18000",
                 "close": "18000",
-                "low": "16600"
+                "low": "16601"
             },
             ...
         ],
@@ -132,7 +132,7 @@ interval is mandatory which must be greater than 300000 miliseconds
             },
             {
                 "time": 1668002049,
-                "value": "0.906764705882352941"
+                "value": "0.906764705882352942"
             },
             ...
         ]

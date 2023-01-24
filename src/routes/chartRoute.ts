@@ -1,11 +1,10 @@
 import express from "express";
-import { getBar, getSymbol } from "../controllers/chartController";
+import { getBar } from "../controllers/chart/getBar";
+import { getSymbol } from "../controllers/chart/getSymbol";
+
 
 
 const router = express.Router();
-
-
-
 
 router.get("/bar/history/:ticker", getBar); 
 router.get("/symbol", getSymbol)
