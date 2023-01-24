@@ -1,6 +1,6 @@
 import { Pair, Order, OrderExecuted, } from "../DB/db";
 import Big from "big.js";
-import { ifOrderCreated, ifPair} from "../helper/interface";
+import { ifOrderCreated, ifPair } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 import * as sentry from "@sentry/node";
 import { getLoop, loopFillAmount } from "./helper/getLoop";
@@ -13,6 +13,14 @@ export async function handleOrderExecuted(data: any, argument: any) {
 
     try {
 
+        let wait = () => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    return resolve("Success")
+                }, 2000)
+            })
+        }
+        await wait()
         const isDuplicateTxn = await OrderExecuted.findOne({
             txnId: argument.txnId,
             blockNumber: argument.blockNumber,
@@ -62,11 +70,11 @@ export async function handleOrderExecuted(data: any, argument: any) {
             { _id: getPairDetails._id.toString() },
             { $set: { exchangeRate: getOrderDetails.exchangeRate, priceDiff: priceDiff, exchangeRateDecimals: argument.exchangeRateDecimals } }
         );
-            // updating userPosition
+        // updating userPosition
         if (getOrderDetails.orderType == 1 || getOrderDetails.orderType == 0) {
             await updateUserPosition(getOrderDetails, getPairDetails, fillAmount)
         }
-        else if (getOrderDetails.orderType == 3 || getOrderDetails.orderType == 2) { 
+        else if (getOrderDetails.orderType == 3 || getOrderDetails.orderType == 2) {
             await marginUpdateUserPosition(getOrderDetails, getPairDetails, fillAmount)
         }
 
