@@ -13,14 +13,6 @@ export async function handleOrderExecuted(data: any, argument: any) {
 
     try {
 
-        let wait = () => {
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    return resolve("Success")
-                }, 5000)
-            })
-        }
-        await wait()
         const isDuplicateTxn = await OrderExecuted.findOne({
             txnId: argument.txnId,
             blockNumber: argument.blockNumber,

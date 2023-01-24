@@ -49,10 +49,10 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
     let txnId = ""
     let userInOrderPre = '0';
     before(async () => {
-        
+        await require('../../../app');
         await mongoose.createConnection(process.env.MONGO_URL + `-backup-zexe-${_version}?retryWrites=true&w=majority`! as string).dropDatabase();
         await mongoose.createConnection(process.env.MONGO_URL1 + `-zexe-${_version}?retryWrites=true&w=majority`! as string).dropDatabase();
-        await require('../../../app');
+       
         [owner, user1, user2] = await ethers.getSigners();
         let deployment = await deploy(owner.address);
         usdc = deployment.usdc;
@@ -291,7 +291,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
 
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
-                }, 5000)
+                }, 7000)
             })
         }
         let res = await wait()

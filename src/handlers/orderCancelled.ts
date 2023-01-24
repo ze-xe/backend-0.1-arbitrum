@@ -9,14 +9,7 @@ import * as sentry from "@sentry/node";
 export async function handleOrderCancelled(data: any) {
 
     try {
-        let wait = () => {
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    return resolve("Success")
-                }, 5000)
-            })
-        }
-        await wait()
+       
         let id = data[0].toLowerCase();
 
         let orderDetails: ifOrderCreated | null = await Order.findOne({ id: id }).lean();
