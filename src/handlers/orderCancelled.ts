@@ -13,7 +13,7 @@ export async function handleOrderCancelled(data: any) {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     return resolve("Success")
-                }, 2000)
+                }, 5000)
             })
         }
         await wait()
