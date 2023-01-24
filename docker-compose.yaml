@@ -13,9 +13,8 @@ services:
   #     - MONGO_INITDB_ROOT_PASSWORD=password
   # Scorer Node
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: mubashirzebi/zexe-arbitrum:latest
+    
     # depends_on:
     #   - mongozexe
     ports:
@@ -25,10 +24,10 @@ services:
         # - MONGO_URL=mongodb://root:password@mongozexe:27017/?directConnection=true&authSource=admin&replicaSet=replicaset&retryWrites=true
         - NODE_ENV=dev
         # - MONGO_URL=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/prod
-        - MONGO_URL=${MONGO_URL}
-        - MONGO_URL1=${MONGO_URL1}
-        - WEB_3_TOKEN=${WEB_3_TOKEN}
-        - ADMIN_ADD=${ADMIN_ADD}
+        - MONGO_URL=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/prod
+        - MONGO_URL1=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/prod
+        - WEB_3_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweERjZTFjMzYxYzgyNEI1ZjRFMzRGY2ZCNjUxMUYzNjkwNjc5RjhmODYiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njk4OTQyMTQ5NjMsIm5hbWUiOiJ6ZXhlLjAxIn0.YR1oAHiW_tA0lwG29tXz2wrYdTjWdCijto4yP_3uHHg
+        - ADMIN_ADD=0x186b4b5Da9E6817C21818DEb83BBA02c4c66627F
         - NETWORK=arbitrumGoerli
   #     - PORT=${PORT}
   #     - ANALYSER_PORT=${ANALYSER_PORT}
