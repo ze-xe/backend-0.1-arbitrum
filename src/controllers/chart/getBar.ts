@@ -18,7 +18,7 @@ export async function getBar(req: any, res: any) {
         let firstDataRequest = req.query.firstDataRequest;
         // console.log(interval);
 
-        if(firstDataRequest){
+        if (firstDataRequest) {
             console.log("from", from)
             console.log("to", to)
         }
@@ -40,7 +40,7 @@ export async function getBar(req: any, res: any) {
 
         let intervalInMSec: number = intervalMap[`${interval}`]
 
-        if (isNaN(to) == true || to == 0 ) {
+        if (isNaN(to) == true || to == 0) {
             to = Date.now();
         }
 
@@ -88,7 +88,7 @@ export async function getBar(req: any, res: any) {
                 };
                 exchangeRatesTrend.push(temp);
                 currTimestamp = currTimestamp + intervalInMSec;
-                if(currTimestamp > to){
+                if (currTimestamp > to) {
                     break
                 }
             }
@@ -116,7 +116,7 @@ export async function getBar(req: any, res: any) {
             close = lastOrder.exchangeRate;
             currTimestamp = from;
         }
-       
+
         let volume: string | number = 0;
 
         for (let i = 0; i < data.length; i++) {
@@ -170,7 +170,7 @@ export async function getBar(req: any, res: any) {
                     close = close;
                     currTimestamp = currTimestamp + intervalInMSec;
                     data[i].fillAmount = '0';
-                    volume= '0';
+                    volume = '0';
                     i--;
                 }
             }
@@ -259,7 +259,7 @@ export async function getBar(req: any, res: any) {
                     currTimestamp = currTimestamp + intervalInMSec;
                     volume = '0'
                     i--;
-                   
+
                 }
 
             }

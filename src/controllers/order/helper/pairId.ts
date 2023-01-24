@@ -3,14 +3,14 @@ import { ethers } from "ethers";
 import { Pair } from "../../../DB/db";
 import { handleToken } from "../../../handlers/token";
 import { ifPair } from "../../../helper/interface";
+import * as sentry from "@sentry/node";
 
 
 
 
 
-
-export async function getPairId(data: any, chainId: any){
-    try{
+export async function getPairId(data: any, chainId: any) {
+    try {
 
         let isPairExist: ifPair = await Pair.findOne({ token0: data.token0, token1: data.token1, chainId: chainId, active: true }).lean();
         let createPair: ifPair | any;
@@ -65,7 +65,8 @@ export async function getPairId(data: any, chainId: any){
         }
         return pair
     }
-    catch(error){
+    catch (error) {
+        sentry.captureException(error)
         console.log(`error at getPairId`, error);
         return null
     }

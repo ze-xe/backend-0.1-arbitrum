@@ -4,14 +4,14 @@ import { use, request } from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 import hre from "hardhat";
-import {  Order, OrderExecuted, Sync, User } from "../../DB/db";
-import {  getVersion } from "../../helper/chain";
+import { Order, OrderExecuted, Sync, User } from "../../DB/db";
+import { getVersion } from "../../helper/chain";
 import { ifOrderCreated } from "../../helper/interface";
-import {  parseEther } from "../../utils/utils";
+import { parseEther } from "../../utils/utils";
 import { io } from "socket.io-client";
 import path from "path";
 import { EVENT_NAME } from "../../socketIo/socket.io";
-import {  } from "../../helper/constant";
+import { } from "../../helper/constant";
 import { deploy } from "../helper/contractDeploy";
 import mongoose from "mongoose";
 import { getTestConfig } from "../helper/addresses";
@@ -52,19 +52,19 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
         await require('../../../app');
         await mongoose.createConnection(process.env.MONGO_URL + `-backup-zexe-${_version}?retryWrites=true&w=majority`! as string).dropDatabase();
         await mongoose.createConnection(process.env.MONGO_URL1 + `-zexe-${_version}?retryWrites=true&w=majority`! as string).dropDatabase();
-       
+
         [owner, user1, user2] = await ethers.getSigners();
         let deployment = await deploy(owner.address);
         usdc = deployment.usdc;
         btc = deployment.btc;
-        exchange = deployment.exchange 
+        exchange = deployment.exchange
         console.log("Mulicall", deployment.multicall.address)
         console.log("Exchange", exchange.address)
         console.log("btc", btc.address)
         await historicEventListner(ExchangeConfig(chainId));
     });
     after(async () => {
-        socket.disconnect()  
+        socket.disconnect()
     })
 
     it('mint 10 btc to user1, 200000 usdt to user2, approve exchange contract', async () => {

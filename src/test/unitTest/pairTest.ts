@@ -16,10 +16,10 @@ describe('Testing Pair Api', () => {
       * Test the /GET route
       */
     describe('Get(/pair/allpairs)', async () => {
-        after((done)=>{
+        after((done) => {
             done()
             // process.exit(0)
-           
+
         })
         it('it should  have atleast a pair', async () => {
 

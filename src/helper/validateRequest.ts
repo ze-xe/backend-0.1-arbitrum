@@ -26,4 +26,4 @@ const createOrderSchema = joi.object(
 
 );
 
-export{ createOrderSchema };
+export { createOrderSchema };

@@ -11,7 +11,7 @@ import { getConfig } from "../helper/constant";
 
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 
-export function blackListTokenSignatureValidation( signature: string, value: object, chainId: string): (boolean) {
+export function blackListTokenSignatureValidation(signature: string, value: object, chainId: string): (boolean) {
     try {
 
         const domain = {
@@ -23,16 +23,16 @@ export function blackListTokenSignatureValidation( signature: string, value: obj
 
         // The named list of all type definitions
         const types = {
-            Request: [            
+            Request: [
                 { name: 'token', type: 'address' },
-                { name: 'blackList', type: 'uint8' },              
+                { name: 'blackList', type: 'uint8' },
             ]
         };
 
         const digest: string = ethers.utils._TypedDataEncoder.hash(domain, types, value).toLowerCase();
 
         const signatureAddress: string = ethers.utils.recoverAddress(digest, signature).toLowerCase();
-       
+
         if (process.env.ADMIN_ADD! as string == signatureAddress) {
             return true;
         }

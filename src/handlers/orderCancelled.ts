@@ -9,7 +9,7 @@ import * as sentry from "@sentry/node";
 export async function handleOrderCancelled(data: any) {
 
     try {
-       
+
         let id = data[0].toLowerCase();
 
         let orderDetails: ifOrderCreated | null = await Order.findOne({ id: id }).lean();
@@ -21,7 +21,7 @@ export async function handleOrderCancelled(data: any) {
         if (orderDetails.cancelled == true) {
             return console.log("Order is already cancelled");
         }
-    
+
         // update user inOrder
         if (orderDetails.orderType == 1 || orderDetails.orderType == 0) {
 

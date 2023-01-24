@@ -7,7 +7,7 @@ import { ethers } from "ethers";
 import { connect, Order, OrderExecuted, Sync, User } from "../../DB/db";
 import { getExchangeAddress } from "../../helper/chain";
 import { ifOrderCreated } from "../../helper/interface";
-import {  getProvider, parseEther } from "../../utils/utils";
+import { getProvider, parseEther } from "../../utils/utils";
 import { io } from "socket.io-client";
 import path from "path";
 import { EVENT_NAME } from "../../socketIo/socket.io";
@@ -48,7 +48,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
     let orderType = 1; // 1 for sell 0 for buy
     let btcAmount = ""
     let userInOrderPre = '0';
-    before(async () => { 
+    before(async () => {
         await require('../../../app')
         // await connect()
     });
@@ -315,7 +315,7 @@ describe("Limit Order Sell => Mint token, create order, execute order, cancel or
 
     })
 
-    
+
 });
 
 

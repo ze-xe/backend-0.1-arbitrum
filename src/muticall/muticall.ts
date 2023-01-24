@@ -1,7 +1,7 @@
 
 
 import { BigNumber, ethers } from "ethers";
-import {  getProvider, getInterface, getABI } from "../utils/utils";
+import { getProvider, getInterface, getABI } from "../utils/utils";
 import { getExchangeAddress, getMulticallAddress } from "../helper/chain";
 import * as sentry from "@sentry/node";
 
@@ -20,9 +20,9 @@ import * as sentry from "@sentry/node";
 
 export async function multicall(token: string, maker: string, chainId: string): Promise<number[] | null> {
     try {
-       console.log("Multicall from fun",  getMulticallAddress(chainId))
-       console.log("Exchange from fun",  getExchangeAddress(chainId))
-       console.log("Token ", token)
+        console.log("Multicall from fun", getMulticallAddress(chainId))
+        console.log("Exchange from fun", getExchangeAddress(chainId))
+        console.log("Token ", token)
         const multicall = new ethers.Contract(
             getMulticallAddress(chainId),
             getABI("Multicall2"),
@@ -35,7 +35,7 @@ export async function multicall(token: string, maker: string, chainId: string): 
         );
 
         let outPut: number[] = [];
-       
+
         for (let i in resp[1]) {
             outPut.push(Number(BigNumber.from(resp[1][i]).toString()))
         }

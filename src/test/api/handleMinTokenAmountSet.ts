@@ -11,7 +11,7 @@ describe("handleMinTokenAmountSet, change its minToken and restore", async () =>
     let currentMinToken = "0"
     await connect();
     it("it will change btc minToken and then restore to previous value", async () => {
-       
+
         const btcAddress = getContractAddress("BTC");
         let minToken = "123456789";
 

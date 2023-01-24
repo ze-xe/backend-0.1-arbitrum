@@ -1,5 +1,5 @@
 //@ts-ignore
-import hre, {ethers} from "hardhat";
+import hre, { ethers } from "hardhat";
 import fs from "fs";
 import { getTestConfig } from "./addresses";
 import path from "path";

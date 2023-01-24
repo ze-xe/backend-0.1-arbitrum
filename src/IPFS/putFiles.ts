@@ -90,7 +90,7 @@ async function mainIPFS(data: any[], id: string) {
 }
 
 
-export  { mainIPFS};
+export { mainIPFS };
 
 // main([
 //     {

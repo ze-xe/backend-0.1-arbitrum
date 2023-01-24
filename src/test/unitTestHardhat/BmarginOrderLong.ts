@@ -65,8 +65,8 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
 
     after(async () => {
         socket.disconnect()
-        
-        
+
+
     })
 
     it('mint 10 btc to user1, 10 btc to user2, approve exchange contract', async () => {

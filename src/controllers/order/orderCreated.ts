@@ -1,12 +1,12 @@
 
-import {  Order, OrderCreatedBackup } from "../../DB/db";
+import { Order, OrderCreatedBackup } from "../../DB/db";
 import Big from "big.js";
 import { ethers } from "ethers";
 import { createOrderSchema } from "../../helper/validateRequest";
 import { mainIPFS } from "../../IPFS/putFiles";
 import { errorMessage } from "../../helper/errorMessage";
 import { EVENT_NAME, socketService } from "../../socketIo/socket.io";
-import { marginValidationAndUserPosition} from "./helper/marginValidationUserPosition";
+import { marginValidationAndUserPosition } from "./helper/marginValidationUserPosition";
 import * as sentry from "@sentry/node";
 import { getPairId } from "./helper/pairId";
 import { validationAndUserPosition } from "./helper/validationUserPosition";
@@ -101,19 +101,19 @@ export async function handleOrderCreated(req: any, res: any) {
                 return res.status(response.statusCode).send({ status: false, error: response.error })
             }
             else if (response.status == true) {
-               balanceAmount = response.balanceAmount!
+                balanceAmount = response.balanceAmount!
             }
         }
 
-        if (orderType == 1 || orderType == 0){
+        if (orderType == 1 || orderType == 0) {
             let response = await validationAndUserPosition(data, chainId, ipfs);
-            if(response.status == false){
-                return res.status(response.statusCode).send({status: false, error: response.error})
+            if (response.status == false) {
+                return res.status(response.statusCode).send({ status: false, error: response.error })
             }
         }
 
         let pair = await getPairId(data, chainId);
-        if(!pair){
+        if (!pair) {
             return res.status(500).send({ status: false, error: errorMessage.server });
         }
         let cid = "";

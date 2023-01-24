@@ -45,8 +45,8 @@ describe("Create Pair => Mint token, create order, deleteOrder", async () => {
     let amount = ethers.utils.parseEther('1').toString();
     let orderType = 1 // sell
 
-    before(async () => {   
-    //     require('../../../app')
+    before(async () => {
+        //     require('../../../app')
     });
 
     after((done) => {

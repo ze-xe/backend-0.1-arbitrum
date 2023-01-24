@@ -53,7 +53,7 @@ describe("Testing get apis", async () => {
 
         let res = await request("http://localhost:3010")
             .get(`/v/${getVersion(process.env.NODE_ENV!)}/pair/trading/status/${pairId}`)
-            
+
         // console.log(res.body)
         expect(res).to.have.status(200);
         expect(res.body.data[0].interval).to.equal("_24hr");

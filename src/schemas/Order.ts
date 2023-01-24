@@ -17,12 +17,12 @@ const OrderSchema = new mongoose.Schema({
     chainId: String,
     cid: String,
     cancelled: { type: Boolean, default: false },
-    orderType: {type:Number, require: true},
-    borrowLimit: {type:String, default: '0'},
-    loops: {type:String, default: '0'},
-    lastInOrderToken0: {type:String, default: '0'},
-    lastInOrderToken1: {type:String, default: '0'},
-    fillAmount: {type:String, default: '0'}, 
+    orderType: { type: Number, require: true },
+    borrowLimit: { type: String, default: '0' },
+    loops: { type: String, default: '0' },
+    lastInOrderToken0: { type: String, default: '0' },
+    lastInOrderToken1: { type: String, default: '0' },
+    fillAmount: { type: String, default: '0' },
 },
     { timestamps: true }
 );

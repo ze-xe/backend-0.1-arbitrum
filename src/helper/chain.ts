@@ -34,7 +34,7 @@ export function getVersion(env: string): string {
     return map[env]
 }
 
-export function getLatest(env: string){
+export function getLatest(env: string) {
     let map: any = {
         "dev": getConfig("latest"),
         "test": getTestConfig("latest")

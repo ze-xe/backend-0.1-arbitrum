@@ -6,7 +6,7 @@ use(chaiHttp);
 import { ethers } from "ethers";
 import Big from "big.js";
 import { EVENT_NAME } from "../../socketIo/socket.io";
-import {  getProvider, parseEther } from "../../utils/utils";
+import { getProvider, parseEther } from "../../utils/utils";
 import { getExchangeAddress } from "../../helper/chain";
 import { io } from "socket.io-client";
 import path from "path";
@@ -29,7 +29,7 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
     let provider = getProvider(chainId);
 
     let exchange = getContract("Exchange", chainId)
-    let btc = getContract("BTC",chainId)
+    let btc = getContract("BTC", chainId)
     let usdc = getContract("USDC", chainId)
     let lever = getContract("Lever", chainId)
     let cUsdc = getContract("lUSDC_Market", chainId)

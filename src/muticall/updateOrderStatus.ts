@@ -67,7 +67,7 @@ async function orderStatus(chainId: string) {
                 if (getOrderCreated[i].orderType == 1 || getOrderCreated[i].orderType == 3) {
                     token = getOrderCreated[i].token0;
                     amount = Big(getOrderCreated[i].balanceAmount);
-                    
+
                     if (getOrderCreated[i].orderType == 3) {
                         amount = Big(getOrderCreated[i].amount);
                     }

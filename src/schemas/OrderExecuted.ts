@@ -10,7 +10,7 @@ const OrderExecutedSchema = new mongoose.Schema({
     pair: { type: String, required: true, trim: true },
     exchangeRate: { type: String, required: true, trim: true },
     exchangeRateDecimals: { type: Number, required: true, trim: true },
-    orderType: {type:Number, require: true},
+    orderType: { type: Number, require: true },
     chainId: String,
     logIndex: Number
 

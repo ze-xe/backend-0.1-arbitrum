@@ -25,7 +25,7 @@ export interface ifOrderCreated {
     fillAmount: string
     lastInOrderToken0: string
     lastInOrderToken1: string
-    
+
 }
 
 export interface ifUserPosition {
@@ -77,19 +77,19 @@ export interface ifSync {
 }
 
 export interface ifHandleOrderExecuted {
-    (data: any, argument: any):void
+    (data: any, argument: any): void
 }
 
 export interface ifHandleOrderCancelled {
-    (data: any):void
+    (data: any): void
 }
 
 
 export interface ifEventListner {
-    contractAddress : string
+    contractAddress: string
     abi: object[]
     handlers: any
     chainId: string
 }
 
-export type Interval = "5"| "15"| "30"| "60"| "240"| "1D"| "1W";
+export type Interval = "5" | "15" | "30" | "60" | "240" | "1D" | "1W";

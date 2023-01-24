@@ -1,4 +1,4 @@
-import express  from "express";
+import express from "express";
 import { getUserInOrderBalance } from "../controllers/user/inOrderBalance";
 import { getOrderCancelled } from "../controllers/user/orderCancelled";
 import { getUserOrderHistory } from "../controllers/user/orderHistory";

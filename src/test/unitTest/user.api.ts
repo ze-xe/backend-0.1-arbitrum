@@ -54,7 +54,7 @@ describe("Testing get apis", async () => {
         // console.log(res.body)
         expect(res).to.have.status(200);
         expect(res.body.data).to.have.an('array');
-    
+
     });
 
 
@@ -67,7 +67,7 @@ describe("Testing get apis", async () => {
         // console.log(res.body)
         expect(res).to.have.status(200);
         expect(res.body.data).to.have.an('array');
-    
+
     });
 
 
@@ -80,7 +80,7 @@ describe("Testing get apis", async () => {
         // console.log(res.body)
         expect(res).to.have.status(200);
         expect(res.body.data).to.have.an('array');
-    
+
     });
 
 
@@ -93,7 +93,7 @@ describe("Testing get apis", async () => {
         // console.log(res.body)
         expect(res).to.have.status(200);
         expect(res.body.data).to.have.an('array');
-    
+
     });
 
 
@@ -106,7 +106,7 @@ describe("Testing get apis", async () => {
         // console.log(res.body)
         expect(res).to.have.status(200);
         expect(res.body.data).to.have.an('array');
-    
+
     });
 
 });

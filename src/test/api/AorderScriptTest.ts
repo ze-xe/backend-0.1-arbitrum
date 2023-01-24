@@ -6,7 +6,7 @@ import chaiHttp from "chai-http";
 import { ethers } from "ethers";
 import { connect, Order, OrderExecuted, Sync, User } from "../../DB/db";
 import { getExchangeAddress, getVersion } from "../../helper/chain";
-import {  getProvider, parseEther } from "../../utils/utils";
+import { getProvider, parseEther } from "../../utils/utils";
 import { io } from "socket.io-client";
 import path from "path";
 import { EVENT_NAME } from "../../socketIo/socket.io";
@@ -34,7 +34,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     let btc = getContract("BTC", chainId)
     let usdc = getContract("USDC", chainId)
     let user1 = new ethers.Wallet(process.env.PRIVATE_KEY1! as string).connect(provider); //2
-        let user2 = new ethers.Wallet(process.env.PRIVATE_KEY2! as string).connect(provider); //1
+    let user2 = new ethers.Wallet(process.env.PRIVATE_KEY2! as string).connect(provider); //1
     let signatures: any[] = [];
     let orders: any[] = [];
     let exchangeRate = ethers.utils.parseEther('20000').toString();
@@ -50,36 +50,36 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         // httpServer
         await connect()
     });
-/*
-    it('mint 10 btc to user1, 200000 usdt to user2, approve exchange contract', async () => {
-
-        let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
-        let user2UsdcBalancePre = (await usdc.balanceOf(user2.address)).toString();
-
-        const btcAmount = ethers.utils.parseEther('10').toString();
-        let tx1 = await btc.connect(user1).mint(user1.address, btcAmount, { gasLimit: "100000000" });
-
-        // approve for exchange
-        let approve = await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
-        await btc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256,{ gasLimit: "100000000" })
-
-        const usdcAmount = ethers.utils.parseEther('200000').toString();
-        let tx2 = await usdc.connect(user2).mint(user2.address, usdcAmount, { gasLimit: "100000000" });
-
-        // approve for exchange
-        let approve1 = await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
-        await usdc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
-        await approve1.wait(1)
-        let user1BtcBalancePost = (await btc.balanceOf(user1.address)).toString();
-        let user2UsdcBalancePost = (await usdc.balanceOf(user2.address)).toString();
-
-        expect(user1BtcBalancePost).to.equal(parseEther(Big(btcAmount).plus(user1BtcBalancePre).toString()));
-        expect(user2UsdcBalancePost).to.equal(parseEther(Big(usdcAmount).plus(user2UsdcBalancePre).toString()));
-
-
-    });
-
-*/
+    /*
+        it('mint 10 btc to user1, 200000 usdt to user2, approve exchange contract', async () => {
+    
+            let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
+            let user2UsdcBalancePre = (await usdc.balanceOf(user2.address)).toString();
+    
+            const btcAmount = ethers.utils.parseEther('10').toString();
+            let tx1 = await btc.connect(user1).mint(user1.address, btcAmount, { gasLimit: "100000000" });
+    
+            // approve for exchange
+            let approve = await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
+            await btc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256,{ gasLimit: "100000000" })
+    
+            const usdcAmount = ethers.utils.parseEther('200000').toString();
+            let tx2 = await usdc.connect(user2).mint(user2.address, usdcAmount, { gasLimit: "100000000" });
+    
+            // approve for exchange
+            let approve1 = await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
+            await usdc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
+            await approve1.wait(1)
+            let user1BtcBalancePost = (await btc.balanceOf(user1.address)).toString();
+            let user2UsdcBalancePost = (await usdc.balanceOf(user2.address)).toString();
+    
+            expect(user1BtcBalancePost).to.equal(parseEther(Big(btcAmount).plus(user1BtcBalancePre).toString()));
+            expect(user2UsdcBalancePost).to.equal(parseEther(Big(usdcAmount).plus(user2UsdcBalancePre).toString()));
+    
+    
+        });
+    
+    */
     it(`user1 creates limit order to sell 1 btc @ 20000, check user inOrder Balance`, async () => {
 
         const domain = {
@@ -173,7 +173,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         orderId = data.id
     })
 
-    
+
     it(`user2 buy user1s 0.8 btc order`, async () => {
         // balances
         let user1BtcBalancePre = btc.balanceOf(user1.address);

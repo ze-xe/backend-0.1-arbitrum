@@ -1,7 +1,7 @@
 import { Order, Pair, Token } from "../../DB/db";
 import { handleOrderCancelled } from "../../handlers/orderCancelled";
 import { blackListTokenSignatureValidation } from "../../utils/blackListTokenSignatureVerify";
-
+import * as sentry from "@sentry/node";
 
 
 
@@ -105,6 +105,7 @@ export async function handleBlackListToken(req: any, res: any) {
 
     }
     catch (error) {
+        sentry.captureException(error)
         console.log("Error @ handleBlackListToken", error)
     }
 }

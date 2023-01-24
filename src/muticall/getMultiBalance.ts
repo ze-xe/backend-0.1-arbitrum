@@ -29,11 +29,11 @@ export async function getMultiBalance(token: string, addresses: string[], ids: s
 
     const _getMultiBalance = async () => {
         try {
-           
+
             const multicall: ethers.Contract = new ethers.Contract(
-               getMulticallAddress(chainId),
-               getABI("Multicall2"),
-               getProvider(chainId)
+                getMulticallAddress(chainId),
+                getABI("Multicall2"),
+                getProvider(chainId)
             );
 
             const itf: ethers.utils.Interface = getInterface(getABI("TestERC20"));

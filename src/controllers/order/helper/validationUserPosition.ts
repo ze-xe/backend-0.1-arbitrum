@@ -2,7 +2,7 @@ import Big from "big.js";
 import { User } from "../../../DB/db";
 import { errorMessage } from "../../../helper/errorMessage";
 import { multicall } from "../../../muticall/muticall";
-
+import * as sentry from "@sentry/node";
 
 
 
@@ -18,7 +18,7 @@ export async function validationAndUserPosition(data: any, chainId: string, ipfs
         let token;
         let amount = data.amount;
         if (data.orderType == 1) {
-             findUserPosition = await User.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
+            findUserPosition = await User.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
             if (!ipfs) {
                 multicallData = await multicall(data.token0, data.maker, chainId)
                 if (multicallData) {
@@ -84,12 +84,13 @@ export async function validationAndUserPosition(data: any, chainId: string, ipfs
 
         }
 
-        return { status: true}
+        return { status: true }
 
 
     }
     catch (error) {
+        sentry.captureException(error)
         console.log(`error @ validationAndUserPosition`)
-        return {status: false, error: errorMessage.server, statusCode: 500}
+        return { status: false, error: errorMessage.server, statusCode: 500 }
     }
 }

@@ -63,7 +63,7 @@ async function eventListner({ contractAddress, abi, handlers, chainId }: ifEvent
                 await handlers[events[i]](result.args, argument);
 
                 await Sync.findOneAndUpdate(
-                    {chainId: chainId},
+                    { chainId: chainId },
                     { blockNumberExchange: fromBlock },
                     { upsert: true }
                 );
@@ -101,7 +101,7 @@ async function historicEventListner({ contractAddress, abi, handlers, chainId }:
         let fromBlock: number = 0;
         try {
 
-            let syncDetails: ifSync | null = await Sync.findOne({chainId:chainId});
+            let syncDetails: ifSync | null = await Sync.findOne({ chainId: chainId });
 
             if (syncDetails) {
                 fromBlock = syncDetails.blockNumberExchange ?? 0;
@@ -145,7 +145,7 @@ async function historicEventListner({ contractAddress, abi, handlers, chainId }:
 
             }
             await Sync.findOneAndUpdate(
-                {chainId: chainId},
+                { chainId: chainId },
                 { blockNumberExchange: fromBlock },
                 { upsert: true }
             );
@@ -165,9 +165,9 @@ async function historicEventListner({ contractAddress, abi, handlers, chainId }:
                 console.log("Error @ historicEventListner", error);
                 errorCount++
                 return eventSync();
-                
+
             }
-            else{
+            else {
                 errorCount = 0;
                 sentry.captureException(error)
             }

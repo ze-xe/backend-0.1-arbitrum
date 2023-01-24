@@ -16,7 +16,7 @@ export async function getNewPair(req: any, res: any) {
         if (!chainId) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
-        let allPairs: ifPair[] = await Pair.find({ chainId: chainId, active: true }).sort({createdAt: -1}).lean();
+        let allPairs: ifPair[] = await Pair.find({ chainId: chainId, active: true }).sort({ createdAt: -1 }).lean();
 
         let data: any = [];
 
@@ -35,7 +35,7 @@ export async function getNewPair(req: any, res: any) {
 
             let token0 = promiseTokens[2 * i];
             let token1 = promiseTokens[2 * i + 1];
-            let temp= {
+            let temp = {
 
                 id: allPairs[i].id,
                 exchangeRate: allPairs[i].exchangeRate,
@@ -44,7 +44,7 @@ export async function getNewPair(req: any, res: any) {
                 marginEnabeled: allPairs[i].marginEnabled,
                 minToken0Order: allPairs[i].minToken0Order,
                 tokens: [token0, token1],
-               
+
             };
 
             data.push(temp);

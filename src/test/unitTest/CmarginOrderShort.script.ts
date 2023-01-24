@@ -6,13 +6,13 @@ use(chaiHttp);
 import { ethers } from "ethers";
 import Big from "big.js";
 import { EVENT_NAME } from "../../socketIo/socket.io";
-import {  getProvider, parseEther } from "../../utils/utils";
+import { getProvider, parseEther } from "../../utils/utils";
 import { getExchangeAddress } from "../../helper/chain";
 import { io } from "socket.io-client";
 import path from "path";
 import { connect, Order, Sync } from "../../DB/db";
 import { ifOrderCreated } from "../../helper/interface";
-import {  getConfig, getContract } from "../../helper/constant";
+import { getConfig, getContract } from "../../helper/constant";
 
 
 

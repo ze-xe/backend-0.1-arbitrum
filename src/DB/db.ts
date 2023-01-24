@@ -11,7 +11,7 @@ import { getVersion } from "../helper/chain";
 
 // require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') })
-console.log(process.env.NODE_ENV,"ENV from DB")
+console.log(process.env.NODE_ENV, "ENV from DB")
 let a = getVersion(process.env.NODE_ENV!).split('.')
 a.pop()
 let _version = a.join("_")

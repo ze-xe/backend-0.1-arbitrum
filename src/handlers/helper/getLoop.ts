@@ -21,7 +21,7 @@ export function loopFillAmount(amount: string, borrowLimit: any, loop: any) {
 
 
 
-export function getLoop(totalSum:string,borrowLimit: string,orderAmount: string){
+export function getLoop(totalSum: string, borrowLimit: string, orderAmount: string) {
 
     borrowLimit = Big(borrowLimit).div(1e6).toString();
     let temp1 = Big(
@@ -32,7 +32,7 @@ export function getLoop(totalSum:string,borrowLimit: string,orderAmount: string)
                     Big(orderAmount).times(Big(1).minus(borrowLimit))
                 ).minus(orderAmount)
             )).div(orderAmount).toNumber()
-    
+
     let loop = Big(Math.log(temp1)).div(Big(Math.log(+borrowLimit))).minus(1).toString();
 
     return loop

@@ -18,7 +18,7 @@ export async function getPairTrandingPair(req: any, res: any) {
     try {
 
         // let chainId = req.query.chainId;
-        let getPairs: ifPair[] = await Pair.find({active: true}).lean()!
+        let getPairs: ifPair[] = await Pair.find({ active: true }).lean()!
 
         let interval = 24 * 60 * 60 * 1000;
 

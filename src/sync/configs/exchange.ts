@@ -1,5 +1,5 @@
 
-import { getABI} from "../../utils/utils";
+import { getABI } from "../../utils/utils";
 import { getExchangeAddress } from "../../helper/chain";
 import { handleFeesSet } from "../../handlers/handleFeeSet";
 import { handleMinTokenAmountSet } from "../../handlers/handleMinTokenAmountSet";

@@ -1,5 +1,5 @@
 import * as sentry from "@sentry/node";
-import { Order} from "../../DB/db";
+import { Order } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
 
 export async function getUserPlacedOrders(req: any, res: any) {

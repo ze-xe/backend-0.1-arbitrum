@@ -12,7 +12,7 @@ export const Decimals = {
 
 export function getTestConfig(name: any) {
 
-    const Config = JSON.parse((fs.readFileSync( __dirname+ "/deployment/config.json")).toString());
+    const Config = JSON.parse((fs.readFileSync(__dirname + "/deployment/config.json")).toString());
     return Config[name]
 }
 

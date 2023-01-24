@@ -51,7 +51,7 @@ describe("Margin Order Short=> Mint token, create order, execute order, cancel o
     let orderType = 3 // long
 
     before(async () => {
-        
+
         [owner, user1, user2] = await ethers.getSigners();
         let deployment = await deploy(owner.address);
         usdc = deployment.usdc;
