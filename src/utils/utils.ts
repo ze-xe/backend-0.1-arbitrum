@@ -1,214 +1,44 @@
 import fs from "fs";
 import { ethers } from "ethers";
 import Big from "big.js";
-import { getExchangeAddress, getRpcLink } from "../helper/chain";
-import { contractName, version } from "../helper/constant";
+import { getRpcLink} from "../helper/chain";
+import { getConfig } from "../helper/constant";
+import path from "path";
 
-// const exchangeDeployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Exchange.json")).toString());
-const Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/deployments.json")).toString());
 
-const erc20Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/abi/ERC20.json")).toString());
 
-const MulticallAbi = JSON.parse((fs.readFileSync(process.cwd() + "/abi/Multical.json")).toString());
 
-export const leverageAbi = Deployments["sources"]["Lever"];
-
-// export const ExchangeAddress1 =  Deployments["contracts"]["Exchange"]["address"]
-
-function getExchangeABI() {
-    return Deployments["sources"]["Exchange"];
+export function getABI(name: any) {
+    const Deployments = JSON.parse((fs.readFileSync(path.join(__dirname, '..', 'deployments', 'deployments.json'))).toString())["sources"];
+    let abis = ["Lever", "TestERC20","Multicall2"]
+    if (name == "Exchange") {
+        return Deployments[`Exchange_${getConfig("latest")}`];
+    }
+    else if (abis.includes(name)) {
+        return Deployments[name]
+    }  
+    console.log(`request not valid`)
+    return []
 }
 
-function getERC20ABI() {
-    return erc20Deployments["abi"];
-}
-
-function parseEther(value: number | string): string {
+export function parseEther(value: number | string): string {
 
     return ethers.utils.parseEther(`${Big(value).div(Big(10).pow(18))}`).toString();
 }
 
-function getInterface(abi: object[]): ethers.utils.Interface {
+export function getInterface(abi: object[]): ethers.utils.Interface {
     const iface = new ethers.utils.Interface(abi);
     return iface;
 }
 
-function getProvider(chainId: string): ethers.providers.JsonRpcProvider {
+export function getProvider(chainId: string): ethers.providers.JsonRpcProvider {
     const provider = new ethers.providers.JsonRpcProvider(getRpcLink(chainId));
     return provider;
 }
 
-/**
- * @dev This function would validate order signatures
- * @notice verify signature
- * @param {*} maker (string) should be order creator's address 
- * @param {*} signature (string)
- * @param {*} value (object)
- * @param {*} chainId (string) numeric chainId
- * @returns digest will be id of order, or false
- */
-function validateSignature(maker: string, signature: string, value: object, chainId: string): (string | null) {
-    try {
-
-        const domain = {
-            name: contractName,
-            version: version,
-            chainId: chainId,
-            verifyingContract: getExchangeAddress(chainId),
-        };
-
-        // The named list of all type definitions
-        const types = {
-            Order: [
-                { name: 'maker', type: 'address' },
-                { name: 'token0', type: 'address' },
-                { name: 'token1', type: 'address' },
-                { name: 'amount', type: 'uint256' },
-                { name: 'orderType', type: 'uint8' },
-                { name: 'salt', type: 'uint32' },
-                { name: 'exchangeRate', type: 'uint176' },
-                { name: 'borrowLimit', type: 'uint32' },
-                { name: 'loops', type: 'uint8' }
-            ]
-        };
-
-        const digest: string = ethers.utils._TypedDataEncoder.hash(domain, types, value).toLowerCase();
-
-        const signatureAddress: string = ethers.utils.recoverAddress(digest, signature).toLowerCase();
-        // console.log(maker, signatureAddress)
-        if (maker == signatureAddress) {
-            return digest;
-        }
-
-        return null;
-
-    }
-    catch (error: any) {
-        console.log("Error @ validateSignature", error.message);
-        return null
-    }
-}
 
 
 
 
 
 
-function getDecimals(exchangeRate: string) {
-    let findExchangeRateDecimals: string[] = [];
-    let a = Big(exchangeRate).div(Big(10).pow(18)).toString().split(".");
-
-    if (a.length > 1) {
-        findExchangeRateDecimals = Big(exchangeRate).div(Big(10).pow(18)).toFixed(20).toString().split(".");
-    }
-    else {
-        findExchangeRateDecimals = a;
-    }
-
-    let countInt = findExchangeRateDecimals[0].length;
-    let exchangeRateDecimals;
-    if (countInt >= 4) {
-        exchangeRateDecimals = 2;
-    }
-    else if (countInt >= 1 && findExchangeRateDecimals[0] != '0') {
-        exchangeRateDecimals = 3;
-    }
-
-    let count0 = 0;
-
-    for (let i = 0; i < findExchangeRateDecimals[1]?.length ?? 0; i++) {
-        if (findExchangeRateDecimals[1][i] == '0') {
-            count0++;
-        }
-        else {
-            break;
-        }
-    }
-
-    let countDecInt = 0;
-
-    for (let i = 0; i < findExchangeRateDecimals[1]?.length ?? 0; i++) {
-        if (findExchangeRateDecimals[1][i] != '0') {
-            countDecInt++;
-        }
-        else {
-            break;
-        }
-    }
-
-    if (exchangeRateDecimals && (count0 > exchangeRateDecimals || countDecInt > exchangeRateDecimals)) {
-
-        return `only ${exchangeRateDecimals} decimal acceptable`;
-
-    }
-    else if (exchangeRateDecimals && count0 < exchangeRateDecimals && count0 < exchangeRateDecimals) {
-        return exchangeRateDecimals;
-    }
-    else {
-        exchangeRateDecimals = count0 + 4;
-        for (let i = 0; i < findExchangeRateDecimals[1]?.length ?? 0; i++) {
-            if (i <= exchangeRateDecimals - 1) {
-                continue;
-            }
-            else if (findExchangeRateDecimals[1][i] != '0') {
-                return `only ${exchangeRateDecimals} decimal acceptable`;
-            }
-
-        }
-        return exchangeRateDecimals;
-    }
-
-}
-
-
-export const expressMonitorConfig = {
-
-    title: 'Express Status',  // Default title
-    theme: 'default.css',     // Default styles
-    path: '/status',
-    socketPath: '/socket.io', // In case you use a custom path
-    // websocket: existingSocketIoInstance,
-    spans: [{
-        interval: 1,            // Every second
-        retention: 60           // Keep 60 datapoints in memory
-    }, {
-        interval: 5,            // Every 5 seconds
-        retention: 60
-    }, {
-        interval: 15,           // Every 15 seconds
-        retention: 60
-    }],
-    chartVisibility: {
-        cpu: true,
-        mem: true,
-        load: true,
-        eventLoop: true,
-        heap: true,
-        responseTime: true,
-        rps: true,
-        statusCodes: true
-    },
-    healthChecks: [
-        {
-            protocol: 'http',
-            host: 'localhost',
-            port: 3010,
-            path: '/DB/status',
-            headers: {},
-        },
-        {
-            protocol: 'http',
-            host: 'localhost',
-            port: 3010,
-            path: '/DB/fetch/record',
-            headers: {},
-        },
-
-    ],
-    // ignoreStartsWith: '/pair'
-}
-
-
-
-
-export { getExchangeABI, getERC20ABI, validateSignature, parseEther, getInterface, getProvider, MulticallAbi, getDecimals };

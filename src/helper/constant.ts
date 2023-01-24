@@ -1,10 +1,13 @@
 
 import { ethers } from "ethers";
 import fs from "fs";
-import { getERC20ABI, getExchangeABI, getProvider, leverageAbi } from "../utils/utils";
+import path from "path";
+import { getABI, getProvider } from "../utils/utils";
 
 
-const Deployments = JSON.parse((fs.readFileSync(process.cwd() + "/src/deployments/deployments.json")).toString());
+
+
+
 
 
 export const Decimals = {
@@ -12,36 +15,27 @@ export const Decimals = {
     amount: 18
 };
 
-export const contractName = Deployments["contracts"]["Exchange"]["constructorArguments"][0];
-export const version = Deployments["contracts"]["Exchange"]["constructorArguments"][1];
-export const ExchangeAddress = getContractAddress("Exchange").toLowerCase();
-export const BtcAddress = getContractAddress("BTC").toLowerCase();
-//export const BtcAddress = getContractAddress(""); // ethereum
-export const UsdcAddress = getContractAddress("USDC").toLowerCase();
-export const EthAddress = getContractAddress("ETH").toLowerCase();
-export const leverAddress = getContractAddress("Lever").toLowerCase();
-export const ZexeAddress = getContractAddress("ZEXE").toLowerCase();
-export const cUsdcAddress = getContractAddress("lUSDC_Market").toLowerCase();
-export const cBtcAddress = getContractAddress("lBTC_Market").toLowerCase();
-export const LinkAddress = getContractAddress("LINK").toLowerCase();
-
-function getContractAddress(name: string) {
-    return Deployments["contracts"][name]["address"]
+export function getConfig(name: any) {
+    let Config = JSON.parse((fs.readFileSync(path.join(__dirname, '..', 'deployments', 'config.json'))).toString());
+    return Config[name]
 }
 
-export function getContract(name: string) {
-    let chainId = "421613"
+
+export function getContractAddress(name: string) {
+    let Deployments = JSON.parse((fs.readFileSync(path.join(__dirname, '..', 'deployments', 'deployments.json'))).toString());
+    return Deployments["contracts"][name]["address"].toLowerCase()
+}
+
+
+export function getContract(name: string, chainId: any) {
+
     let provider = getProvider(chainId);
-    let abi = getERC20ABI();
-
+    let abi = getABI("TestERC20");
     if (name == "Exchange") {
-        abi = getExchangeABI()
+        abi = getABI("Exchange");
     }
-    else if (name == "Lever"){
-        abi = leverageAbi
+    else if (name == "Lever") {
+        abi = getABI("Lever");
     }
-
     return new ethers.Contract(getContractAddress(name), abi, provider)
 }
-
-// console.log(getContract("Exchange"))

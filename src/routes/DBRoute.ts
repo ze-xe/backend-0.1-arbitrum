@@ -1,10 +1,12 @@
 import express from "express";
-import { DBStatus, fetchDBRecords } from "../controllers/dbController";
-import { version } from "../helper/constant";
+import { DBStatus } from "../controllers/DB/dbStatus";
+import { fetchDBRecords } from "../controllers/DB/fetchRecord";
+import { getVersion } from "../helper/chain";
 
+require("dotenv").config()
 const router = express.Router();
 
-router.get(`/v/${version}/DB/status`, DBStatus); //ok
-router.get(`/v/${version}/DB/fetch/record`, fetchDBRecords)
+router.get(`/v/${getVersion(process.env.NODE_ENV!)}/DB/status`, DBStatus); //ok
+router.get(`/v/${getVersion(process.env.NODE_ENV!)}/DB/fetch/record`, fetchDBRecords)
 
 export default router;

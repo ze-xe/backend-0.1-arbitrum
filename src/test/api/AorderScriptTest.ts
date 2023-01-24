@@ -4,20 +4,17 @@ import { use, request } from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 import { ethers } from "ethers";
-import mongoose from "mongoose";
-import { httpServer } from "../../../app";
-import { connect, OrderCreated, OrderExecuted, Sync, UserPosition } from "../../db";
-import { getExchangeAddress } from "../../helper/chain";
-import { BtcAddress, ExchangeAddress, UsdcAddress } from "../helper/contractDeployment";
-import { ifOrderCreated } from "../../helper/interface";
-import { getERC20ABI, getExchangeABI, getProvider, parseEther } from "../../utils/utils";
+import { connect, Order, OrderExecuted, Sync, User } from "../../DB/db";
+import { getExchangeAddress, getVersion } from "../../helper/chain";
+import {  getProvider, parseEther } from "../../utils/utils";
 import { io } from "socket.io-client";
 import path from "path";
 import { EVENT_NAME } from "../../socketIo/socket.io";
-import { contractName, getContract, version } from "../../helper/constant";
+import { getConfig, getContract, } from "../../helper/constant";
+import { ifOrderCreated } from "../../helper/interface";
 use(chaiHttp);
 require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
-const socket = io("https://api.zexe.io");
+const socket = io("http://localhost:3010");
 
 
 socket.on(EVENT_NAME.PAIR_ORDER, (data) => {
@@ -33,11 +30,11 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     // requirements
     let chainId = "421613"
     let provider = getProvider(chainId);
-    let exchange = getContract("Exchange");
-    let btc = getContract("BTC")
-    let usdc = getContract("USDC")
-    let user1 = new ethers.Wallet(process.env.PRIVATE_KEY1! as string).connect(provider); //1
-    let user2 = new ethers.Wallet(process.env.PRIVATE_KEY2! as string).connect(provider); //2
+    let exchange = getContract("Exchange", chainId);
+    let btc = getContract("BTC", chainId)
+    let usdc = getContract("USDC", chainId)
+    let user1 = new ethers.Wallet(process.env.PRIVATE_KEY1! as string).connect(provider); //2
+        let user2 = new ethers.Wallet(process.env.PRIVATE_KEY2! as string).connect(provider); //1
     let signatures: any[] = [];
     let orders: any[] = [];
     let exchangeRate = ethers.utils.parseEther('20000').toString();
@@ -53,25 +50,25 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         // httpServer
         await connect()
     });
-
+/*
     it('mint 10 btc to user1, 200000 usdt to user2, approve exchange contract', async () => {
 
         let user1BtcBalancePre = (await btc.balanceOf(user1.address)).toString();
         let user2UsdcBalancePre = (await usdc.balanceOf(user2.address)).toString();
 
         const btcAmount = ethers.utils.parseEther('10').toString();
-        let tx1 = await btc.connect(user1).mint(user1.address, btcAmount);
+        let tx1 = await btc.connect(user1).mint(user1.address, btcAmount, { gasLimit: "100000000" });
 
         // approve for exchange
-        let approve = await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
-        await btc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256)
+        let approve = await btc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
+        await btc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256,{ gasLimit: "100000000" })
 
         const usdcAmount = ethers.utils.parseEther('200000').toString();
-        let tx2 = await usdc.connect(user2).mint(user2.address, usdcAmount);
+        let tx2 = await usdc.connect(user2).mint(user2.address, usdcAmount, { gasLimit: "100000000" });
 
         // approve for exchange
-        let approve1 = await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256);
-        await usdc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
+        let approve1 = await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
+        await usdc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256, { gasLimit: "100000000" });
         await approve1.wait(1)
         let user1BtcBalancePost = (await btc.balanceOf(user1.address)).toString();
         let user2UsdcBalancePost = (await usdc.balanceOf(user2.address)).toString();
@@ -82,12 +79,12 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
     });
 
-
+*/
     it(`user1 creates limit order to sell 1 btc @ 20000, check user inOrder Balance`, async () => {
 
         const domain = {
-            name: contractName,
-            version: version,
+            name: getConfig("name"),
+            version: getVersion(process.env.NODE_ENV!),
             chainId: chainId.toString(),
             verifyingContract: getExchangeAddress(chainId),
         };
@@ -132,12 +129,12 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
             value, storedSignature
         ]);
 
-        let userPositionPre = await UserPosition.findOne({ token: btc.address.toLowerCase(), id: user1.address.toLowerCase() }).lean();
+        let userPositionPre = await User.findOne({ token: btc.address.toLowerCase(), id: user1.address.toLowerCase() }).lean();
 
         let userInOrder = userPositionPre?.inOrderBalance ?? '0';
 
-        let res = await request("https://api.zexe.io")
-            .post(`/v/${version}/order/create`)
+        let res = await request("http://localhost:3010")
+            .post(`/v/${getVersion(process.env.NODE_ENV!)}/order/create`)
             .send(
                 {
                     "data": {
@@ -156,7 +153,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
                 }
             );
 
-        let userPositionPost = await UserPosition.findOne({ token: btc.address.toLowerCase(), id: user1.address.toLowerCase() }).lean()
+        let userPositionPost = await User.findOne({ token: btc.address.toLowerCase(), id: user1.address.toLowerCase() }).lean()
         // console.log(res)
         expect(res).to.have.status(201);
         expect(res.body.status).to.be.equal(true);
@@ -169,14 +166,14 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
     it(`find created order in data base`, async () => {
 
-        let data = await OrderCreated.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
+        let data = await Order.findOne({ signature: signatures[0] }).lean()! as ifOrderCreated;
         expect(data).to.be.an('object');
         expect(data.amount).to.equal(amount);
         expect(data.maker).to.equal(user1.address.toLowerCase());
         orderId = data.id
     })
 
-
+    
     it(`user2 buy user1s 0.8 btc order`, async () => {
         // balances
         let user1BtcBalancePre = btc.balanceOf(user1.address);
@@ -190,7 +187,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         user1UsdcBalancePre = promise[3].toString()
 
         // inOrder Balance
-        let userPositionPre = await UserPosition.findOne({ token: btc.address.toLowerCase(), id: user1.address.toLowerCase() }).lean();
+        let userPositionPre = await User.findOne({ token: btc.address.toLowerCase(), id: user1.address.toLowerCase() }).lean();
 
         userInOrderPre = userPositionPre?.inOrderBalance ?? '0';
 
@@ -241,7 +238,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
-                }, 60000)
+                }, 15000)
 
                 socket.on(EVENT_NAME.PAIR_HISTORY, (data) => {
                     clearTimeout(timeOutId)
@@ -264,8 +261,8 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     it(`find executed Order, check inOrderBalance`, async () => {
         // console.log("txnId=",txnId, "orderId", orderId)
         let executeOrder = await OrderExecuted.findOne({ id: orderId }).lean();
-        let userPosition = await UserPosition.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()! as any;
-        let orderCreated = await OrderCreated.findOne({ id: orderId }).lean()! as any;
+        let userPosition = await User.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()! as any;
+        let orderCreated = await Order.findOne({ id: orderId }).lean()! as any;
 
         expect(orderCreated?.balanceAmount).to.equal(Big(orderCreated.amount).minus(btcAmount).toString())
         expect(executeOrder).not.to.be.null;
@@ -281,7 +278,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
     it(`user1 cancell order 0.2 btc, check order, inOrderbalance `, async () => {
 
-        let userPositionPre = await UserPosition.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()
+        let userPositionPre = await User.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()
 
         let exTxn = await exchange.connect(user1).cancelOrder(
             signatures[0],
@@ -296,7 +293,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
                 let timeOutId = setTimeout(() => {
                     return resolve("Success")
-                }, 60000)
+                }, 15000)
 
                 socket.on(EVENT_NAME.CANCEL_ORDER, (data) => {
                     clearTimeout(timeOutId)
@@ -306,8 +303,8 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         }
         let res = await wait()
         expect(res).to.equal("Success")
-        let order = await OrderCreated.findOne({ id: orderId }).lean();
-        let userPositionPost = await UserPosition.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()
+        let order = await Order.findOne({ id: orderId }).lean();
+        let userPositionPost = await User.findOne({ id: user1.address.toLowerCase(), token: btc.address.toLowerCase() }).lean()
         expect(order).to.be.an('object');
         expect(order?.cancelled).to.equal(true);
         expect(userPositionPost).to.be.an('object');

@@ -1,7 +1,7 @@
-import { Token } from "../db";
-import { getERC20ABI, getProvider } from "../utils/utils";
+import { Token } from "../DB/db";
+import { getABI, getProvider } from "../utils/utils";
 import { ethers } from "ethers";
-import { sentry } from "../../app";
+import * as sentry from "@sentry/node";
 
 
 
@@ -14,7 +14,7 @@ async function handleToken(token: string, chainId: string) {
         }
 
         let provider = getProvider(chainId);
-        let getTokenDetails = new ethers.Contract(token, getERC20ABI(), provider);
+        let getTokenDetails = new ethers.Contract(token, getABI("TestERC20"), provider);
 
         let name = getTokenDetails["name"]();
         let symbol = getTokenDetails["symbol"]();
