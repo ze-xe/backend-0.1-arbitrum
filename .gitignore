@@ -4,3 +4,4 @@ data
 .env.test
 .nyc_output
 .vscode
+apiTest.ts
