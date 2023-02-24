@@ -6,6 +6,7 @@
   "author": "mubashirzebi <mubashshirzebi@gmail.com>",
   "license": "MIT",
   "private": true,
+
   "scripts": {
     "start1": "ts-node build",
     "dep": "ts-node ./script/config.ts",

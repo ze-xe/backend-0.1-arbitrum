@@ -4,7 +4,7 @@ import path from 'path';
 import SyncSchema from "../schemas/Sync";
 import PairSchema from "../schemas/Pair";
 import OrderSchema from "../schemas/Order";
-import OrderExecutedSchema from "../schemas/OrderExecuted";
+import OrderExecutedSchema from "../schemas/OrderFilled";
 import TokenSchema from "../schemas/Token";
 import UserSchema from "../schemas/User";
 import { getVersion } from "../helper/chain";

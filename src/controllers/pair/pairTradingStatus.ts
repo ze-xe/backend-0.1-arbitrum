@@ -44,18 +44,18 @@ export async function getPairTradingStatus(req: any, res: any) {
                     },
                     {
                         $addFields: {
-                            amount: { $toDecimal: "$fillAmount" },
+                            amount: { $toDecimal: "$pairToken0Amount" },
                         }
                     },
                     {
                         $facet: {
 
-                            "exchangeRate": [
+                            "price": [
                                 {
                                     $group: {
                                         _id: null,
-                                        first: { $first: "$exchangeRate" },
-                                        last: { $last: "$exchangeRate" }
+                                        first: { $first: "$pairPrice" },
+                                        last: { $last: "$pairPrice" }
 
                                     }
                                 },
@@ -77,7 +77,7 @@ export async function getPairTradingStatus(req: any, res: any) {
             );
             let intervalStr = ["_24hr", " _7D", " _30D", "_90D", " _1Yr"];
 
-            if (getOrderExecuted[0].exchangeRate.length <= 0) {
+            if (getOrderExecuted[0].price.length <= 0) {
 
                 let temp = {
                     interval: `${intervalStr[i]}`,
@@ -89,9 +89,9 @@ export async function getPairTradingStatus(req: any, res: any) {
 
             }
             else {
-                let changeInER = getOrderExecuted[0].exchangeRate[0].first - getOrderExecuted[0].exchangeRate[0].last;
+                let changeInER = getOrderExecuted[0].price[0].first - getOrderExecuted[0].price[0].last;
 
-                changeInER = (changeInER / getOrderExecuted[0].exchangeRate[0].last) * 100;
+                changeInER = (changeInER / getOrderExecuted[0].price[0].last) * 100;
 
                 let volume = Number(getOrderExecuted[0].volume[0].volume) / 10 ** 18;
 

@@ -30,12 +30,14 @@ export function getContractAddress(name: string) {
 export function getContract(name: string, chainId: any) {
 
     let provider = getProvider(chainId);
-    let abi = getABI("TestERC20");
-    if (name == "Exchange") {
-        abi = getABI("Exchange");
+    let abi = getABI("MockToken");
+    if (name == "Spot") {
+        abi = getABI("Spot");
     }
-    else if (name == "Lever") {
-        abi = getABI("Lever");
+    else if (name == "IPool") {
+        abi = getABI("IPool");
     }
     return new ethers.Contract(getContractAddress(name), abi, provider)
 }
+
+// console.log(getContractAddress("WETH"))

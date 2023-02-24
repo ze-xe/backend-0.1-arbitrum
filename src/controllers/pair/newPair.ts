@@ -38,8 +38,8 @@ export async function getNewPair(req: any, res: any) {
             let temp = {
 
                 id: allPairs[i].id,
-                exchangeRate: allPairs[i].exchangeRate,
-                exchangeRateDecimals: allPairs[i].exchangeRateDecimals,
+                price: allPairs[i].price,
+                priceDecimals: allPairs[i].priceDecimals,
                 priceDiff: allPairs[i].priceDiff,
                 marginEnabeled: allPairs[i].marginEnabled,
                 minToken0Order: allPairs[i].minToken0Order,

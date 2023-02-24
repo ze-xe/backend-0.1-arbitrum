@@ -4,56 +4,53 @@ import { errorMessage } from "../../../helper/errorMessage";
 import { multicall } from "../../../muticall/muticall";
 import * as sentry from "@sentry/node";
 
-
+/**
+           LIMIT: SELL 0.1 BTC for USDC (0.0001)
+           token0: USDC
+           token1: BTC
+           amount: 1000 USDC
+        */
+/**
+    LIMIT: BUY 0.1 BTC for USDC (10000)
+    token0: BTC
+    token1: USDC
+    amount: 0.1 BTC
+ */
 
 
 
 export async function validationAndUserPosition(data: any, chainId: string, ipfs: boolean | undefined) {
     try {
 
-        let findUserPosition;
+       
         let multicallData: number[] | null;
         let userTokenBalance = 0;
         let allowance = 0;
-        let token;
-        let amount = data.amount;
-        if (data.orderType == 1) {
-            findUserPosition = await User.findOne({ id: data.maker, token: data.token0, chainId: chainId }).lean();
-            if (!ipfs) {
-                multicallData = await multicall(data.token0, data.maker, chainId)
-                if (multicallData) {
-                    userTokenBalance = multicallData[0];
-                    allowance = multicallData[1];
-                }
-            }
-            token = data.token0
-        }
-        else if (data.orderType == 0) {
-            findUserPosition = await User.findOne({ id: data.maker, token: data.token1, chainId: chainId }).lean();
-            if (!ipfs) {
-                multicallData = await multicall(data.token1, data.maker, chainId)
-                if (multicallData) {
-                    userTokenBalance = multicallData[0];
-                    allowance = multicallData[1];
-                }
-            }
-            token = data.token1
-            amount = Big(data.amount).times(data.exchangeRate).div(Big(10).pow(18));
-        }
+        // let token = data.token1;
+        // let amount = data.token1Amount;
 
+        let findUserPosition = await User.findOne({ id: data.maker, token: data.token1, chainId: chainId }).lean();
+        if (!ipfs) {
+            multicallData = await multicall(data.token1, data.maker, chainId)
+            if (multicallData) {
+                userTokenBalance = multicallData[0];
+                allowance = multicallData[1];
+            }
+        }
+       
         if (findUserPosition) {
 
             let _id = findUserPosition._id.toString();
 
-            let currentInOrderBalance = Big(findUserPosition.inOrderBalance).plus(amount).toString();
+            let currentInOrderBalance = Big(findUserPosition.inOrderBalance).plus(data.token1Amount).toString();
 
             if (!ipfs && Number(allowance) < Number(currentInOrderBalance)) {
-                console.log(`${errorMessage.allowance, token}`);
+                console.log(`${errorMessage.allowance, data.token1}`);
                 return { status: false, error: errorMessage.allowance, statusCode: 400 };
             }
 
             if (!ipfs && Number(userTokenBalance) < Number(currentInOrderBalance)) {
-                console.log(`${errorMessage.balance, token}`);
+                console.log(`${errorMessage.balance, data.token1}`);
                 return { status: false, error: errorMessage.balance, statusCode: 400 };
             }
 
@@ -63,21 +60,21 @@ export async function validationAndUserPosition(data: any, chainId: string, ipfs
             );
         } else {
 
-            if (!ipfs && Number(allowance) < Number(amount)) {
-                console.log(`${errorMessage.allowance, token}`);
+            if (!ipfs && Number(allowance) < Number(data.token1Amount)) {
+                console.log(`${errorMessage.allowance, data.token1}`);
                 return { status: false, error: errorMessage.allowance, statusCode: 400 };
             }
 
-            if (!ipfs && Number(userTokenBalance) < Number(amount)) {
-                console.log(`${errorMessage.balance, token}`);
+            if (!ipfs && Number(userTokenBalance) < Number(data.token1Amount)) {
+                console.log(`${errorMessage.balance, data.token1}`);
                 return { status: false, error: errorMessage.balance, statusCode: 400 };
             }
 
             User.create(
                 {
-                    token: token,
+                    token: data.token1,
                     chainId: chainId,
-                    inOrderBalance: amount.toString(),
+                    inOrderBalance: data.token1Amount,
                     id: data.maker
                 }
             );

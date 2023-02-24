@@ -7,6 +7,7 @@ import { getProvider, getInterface, getABI } from "../utils/utils";
 import { ifOrderCreated, ifUserPosition, orderSignature } from "../helper/interface";
 import * as sentry from "@sentry/node";
 import { getMulticallAddress } from "../helper/chain";
+import { Action } from "../controllers/order/helper/marginValidationUserPosition";
 
 
 
@@ -25,7 +26,7 @@ import { getMulticallAddress } from "../helper/chain";
  * @param {*} amounts ([string]) numeric amounts of repective orders
  * @returns (object) only valid order send 
  */
-export async function getMultiBalance(token: string, addresses: string[], ids: string[], data: ifOrderCreated[], chainId: string, amounts: number[]) {
+export async function getMultiBalance(token: string, addresses: string[], data: ifOrderCreated[], chainId: string, pairToken0: string) {
 
     const _getMultiBalance = async () => {
         try {
@@ -36,7 +37,7 @@ export async function getMultiBalance(token: string, addresses: string[], ids: s
                 getProvider(chainId)
             );
 
-            const itf: ethers.utils.Interface = getInterface(getABI("TestERC20"));
+            const itf: ethers.utils.Interface = getInterface(getABI("MockToken"));
 
             const resp: any = await multicall.callStatic.aggregate(
 
@@ -55,20 +56,43 @@ export async function getMultiBalance(token: string, addresses: string[], ids: s
                 let balance = BigNumber.from(resp[1][i]).toString();
                 let userPosition: ifUserPosition = await User.findOne({ token: token, id: addresses[i], chainId: chainId }).lean();
                 let inOrderBalance = Big(userPosition.inOrderBalance);
-
+                let amounts = data[i].balanceAmount;
                 if (Number(balance) < Number(inOrderBalance)) {
-                    inActiveIds.push(ids[i]);
-                    let currentInOrderBalance = Big(inOrderBalance).minus(amounts[i]).toString();
+                    inActiveIds.push(data[i]._id);
 
-                    let updateUserPosition = User.findOneAndUpdate({ token: token, id: addresses[i], chainId: chainId }, { $set: { inOrderBalance: currentInOrderBalance } });
-                    console.log("Order Deactivate", data[i].id)
-                    let deleteOrder = Order.findOneAndUpdate({ _id: ids[i] }, { $set: { active: false } });
-                    await Promise.all([updateUserPosition, deleteOrder]);
+                    if (data[i].action != Action.CLOSE) {
+
+                        if (data[i].action == Action.LIMIT) {
+
+                            if (pairToken0 != data[i].token1) {
+                                amounts = Big(data[i].balanceAmount).times(data[i].price).div(1e18).toString();
+                            }
+
+                            let currentInOrderBalance = Big(inOrderBalance).minus(amounts).toString();
+
+                             await User.findOneAndUpdate({ token: token, id: addresses[i], chainId: chainId }, { $set: { inOrderBalance: currentInOrderBalance } });
+
+                        }
+                        else if (data[i].action == Action.OPEN ) {
+                            let token0Amount = data[i].balanceAmount;
+                            if (pairToken0 != data[i].token0) {
+                                token0Amount = Big(data[i].balanceAmount).div(data[i].price).mul(1e18).toString();
+                            }
+                            let token0InOrder = Big(inOrderBalance).minus(Big(token0Amount).div(Big(Number(data[i].leverage) - 1)));
+                             await User.findOneAndUpdate({ token: token, id: addresses[i], chainId: chainId }, { $set: { inOrderBalance: token0InOrder } });
+
+                        }
+
+
+                    }
+                    console.log("Order Deactivate from getMultiBalance", data[i].id)
+                     await Order.findOneAndUpdate({ _id: data[i]._id }, { $set: { active: false } });
+                    // await Promise.all([updateUserPosition, deleteOrder]);
                 }
 
             }
 
-            let res: orderSignature[] = [];
+            let res: any[] = [];
 
             for (let i in data) {
 
@@ -83,18 +107,21 @@ export async function getMultiBalance(token: string, addresses: string[], ids: s
                             maker: data[i].maker,
                             token0: data[i].token0,
                             token1: data[i].token1,
-                            amount: data[i].amount,
-                            orderType: data[i].orderType,
-                            salt: data[i].salt,
-                            exchangeRate: data[i].exchangeRate,
-                            borrowLimit: data[i].borrowLimit,
-                            loops: data[i].loops
+                            token0Amount: data[i].token0Amount,
+                            token1Amount: data[i].token1Amount,
+                            leverage: data[i].leverage,
+                            price: data[i].price,
+                            expiry: data[i].expiry,
+                            nonce: data[i].nonce,
+                            action: data[i].action,
+                            position: data[i].position,
+                            
                         }
                     });
 
                 }
             }
-
+           
             return res;
         } catch (error) {
             sentry.captureException(error);

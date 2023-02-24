@@ -25,7 +25,7 @@ export async function getUserOrderHistory(req: any, res: any) {
         if (!chainId) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
-        const getOrderHistory = await OrderExecuted.find({ taker: taker, pair: pairId, chainId: chainId }).sort({ blockTimestamp: -1, createdAt: -1 }).select({ orderType: 1, exchangeRate: 1, fillAmount: 1, _id: 0 }).limit(50).lean();
+        const getOrderHistory = await OrderExecuted.find({ taker: taker, pair: pairId, chainId: chainId }).sort({ blockTimestamp: -1, createdAt: -1 }).select({ action: 1, pairPrice: 1, pairToken0Amount: 1, _id: 0 }).limit(50).lean();
 
         return res.status(200).send({ status: true, data: getOrderHistory });
     }

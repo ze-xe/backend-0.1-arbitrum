@@ -27,7 +27,7 @@ async function start(chainId: string, httpServer: any) {
             let page: number = 0;
 
             let _limit: number = 20;
-            await copy();
+            // await copy();
             async function copy() {
                 console.log(page, "Page No");
                 let copyOrder: ifOrderCreated[] = await OrderCreatedBackup.find({ chainId: chainId }, { _id: 0, __v: 0 }).skip(page * _limit).limit(20).lean();
@@ -38,12 +38,12 @@ async function start(chainId: string, httpServer: any) {
                         maker: copyOrder[i].maker,
                         token0: copyOrder[i].token0,
                         token1: copyOrder[i].token1,
-                        amount: copyOrder[i].amount,
-                        orderType: copyOrder[i].orderType,
+                        amount: copyOrder[i].token0Amount,
+                        orderType: copyOrder[i].action,
                         salt: Number(copyOrder[i].salt),
-                        exchangeRate: copyOrder[i].exchangeRate,
-                        borrowLimit: copyOrder[i].borrowLimit,
-                        loops: copyOrder[i].loops
+                        exchangeRate: copyOrder[i].price,
+                        borrowLimit: copyOrder[i].action,
+                        loops: copyOrder[i].action
                     }
 
                     let result: AxiosResponse = await axios({

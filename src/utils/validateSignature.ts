@@ -16,9 +16,10 @@ import { getConfig } from "../helper/constant";
  * @param {*} chainId (string) numeric chainId
  * @returns digest will be id of order, or false
  */
-export function validateSignature(maker: string, signature: string, value: object, chainId: string): (string | null) {
+export function validateSignature(maker: string, signature: string, value: any, chainId: string): (string | null) {
     try {
         require("dotenv").config()
+       
         const domain = {
             name: getConfig("name"),
             version: getVersion(process.env.NODE_ENV!),
@@ -32,15 +33,17 @@ export function validateSignature(maker: string, signature: string, value: objec
                 { name: 'maker', type: 'address' },
                 { name: 'token0', type: 'address' },
                 { name: 'token1', type: 'address' },
-                { name: 'amount', type: 'uint256' },
-                { name: 'orderType', type: 'uint8' },
-                { name: 'salt', type: 'uint32' },
-                { name: 'exchangeRate', type: 'uint176' },
-                { name: 'borrowLimit', type: 'uint32' },
-                { name: 'loops', type: 'uint8' }
-            ]
+                { name: 'token0Amount', type: 'uint256' },
+                { name: 'token1Amount', type: 'uint256' },
+                { name: 'leverage', type: 'uint256' },
+                { name: 'price', type: 'uint256' },
+                { name: 'expiry', type: 'uint256' },
+                { name: 'nonce', type: 'uint256' },
+                { name: 'action', type: 'uint256' },
+                { name: 'position', type: 'uint256' }
+			],
         };
-
+        // console.log("value from signature", value, signature);
         const digest: string = ethers.utils._TypedDataEncoder.hash(domain, types, value).toLowerCase();
 
         const signatureAddress: string = ethers.utils.recoverAddress(digest, signature).toLowerCase();

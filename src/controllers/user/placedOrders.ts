@@ -31,18 +31,19 @@ export async function getUserPlacedOrders(req: any, res: any) {
                     maker: order.maker,
                     token0: order.token0,
                     token1: order.token1,
-                    amount: order.amount,
-                    orderType: order.orderType,
-                    salt: order.salt,
-                    exchangeRate: order.exchangeRate,
-                    borrowLimit: order.borrowLimit,
-                    loops: order.loops
+                    token0Amount: order.token0Amount,
+                    token1Amount: order.token1Amount,
+                    leverage: order.leverage,
+                    price: order.price,
+                    expiry: order.expiry,
+                    nonce: order.nonce,
+                    action: order.action,
+                    position: order.position
                 }
             }
         });
 
-
-
+    
         return res.status(200).send({ status: true, data: data });
     }
     catch (error: any) {

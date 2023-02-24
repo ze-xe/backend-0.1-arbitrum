@@ -14,7 +14,7 @@ async function handleToken(token: string, chainId: string) {
         }
 
         let provider = getProvider(chainId);
-        let getTokenDetails = new ethers.Contract(token, getABI("TestERC20"), provider);
+        let getTokenDetails = new ethers.Contract(token, getABI("MockToken"), provider);
 
         let name = getTokenDetails["name"]();
         let symbol = getTokenDetails["symbol"]();

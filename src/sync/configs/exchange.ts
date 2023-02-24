@@ -15,13 +15,15 @@ function ExchangeConfig(chainId: string) {
 
     return {
         contractAddress: getExchangeAddress(chainId),
-        abi: getABI("Exchange"),
+        abi: getABI("Spot"),
         handlers: {
-            "OrderExecuted": handleOrderExecuted,
+            "OpenPosition": handleOrderExecuted,
+            "ClosePosition": handleOrderExecuted,
+            "LimitOrderFilled": handleOrderExecuted,
             "OrderCancelled": handleOrderCancelled,
-            "MarginEnabled": handleMarginEnabled,
-            "FeesSet": handleFeesSet,
-            "MinTokenAmountSet": handleMinTokenAmountSet
+            // "MarginEnabled": handleMarginEnabled,
+            // "FeesSet": handleFeesSet,
+            // "MinTokenAmountSet": handleMinTokenAmountSet
         },
         chainId: chainId
     };

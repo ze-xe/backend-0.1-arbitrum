@@ -41,18 +41,18 @@ export async function getPairTrandingPair(req: any, res: any) {
                     },
                     {
                         $addFields: {
-                            amount: { $toDecimal: "$fillAmount" },
+                            amount: { $toDecimal: "$pairToken0Amount" },
                         }
                     },
                     {
                         $facet: {
 
-                            "exchangeRate": [
+                            "price": [
                                 {
                                     $group: {
                                         _id: null,
-                                        first: { $first: "$exchangeRate" },
-                                        last: { $last: "$exchangeRate" }
+                                        first: { $first: "$pairPrice" },
+                                        last: { $last: "$pairPrice" }
 
                                     }
                                 },
@@ -74,7 +74,7 @@ export async function getPairTrandingPair(req: any, res: any) {
             );
 
 
-            if (getOrderExecuted[0].exchangeRate.length <= 0) {
+            if (getOrderExecuted[0].price.length <= 0) {
 
                 let temp = {
                     pairId: getPairs[i].id,
@@ -85,9 +85,9 @@ export async function getPairTrandingPair(req: any, res: any) {
 
             }
             else {
-                let changeInER = getOrderExecuted[0].exchangeRate[0].first - getOrderExecuted[0].exchangeRate[0].last;
+                let changeInER = getOrderExecuted[0].price[0].first - getOrderExecuted[0].price[0].last;
 
-                let trade = Big(getOrderExecuted[0].exchangeRate[0].first).times(getOrderExecuted[0].volume[0].volume).div(1e36).toString()
+                let trade = Big(getOrderExecuted[0].price[0].first).times(getOrderExecuted[0].volume[0].volume).div(1e36).toString()
 
                 let temp = {
                     pairId: getPairs[i].id,
@@ -122,8 +122,8 @@ export async function getPairTrandingPair(req: any, res: any) {
             let temp = {
 
                 id: allPairs.id,
-                exchangeRate: allPairs.exchangeRate,
-                exchangeRateDecimals: allPairs.exchangeRateDecimals,
+                price: allPairs.price,
+                priceDecimals: allPairs.priceDecimals,
                 priceDiff: allPairs.priceDiff,
                 marginEnabeled: allPairs.marginEnabled,
                 minToken0Order: allPairs.minToken0Order,

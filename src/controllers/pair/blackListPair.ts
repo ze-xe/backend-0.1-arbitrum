@@ -13,7 +13,7 @@ import * as sentry from "@sentry/node";
 export async function handleBlackListToken(req: any, res: any) {
 
     try {
-
+        // 0 for blackList
         const signature = req.body.signature;
         const blackList = req.body.blackList;
         const token = req.body.token;

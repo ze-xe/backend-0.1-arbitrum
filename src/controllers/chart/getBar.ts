@@ -71,10 +71,10 @@ export async function getBar(req: any, res: any) {
             if (!lastOrder) {
                 return res.status(200).send({ status: true, data: [] });
             }
-            let min = lastOrder.exchangeRate;
-            let max = lastOrder.exchangeRate;
-            let open = lastOrder.exchangeRate;
-            let close = lastOrder.exchangeRate;
+            let min = lastOrder.pairPrice;
+            let max = lastOrder.pairPrice;
+            let open = lastOrder.pairPrice;
+            let close = lastOrder.pairPrice;
             let currTimestamp = from;
 
             while (currTimestamp < to) {
@@ -94,7 +94,7 @@ export async function getBar(req: any, res: any) {
             }
 
             let result = {
-                exchangeRate: exchangeRatesTrend,
+                price: exchangeRatesTrend,
             };
             return res.status(200).send({ status: true, data: result });
 
@@ -103,17 +103,17 @@ export async function getBar(req: any, res: any) {
         let exchangeRatesTrend: any = [];
         let min: string = Big(Number.MAX_VALUE).toString();
         let max: string = Big(0).toString();
-        let open: string = data[0].exchangeRate;
-        let close: string = data[0].exchangeRate;
+        let open: string = data[0].pairPrice;
+        let close: string = data[0].pairPrice;
         let currTimestamp: number = data[0].blockTimestamp;
 
         let lastOrder = await OrderExecuted.findOne({ pair: pairId, chainId: chainId, blockTimestamp: { $lt: Number(from) } }).sort({ createdAt: -1 }).lean();
 
         if (lastOrder) {
-            min = lastOrder.exchangeRate;
-            max = lastOrder.exchangeRate;
-            open = lastOrder.exchangeRate;
-            close = lastOrder.exchangeRate;
+            min = lastOrder.pairPrice;
+            max = lastOrder.pairPrice;
+            open = lastOrder.pairPrice;
+            close = lastOrder.pairPrice;
             currTimestamp = from;
         }
 
@@ -124,16 +124,16 @@ export async function getBar(req: any, res: any) {
             if (data[i].blockTimestamp <= currTimestamp + intervalInMSec) {
                 // this block will mainly update the min max, open close value
 
-                if (Number(data[i].exchangeRate) > Number(max)) {
-                    max = data[i].exchangeRate;
+                if (Number(data[i].pairPrice) > Number(max)) {
+                    max = data[i].pairPrice;
                 }
 
-                if (Number(data[i].exchangeRate) < Number(min)) {
-                    min = data[i].exchangeRate;
+                if (Number(data[i].pairPrice) < Number(min)) {
+                    min = data[i].pairPrice;
                 }
 
-                close = data[i].exchangeRate;
-                volume = Big(volume).plus(data[i].fillAmount).toString();
+                close = data[i].pairPrice;
+                volume = Big(volume).plus(data[i].pairToken0Amount).toString();
 
                 if (i == data.length - 1 && currTimestamp >= to) {
 
@@ -169,7 +169,7 @@ export async function getBar(req: any, res: any) {
                     open = close;
                     close = close;
                     currTimestamp = currTimestamp + intervalInMSec;
-                    data[i].fillAmount = '0';
+                    data[i].pairToken0Amount = '0';
                     volume = '0';
                     i--;
                 }
@@ -211,16 +211,16 @@ export async function getBar(req: any, res: any) {
                 else {
                     // block fall in that interval
                     max = close
-                    if (Number(data[i].exchangeRate) > Number(close)) {
-                        max = data[i].exchangeRate
+                    if (Number(data[i].pairPrice) > Number(close)) {
+                        max = data[i].pairPrice
                     }
                     min = close;
-                    if (Number(data[i].exchangeRate) < Number(close)) {
-                        min = data[i].exchangeRate
+                    if (Number(data[i].pairPrice) < Number(close)) {
+                        min = data[i].pairPrice
                     }
                     open = close;
-                    close = data[i].exchangeRate;
-                    volume = data[i].fillAmount;
+                    close = data[i].pairPrice;
+                    volume = data[i].pairToken0Amount;
                 }
 
                 if (i == data.length - 1 && currTimestamp >= to) {

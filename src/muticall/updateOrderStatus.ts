@@ -5,6 +5,7 @@ import { getABI, getProvider, getInterface } from "../utils/utils";
 import { ifOrderCreated, ifUserPosition } from "../helper/interface";
 import * as sentry from "@sentry/node";
 import { getMulticallAddress } from "../helper/chain";
+import { Action } from "../controllers/order/helper/marginValidationUserPosition";
 
 
 
@@ -17,110 +18,110 @@ import { getMulticallAddress } from "../helper/chain";
  * @param {*} chainId (string) numeric chainId
  */
 async function orderStatus(chainId: string) {
-    try {
+    // try {
 
-        const multicall: ethers.Contract = new ethers.Contract(
-            getMulticallAddress(chainId),
-            getABI("Multicall2"),
-            getProvider(chainId)
-        );
+    //     const multicall: ethers.Contract = new ethers.Contract(
+    //         getMulticallAddress(chainId),
+    //         getABI("Multicall2"),
+    //         getProvider(chainId)
+    //     );
 
-        const itf: ethers.utils.Interface = getInterface(getABI("TestERC20"));
-        let hasOrder: boolean = true;
-        let page: number = 0;
-        const _limit = 20;
+    //     const itf: ethers.utils.Interface = getInterface(getABI("MockToken"));
+    //     let hasOrder: boolean = true;
+    //     let page: number = 0;
+    //     const _limit = 20;
 
-        while (hasOrder == true) {
-            const getOrderCreated: ifOrderCreated[] = await Order.find({ deleted: false, cancelled: false, chainId: chainId }).skip(page * _limit).limit(_limit).lean();
-            if (getOrderCreated.length == 0) {
-                hasOrder = false;
-                break;
-            }
-            page++;
+    //     while (hasOrder == true) {
+    //         const getOrderCreated: ifOrderCreated[] = await Order.find({ deleted: false, cancelled: false, chainId: chainId }).skip(page * _limit).limit(_limit).lean();
+    //         if (getOrderCreated.length == 0) {
+    //             hasOrder = false;
+    //             break;
+    //         }
+    //         page++;
 
-            let input: any = [];
+    //         let input: any = [];
 
-            // creating input for multicall
-            for (let k in getOrderCreated) {
+    //         // creating input for multicall
+    //         for (let k in getOrderCreated) {
 
-                if (getOrderCreated[k].orderType == 1 || getOrderCreated[k].orderType == 3) {
+    //             if (getOrderCreated[k].action == Action.LIMIT) {
 
-                    input.push([getOrderCreated[k].token0, itf.encodeFunctionData("balanceOf", [getOrderCreated[k].maker])]);
+    //                 input.push([getOrderCreated[k].token1, itf.encodeFunctionData("balanceOf", [getOrderCreated[k].maker])]);
 
-                }
-                else if (getOrderCreated[k].orderType == 0 || getOrderCreated[k].orderType == 2) {
+    //             }
+    //             else if (getOrderCreated[k].action == Action.OPEN) {
 
-                    input.push([getOrderCreated[k].token1, itf.encodeFunctionData("balanceOf", [getOrderCreated[k].maker])]);
-                }
-            }
+    //                 input.push([getOrderCreated[k].token0, itf.encodeFunctionData("balanceOf", [getOrderCreated[k].maker])]);
+    //             }
+    //         }
 
-            let resp: any = await multicall.callStatic.aggregate(input);
+    //         let resp: any = await multicall.callStatic.aggregate(input);
 
-            for (let i = 0; i < resp[1].length; i++) {
+    //         for (let i = 0; i < resp[1].length; i++) {
 
-                let balance: string = BigNumber.from(resp[1][i]).toString();
+    //             let balance: string = BigNumber.from(resp[1][i]).toString();
 
-                let token: string = '';
-                let amount: Big = Big(0);
-                let id = getOrderCreated[i].maker;
+    //             let token: string = '';
+    //             let amount: Big = Big(0);
+    //             let id = getOrderCreated[i].maker;
 
-                if (getOrderCreated[i].orderType == 1 || getOrderCreated[i].orderType == 3) {
-                    token = getOrderCreated[i].token0;
-                    amount = Big(getOrderCreated[i].balanceAmount);
+    //             if (getOrderCreated[i].action == '1' || getOrderCreated[i].action == '3') {
+    //                 token = getOrderCreated[i].token0;
+    //                 amount = Big(getOrderCreated[i].balanceAmount);
 
-                    if (getOrderCreated[i].orderType == 3) {
-                        amount = Big(getOrderCreated[i].amount);
-                    }
-                }
-                else if (getOrderCreated[i].orderType == 0 || getOrderCreated[i].orderType == 2) {
-                    token = getOrderCreated[i].token1;
-                    amount = Big(getOrderCreated[i].balanceAmount).times(getOrderCreated[i].exchangeRate).div(Big(10).pow(18));
+    //                 if (getOrderCreated[i].action == '3') {
+    //                     amount = Big(getOrderCreated[i].token0Amount);
+    //                 }
+    //             }
+    //             else if (getOrderCreated[i].action == '0' || getOrderCreated[i].action == '2') {
+    //                 token = getOrderCreated[i].token1;
+    //                 amount = Big(getOrderCreated[i].balanceAmount).times(getOrderCreated[i].price).div(Big(10).pow(18));
 
-                    if (getOrderCreated[i].orderType == 2) {
-                        amount = Big(getOrderCreated[i].amount).times(getOrderCreated[i].exchangeRate).div(Big(10).pow(18));
-                    }
-                }
+    //                 if (getOrderCreated[i].action == '2') {
+    //                     amount = Big(getOrderCreated[i].token0Amount).times(getOrderCreated[i].price).div(Big(10).pow(18));
+    //                 }
+    //             }
 
-                if (getOrderCreated[i].active == true) {
+    //             if (getOrderCreated[i].active == true) {
 
-                    const getUserPos: ifUserPosition = await User.findOne({ token: token, id: id, chainId: chainId }).lean();
+    //                 const getUserPos: ifUserPosition = await User.findOne({ token: token, id: id, chainId: chainId }).lean();
 
-                    let inOrderBalance = Big(getUserPos.inOrderBalance);
+    //                 let inOrderBalance = Big(getUserPos.inOrderBalance);
 
-                    if (Number(inOrderBalance) > Number(balance)) {
-                        let currentInOrderBalance = Big(inOrderBalance).minus(amount).toString();
-                        // updating inOrderBalance and active
-                        await Promise.all([
-                            Order.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: false } }),
-                            User.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: currentInOrderBalance } })
-                        ]);
-                        console.log("inactive", getOrderCreated[i].id, getUserPos.id);
-                    }
-                }
-                else if (getOrderCreated[i].active == false) {
+    //                 if (Number(inOrderBalance) > Number(balance)) {
+    //                     let currentInOrderBalance = Big(inOrderBalance).minus(amount).toString();
+    //                     // updating inOrderBalance and active
+    //                     await Promise.all([
+    //                         Order.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: false } }),
+    //                         User.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: currentInOrderBalance } })
+    //                     ]);
+    //                     console.log("inactive", getOrderCreated[i].id, getUserPos.id);
+    //                 }
+    //             }
+    //             else if (getOrderCreated[i].active == false) {
 
-                    const getUserPos: ifUserPosition = await User.findOne({ token: token, id: getOrderCreated[i].maker, chainId: getOrderCreated[i].chainId }).lean();
+    //                 const getUserPos: ifUserPosition = await User.findOne({ token: token, id: getOrderCreated[i].maker, chainId: getOrderCreated[i].chainId }).lean();
 
-                    let inOrderBalance = Big(getUserPos.inOrderBalance).plus(amount).toString();
+    //                 let inOrderBalance = Big(getUserPos.inOrderBalance).plus(amount).toString();
 
-                    if (Number(inOrderBalance) < Number(balance)) {
+    //                 if (Number(inOrderBalance) < Number(balance)) {
 
-                        await Promise.all([
-                            Order.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: true } }),
-                            User.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: inOrderBalance } })
-                        ]);
-                        console.log("active", getOrderCreated[i].id, getUserPos.id);
-                    }
-                }
-            }
+    //                     await Promise.all([
+    //                         Order.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: true } }),
+    //                         User.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: inOrderBalance } })
+    //                     ]);
+    //                     console.log("active", getOrderCreated[i].id, getUserPos.id);
+    //                 }
+    //             }
+    //         }
 
-        }
+    //     }
 
-    }
-    catch (error) {
-        sentry.captureException(error)
-        console.log("Error @ orderStatus", error);
-    }
+    // }
+    // catch (error) {
+    //     sentry.captureException(error)
+    //     console.log("Error @ orderStatus", error);
+    // }
 }
 
 export function startOrderStatus(chainId: string) {

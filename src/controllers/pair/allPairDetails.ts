@@ -13,6 +13,7 @@ import * as sentry from "@sentry/node";
 
 
 
+
 export async function getAllPairDetails(req: any, res: any) {
 
     try {
@@ -44,8 +45,8 @@ export async function getAllPairDetails(req: any, res: any) {
             let temp = {
 
                 id: allPairs[i].id,
-                exchangeRate: allPairs[i].exchangeRate,
-                exchangeRateDecimals: allPairs[i].exchangeRateDecimals,
+                exchangeRate: allPairs[i].price,
+                exchangeRateDecimals: allPairs[i].price,
                 priceDiff: allPairs[i].priceDiff,
                 marginEnabeled: allPairs[i].marginEnabled,
                 minToken0Order: allPairs[i].minToken0Order,

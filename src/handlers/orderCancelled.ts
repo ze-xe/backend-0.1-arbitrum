@@ -1,8 +1,9 @@
-import { Order, User } from "../DB/db";
+import { Order, Pair, User } from "../DB/db";
 import Big from "big.js";
-import { ifOrderCreated, ifUserPosition } from "../helper/interface";
+import { ifOrderCreated, ifPair, ifUserPosition } from "../helper/interface";
 import { EVENT_NAME, socketService } from "../socketIo/socket.io";
 import * as sentry from "@sentry/node";
+import { Action } from "../controllers/order/helper/marginValidationUserPosition";
 
 
 
@@ -21,23 +22,19 @@ export async function handleOrderCancelled(data: any) {
         if (orderDetails.cancelled == true) {
             return console.log("Order is already cancelled");
         }
-
+        let pairDetails = await Pair.findOne({id: orderDetails.pair}).lean()! as ifPair
         // update user inOrder
-        if (orderDetails.orderType == 1 || orderDetails.orderType == 0) {
+        if (Number(orderDetails.action) == Action.LIMIT) {
 
-            let token = orderDetails.token0;
+            let token = orderDetails.token1;
 
-            if (orderDetails.orderType == 0) {
-                token = orderDetails.token1
-            }
             let getUser: ifUserPosition | null = await User.findOne({ id: orderDetails.maker, token: token, chainId: orderDetails.chainId }).lean();
             if (getUser) {
-
-                let currentInOrderBalance = Big(getUser.inOrderBalance).minus(orderDetails.balanceAmount).toString();
-
-                if (orderDetails.orderType == 0) {
-                    currentInOrderBalance = Big(getUser.inOrderBalance).minus(Big(orderDetails.balanceAmount).times(orderDetails.exchangeRate).div(Big(10).pow(18))).toString();
+                let token1Amount = orderDetails.balanceAmount;
+                if(pairDetails.token0 != orderDetails.token1) {
+                    token1Amount = Big(orderDetails.balanceAmount).times(orderDetails.price).div(1e18).toString();
                 }
+                let currentInOrderBalance = Big(getUser.inOrderBalance).minus(token1Amount).toString();
 
                 await Promise.all(
                     [
@@ -53,22 +50,21 @@ export async function handleOrderCancelled(data: any) {
                 )
             }
         }
-        else if (orderDetails.orderType == 2 || orderDetails.orderType == 3) {
+        else if (Number(orderDetails.action) == Action.OPEN) {
 
             let token0Position = await User.findOne({ id: orderDetails.maker, token: orderDetails.token0 }).lean()! as any;
-            let token1Position = await User.findOne({ id: orderDetails.maker, token: orderDetails.token1 }).lean()! as any;
-            let token0InOrder = Big(token0Position?.inOrderBalance).minus(orderDetails.lastInOrderToken0).toString();
-            let token1InOrder = Big(token1Position?.inOrderBalance).minus(orderDetails.lastInOrderToken1).toString();
+            let token0Amount = orderDetails.balanceAmount;
 
+            if(pairDetails.token0 != orderDetails.token0) {
+                token0Amount = Big(orderDetails.balanceAmount).div(orderDetails.price).mul(1e18).toString();
+            }
+            let token0InOrder = Big(token0Position?.inOrderBalance).minus(Big(token0Amount).div(Big(Number(orderDetails.leverage) - 1)));
+            // console.log("token0InOrder,OPEN", token0InOrder);
             await Promise.all(
                 [
                     User.findOneAndUpdate(
                         { _id: token0Position._id },
                         { $set: { inOrderBalance: token0InOrder } }
-                    ),
-                    User.findOneAndUpdate(
-                        { _id: token1Position._id },
-                        { $set: { inOrderBalance: token1InOrder } }
                     ),
                     Order.findOneAndUpdate(
                         { _id: orderDetails._id },
@@ -77,18 +73,24 @@ export async function handleOrderCancelled(data: any) {
                 ]
             )
         }
+        else if (Number(orderDetails.action) == Action.CLOSE) {
+            await Order.findOneAndUpdate(
+                { _id: orderDetails._id },
+                { $set: { cancelled: true, active: false } }
+            )
+        }
 
         socketService.emit(EVENT_NAME.PAIR_ORDER, {
             amount: `-${orderDetails.balanceAmount}`,
-            exchangeRate: orderDetails.exchangeRate,
-            orderType: orderDetails.orderType,
+            price: orderDetails.price,
+            action: orderDetails.action,
             pair: orderDetails.pair
         });
-
+       
         socketService.emit(EVENT_NAME.CANCEL_ORDER, {
             amount: `-${orderDetails.balanceAmount}`,
-            exchangeRate: orderDetails.exchangeRate,
-            orderType: orderDetails.orderType,
+            price: orderDetails.price,
+            action: orderDetails.action,
             pair: orderDetails.pair
         });
 

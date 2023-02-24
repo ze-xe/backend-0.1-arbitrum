@@ -5,13 +5,15 @@ export interface ifOrderCreated {
     id: string
     signature: string
     pair: string
+    pairPrice: string
     maker: string
     token0: string
     token1: string
     salt: string
-    amount: string
-    exchangeRate: string
-    exchangeRateDecimals: string
+    token0Amount: string
+    token1Amount: string
+    price: string
+    priceDecimals: string
     balanceAmount: string
     deleted: boolean
     active: boolean
@@ -19,12 +21,14 @@ export interface ifOrderCreated {
     cid: string
     cancelled: boolean
     _id: string
-    borrowLimit: string,
-    loops: string,
-    orderType: number,
-    fillAmount: string
-    lastInOrderToken0: string
-    lastInOrderToken1: string
+    action: number
+    position: number
+    leverage: number
+    expiry: string
+    nonce:string
+    // fillAmount: string
+    // lastInOrderToken0: string
+    // lastInOrderToken1: string
 
 }
 
@@ -41,14 +45,17 @@ export interface ifPair {
     id: string
     token0: string
     token1: string
-    exchangeRateDecimals: string
+    priceDecimals: string
     minToken0Order: string
-    exchangeRate: string
+    price: string
     priceDiff: string
     chainId: string
     _id: string
     marginEnabled: boolean,
     active: boolean
+    action:number
+    position:number
+    leverage:number
 
 }
 
