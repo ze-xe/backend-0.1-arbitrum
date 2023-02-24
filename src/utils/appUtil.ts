@@ -40,7 +40,7 @@ async function start(chainId: string, httpServer: any) {
                         token1: copyOrder[i].token1,
                         amount: copyOrder[i].token0Amount,
                         orderType: copyOrder[i].action,
-                        salt: Number(copyOrder[i].salt),
+                        salt: Number(copyOrder[i].nonce),
                         exchangeRate: copyOrder[i].price,
                         borrowLimit: copyOrder[i].action,
                         loops: copyOrder[i].action

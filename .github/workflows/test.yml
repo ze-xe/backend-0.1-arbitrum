@@ -1,49 +1,49 @@
-name: ze-xe backend
+# name: ze-xe backend
 
-on:
-  push:
-    branches: [ dev ]
-  pull_request:
-    branches: [ dev ]
+# on:
+#   push:
+#     branches: [ dev ]
+#   pull_request:
+#     branches: [ dev ]
 
-env:  
-  NODE_ENV: test
-  MONGO_URL: mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/test
-  MONGO_URL1: mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/test
-  WEB_3_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweERjZTFjMzYxYzgyNEI1ZjRFMzRGY2ZCNjUxMUYzNjkwNjc5RjhmODYiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njk4OTQyMTQ5NjMsIm5hbWUiOiJ6ZXhlLjAxIn0.YR1oAHiW_tA0lwG29tXz2wrYdTjWdCijto4yP_3uHHg
-  ADMIN_ADD: "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
-  NETWORK: arbitrumGoerli  
+# env:  
+#   NODE_ENV: test
+#   MONGO_URL: mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/test
+#   MONGO_URL1: mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/test
+#   WEB_3_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweERjZTFjMzYxYzgyNEI1ZjRFMzRGY2ZCNjUxMUYzNjkwNjc5RjhmODYiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njk4OTQyMTQ5NjMsIm5hbWUiOiJ6ZXhlLjAxIn0.YR1oAHiW_tA0lwG29tXz2wrYdTjWdCijto4yP_3uHHg
+#   ADMIN_ADD: "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
+#   NETWORK: arbitrumGoerli  
 
-jobs:
-  build:
+# jobs:
+#   build:
 
-    runs-on: ubuntu-latest
+#     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [16.x]
-    # defaults:
-    #       run:
-    #        working-directory: ./contracts    
+#     strategy:
+#       matrix:
+#         node-version: [16.x]
+#     # defaults:
+#     #       run:
+#     #        working-directory: ./contracts    
 
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
+#     steps:
+#       - uses: actions/checkout@v3
+#       - name: Use Node.js ${{ matrix.node-version }}
      
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: ${{ matrix.node-version }}
     
-      - run: git submodule update --init --recursive    
-      - run: npm install
-      - run: cd contracts && git checkout dev && npm install --save --legacy-peer-deps
-      - run: cd contracts && npx hardhat compile
-      # - run: npm install
-      # - run: npx hardhat node
-      # - run: npx hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
-      # - run:  yarn test6
+#       - run: git submodule update --init --recursive    
+#       - run: npm install
+#       - run: cd contracts && git checkout dev && npm install --save --legacy-peer-deps
+#       - run: cd contracts && npx hardhat compile
+#       # - run: npm install
+#       # - run: npx hardhat node
+#       # - run: npx hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
+#       # - run:  yarn test6
           
-      - run: |
-         cd contracts && npx hardhat node &
-         cd contracts && npx hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
+#       - run: |
+#          cd contracts && npx hardhat node &
+#          cd contracts && npx hardhat test ../src/test/unitTestHardhat/**.ts --network localhost
 

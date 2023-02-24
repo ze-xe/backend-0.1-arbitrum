@@ -9,7 +9,6 @@ export interface ifOrderCreated {
     maker: string
     token0: string
     token1: string
-    salt: string
     token0Amount: string
     token1Amount: string
     price: string

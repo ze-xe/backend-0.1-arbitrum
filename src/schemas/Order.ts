@@ -12,7 +12,7 @@ const OrderSchema = new mongoose.Schema({
     token1Amount: { type: String, default:"0" },
     leverage: { type: String, default: "0"},
     price: { type: String, required: true, trim: true },
-    pairPrice: { type: Number, required: true, trim: true },
+    pairPrice: { type: String, required: true, trim: true },
     priceDecimals: { type: String, required: true, trim: true },
     balanceAmount: { type: String, required: true, trim: true },
     expiry: { type: String, required: true, trim: true },
