@@ -57,7 +57,7 @@ export async function getMultiBalance(token: string, addresses: string[], data: 
                 let userPosition: ifUserPosition = await User.findOne({ token: token, id: addresses[i], chainId: chainId }).lean();
                 let inOrderBalance = Big(userPosition.inOrderBalance);
                 let amounts = data[i].balanceAmount;
-                if (Number(balance) < Number(inOrderBalance)) {
+                if (Number(balance) < Number(inOrderBalance) || Date.now()/1e3 >= Number(data[i].expiry)) {
                     inActiveIds.push(data[i]._id);
 
                     if (data[i].action != Action.CLOSE) {

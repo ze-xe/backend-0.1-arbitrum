@@ -1,6 +1,7 @@
 import * as sentry from "@sentry/node";
 import { Order } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
+import { parseEther } from "../../utils/utils";
 
 
 
@@ -23,9 +24,16 @@ export async function getOrderCancelled(req: any, res: any) {
         if (!chainId) {
             return res.status(400).send({ status: false, error: errorMessage.chainId });
         }
-        let getOrderCancelledDoc = await Order.find({ maker: maker, pair: pairId, chainId, cancelled: true }).sort({createdAt: -1 }).select({ balanceAmount: 1, pairPrice: 1, action: 1, _id: 0 }).lean();
+        const getOrderCancelledDoc = await Order.find({ maker: maker, pair: pairId, chainId, cancelled: true }).sort({ createdAt: -1 }).select({ balanceAmount: 1, pairPrice: 1, action: 1, _id: 0 }).lean();
 
-        return res.status(200).send({ status: true, data: getOrderCancelledDoc });
+        const data = getOrderCancelledDoc.map(x => {
+            return {
+                price: parseEther(x.pairPrice),
+                amount: parseEther(x.balanceAmount),
+                action: x.action
+            }
+        })
+        return res.status(200).send({ status: true, data: data });
     }
     catch (error: any) {
         sentry.captureException(error)

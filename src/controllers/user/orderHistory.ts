@@ -3,6 +3,7 @@
 import * as sentry from "@sentry/node";
 import { OrderExecuted } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
+import { parseEther } from "../../utils/utils";
 
 
 
@@ -27,7 +28,15 @@ export async function getUserOrderHistory(req: any, res: any) {
         }
         const getOrderHistory = await OrderExecuted.find({ taker: taker, pair: pairId, chainId: chainId }).sort({ blockTimestamp: -1, createdAt: -1 }).select({ action: 1, pairPrice: 1, pairToken0Amount: 1, _id: 0 }).limit(50).lean();
 
-        return res.status(200).send({ status: true, data: getOrderHistory });
+        const data = getOrderHistory.map(x=>{
+            return {
+                fillAmount : parseEther(x.pairToken0Amount),
+                price: parseEther(x.pairPrice),
+                action: x.action
+
+            }
+        })
+        return res.status(200).send({ status: true, data: data });
     }
     catch (error: any) {
         sentry.captureException(error)

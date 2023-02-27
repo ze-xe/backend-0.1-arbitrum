@@ -45,7 +45,7 @@ export async function getPairId(data: any, chainId: any) {
                 }
                 let temp = {
                     id: id,
-                    priceDecimals: data.priceDecimals,
+                    priceDecimals: 2,
                     minToken0Order: token0Details?.minToken0Amount,
                     price: '0',
                     priceDiff: '0',

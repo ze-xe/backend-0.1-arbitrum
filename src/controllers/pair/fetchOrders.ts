@@ -5,6 +5,7 @@ import { Pair, Order } from "../../DB/db";
 import { Decimals } from "../../helper/constant";
 import { errorMessage } from "../../helper/errorMessage"
 import * as sentry from "@sentry/node";
+import { ethers } from "ethers";
 
 
 
@@ -158,53 +159,61 @@ export async function fetchOrders(req: any, res: any) {
         // action limit and open
         for (let i = 0; i < buyOrder.length; i++) {
 
-            if (!mapBuy[`${buyOrder[i].pairPrice / 1e18}`]) {
+            buyOrder[i].pairPrice = ethers.utils.parseEther(`${Number(buyOrder[i].pairPrice) / 1e18}`).toString();
 
-                mapBuy[`${buyOrder[i].pairPrice / 1e18}`] = buyOrder[i].balanceAmount;
+            if (!mapBuy[`${buyOrder[i].pairPrice}`]) {
+
+                mapBuy[`${buyOrder[i].pairPrice}`] = buyOrder[i].balanceAmount;
             }
-            else if (mapBuy[`${buyOrder[i].pairPrice / 1e18}`]) {
+            else if (mapBuy[`${buyOrder[i].pairPrice}`]) {
 
-                mapBuy[`${buyOrder[i].pairPrice / 1e18}`] = Number(mapBuy[`${buyOrder[i].pairPrice / 1e18}`]) + Number(buyOrder[i].balanceAmount);
+                mapBuy[`${buyOrder[i].pairPrice}`] = Number(mapBuy[`${buyOrder[i].pairPrice}`]) + Number(buyOrder[i].balanceAmount);
             }
 
         }
 
         for (let i in sellOrder) {
 
-            if (!mapSell[`${sellOrder[i].pairPrice / 1e18}`]) {
+            sellOrder[i].pairPrice = ethers.utils.parseEther(`${Number(sellOrder[i].pairPrice) / 1e18}`).toString();
 
-                mapSell[`${sellOrder[i].pairPrice / 1e18}`] = sellOrder[i].balanceAmount;
+            if (!mapSell[`${sellOrder[i].pairPrice}`]) {
+
+                mapSell[`${sellOrder[i].pairPrice}`] = sellOrder[i].balanceAmount;
 
             }
-            else if (mapSell[`${sellOrder[i].pairPrice / 1e18}`]) {
+            else if (mapSell[`${sellOrder[i].pairPrice}`]) {
 
-                mapSell[`${sellOrder[i].pairPrice / 1e18}`] = Number(mapSell[`${sellOrder[i].pairPrice / 1e18}`]) + Number(sellOrder[i].balanceAmount);
+                mapSell[`${sellOrder[i].pairPrice}`] = Number(mapSell[`${sellOrder[i].pairPrice}`]) + Number(sellOrder[i].balanceAmount);
             }
         }
         // action close
         for (let i = 0; i < buyOrder1.length; i++) {
+            
+            buyOrder1[i].pairPrice = ethers.utils.parseEther(`${Number(buyOrder1[i].pairPrice) / 1e18}`).toString();
 
-            if (!mapBuy[`${buyOrder1[i].pairPrice / 1e18}`]) {
+            if (!mapBuy[`${buyOrder1[i].pairPrice}`]) {
 
-                mapBuy[`${buyOrder1[i].pairPrice / 1e18}`] = buyOrder1[i].balanceAmount;
+                mapBuy[`${buyOrder1[i].pairPrice}`] = buyOrder1[i].balanceAmount;
             }
-            else if (mapBuy[`${buyOrder1[i].pairPrice / 1e18}`]) {
+            else if (mapBuy[`${buyOrder1[i].pairPrice}`]) {
 
-                mapBuy[`${buyOrder1[i].pairPrice / 1e18}`] = Number(mapBuy[`${buyOrder1[i].pairPrice / 1e18}`]) + Number(buyOrder1[i].balanceAmount);
+                mapBuy[`${buyOrder1[i].pairPrice}`] = Number(mapBuy[`${buyOrder1[i].pairPrice}`]) + Number(buyOrder1[i].balanceAmount);
             }
 
         }
 
         for (let i in sellOrder1) {
 
-            if (!mapSell[`${sellOrder1[i].pairPrice / 1e18}`]) {
+            sellOrder1[i].pairPrice = ethers.utils.parseEther(`${Number(sellOrder1[i].pairPrice) / 1e18}`).toString();
 
-                mapSell[`${sellOrder1[i].pairPrice / 1e18}`] = sellOrder1[i].balanceAmount;
+            if (!mapSell[`${sellOrder1[i].pairPrice}`]) {
+
+                mapSell[`${sellOrder1[i].pairPrice}`] = sellOrder1[i].balanceAmount;
 
             }
-            else if (mapSell[`${sellOrder1[i].pairPrice / 1e18}`]) {
+            else if (mapSell[`${sellOrder1[i].pairPrice}`]) {
 
-                mapSell[`${sellOrder1[i].pairPrice / 1e18}`] = Number(mapSell[`${sellOrder1[i].pairPrice / 1e18}`]) + Number(sellOrder1[i].balanceAmount);
+                mapSell[`${sellOrder1[i].pairPrice}`] = Number(mapSell[`${sellOrder1[i].pairPrice}`]) + Number(sellOrder1[i].balanceAmount);
             }
         }
 
@@ -219,7 +228,7 @@ export async function fetchOrders(req: any, res: any) {
             let temp = {
 
                 price: buyEntries[i][0],
-                token0Amount: (buyEntries[i][1]).toString()
+                token0Amount: ethers.utils.parseEther(`${Number(buyEntries[i][1])/1e18}`).toString(),
 
             };
             buyOrders.push(temp);
@@ -233,7 +242,7 @@ export async function fetchOrders(req: any, res: any) {
 
             let temp = {
                 price: sellEntries[i][0],
-                token0Amount: (sellEntries[i][1]).toString(),
+                token0Amount: ethers.utils.parseEther(`${Number(sellEntries[i][1])/1e18}`).toString(),
             };
             sellOrders.push(temp);
         }

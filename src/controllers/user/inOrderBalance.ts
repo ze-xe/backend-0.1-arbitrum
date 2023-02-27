@@ -1,6 +1,7 @@
 import * as sentry from "@sentry/node";
 import { User } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage";
+import { parseEther } from "../../utils/utils";
 
 
 
@@ -28,7 +29,15 @@ export async function getUserInOrderBalance(req: any, res: any) {
 
             userInOrder[0].inOrderBalance = userInOrder[0].inOrderBalance;
         }
-        return res.status(200).send({ status: true, data: userInOrder });
+        let data = userInOrder.map(x => {
+            return {
+                id: x.id,
+                token: x.token,
+                inOrderBalance: parseEther(x.inOrderBalance),
+                chainId: x.chainId
+            }
+        })
+        return res.status(200).send({ status: true, data: data });
 
     }
     catch (error: any) {

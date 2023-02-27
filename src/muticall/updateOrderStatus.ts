@@ -95,7 +95,7 @@ async function orderStatus(chainId: string) {
 
                     let inOrderBalance = Big(getUserPos.inOrderBalance);
 
-                    if (Number(inOrderBalance) > Number(balance)) {
+                    if (Number(inOrderBalance) > Number(balance) || Date.now() / 1e3 >= Number(getOrderCreated[i].expiry)) {
                         let currentInOrderBalance = Big(inOrderBalance).minus(amount).toString();
                         // updating inOrderBalance and active
                         await Promise.all([
@@ -111,7 +111,7 @@ async function orderStatus(chainId: string) {
 
                     let inOrderBalance = Big(getUserPos.inOrderBalance).plus(amount).toString();
 
-                    if (Number(inOrderBalance) < Number(balance)) {
+                    if (Number(inOrderBalance) < Number(balance) && Date.now() / 1e3 < Number(getOrderCreated[i].expiry)) {
 
                         await Promise.all([
                             Order.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: true } }),
@@ -133,9 +133,9 @@ async function orderStatus(chainId: string) {
 
 export async function startOrderStatus(chainId: string) {
     setInterval(async () => {
-    console.log("order status start running");
-    await orderStatus(chainId);
-    console.log("order status done updating");
+        console.log("order status start running");
+        await orderStatus(chainId);
+        console.log("order status done updating");
     }, 1000 * 60 * 30);
 }
 // startOrderStatus("421613")

@@ -23,7 +23,7 @@ export function getABI(name: any) {
 
 export function parseEther(value: number | string): string {
 
-    return ethers.utils.parseEther(`${Big(value).div(Big(10).pow(18))}`).toString();
+    return ethers.utils.parseEther(`${Big(value).div(1e18)}`).toString();
 }
 
 export function getInterface(abi: object[]): ethers.utils.Interface {

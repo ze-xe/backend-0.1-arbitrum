@@ -2,6 +2,7 @@
 import { OrderExecuted } from "../../DB/db";
 import { errorMessage } from "../../helper/errorMessage"
 import * as sentry from "@sentry/node";
+import { parseEther } from "../../utils/utils";
 
 
 
@@ -26,7 +27,14 @@ export async function getPairOrderExecutedHistory(req: any, res: any) {
 
         let getPairOrderHistory = await OrderExecuted.find({ pair: pairId, chainId }).sort({ blockTimestamp: -1, logIndex: -1 }).select({ pairToken0Amount: 1, pairPrice: 1, action: 1,_id: 0 }).limit(50).lean();
 
-        return res.status(200).send({ status: true, data: getPairOrderHistory });
+        const data = getPairOrderHistory.map((x)=>{
+            return {
+                fillAmount : parseEther(x.pairToken0Amount),
+                price: parseEther(x.pairPrice),
+                action: x.action
+            }
+        })
+        return res.status(200).send({ status: true, data: data });
 
     }
     catch (error: any) {

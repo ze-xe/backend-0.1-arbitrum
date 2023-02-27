@@ -4,13 +4,13 @@
 
 ### 1. For Fetching All Pairs Details
 
-### Route /pair/allpairs?chainId
+### Route /v/version/pair/allpairs?chainId
 
 ### Expected Input
 
 ```
 Method : Get
-Url : http://localhost:3010/pair/allpairs?chainId
+Url : http://localhost:3010/v/1/pair/allpairs?chainId=421613
 ```
 
 ### Expected Output
@@ -20,21 +20,22 @@ Url : http://localhost:3010/pair/allpairs?chainId
     "status": true,
     "data": [
         {
-            "id": "0x3b8025593f618d3dc1452325f3804f0229252f135e4eb37cc29832428b8e2475",
-            "exchangeRate": "20297000000000000000000",
-            "exchangeRateDecimals": "2",
-            "priceDiff": "2675000000000000000000",
-            "minToken0Order": 10000000000,
+            "id": "0xda509e348e9ba4dfd5606a2913c80347f7bee1bc2a5ba42ded50a3bc158f5078",
+            "price": "1100000000000000000000",
+            "priceDecimals": "2",
+            "priceDiff": "100000000000000000000",
+            "marginEnabeled": false,
+            "minToken0Order": "10000000000",
             "tokens": [
                 {
-                    "id": "0x2F123F27fC28Eba0101BDb439F32eBf05732d475",
-                    "name": "BTC",
-                    "symbol": "BTC",
+                    "id": "0x1fe7250ca569bb07610596d2371f2e83fae3ea2b",
+                    "name": "Wrapped Ethereum",
+                    "symbol": "WETH",
                     "decimals": 18
                 },
                 {
-                    "id": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25793d",
-                    "name": "USDC",
+                    "id": "0x95e3d2540479c67596575971b69b0c3951837359",
+                    "name": "USD Coin",
                     "symbol": "USDC",
                     "decimals": 18
                 }
@@ -46,13 +47,13 @@ Url : http://localhost:3010/pair/allpairs?chainId
 
 ### 2. For Fetching All Orders Of Pair
 
-### Route /orders/:pairId?chainId
+### Route /v/version/orders/:pairId?chainId
 
 ### Expected Input
 
 ```
 Method : Get
-Url : http://localhost:3010/pair/orders/:pairId?chainId
+Url : http://localhost:3010/v/1/pair/orders/:pairId?chainId=421613
 
 ```
 
@@ -61,30 +62,24 @@ Url : http://localhost:3010/pair/orders/:pairId?chainId
 ```
 {
     "status": true,
-    "data": {
-        "pair": "0x3b8025593f618d3dc1452325f3804f0229252f135e4eb37cc29832428b8e2475",
+     "data": {
+        "pair": "0xda509e348e9ba4dfd5606a2913c80347f7bee1bc2a5ba42ded50a3bc158f5078",
         "decimals": 18,
         "sellOrders": [
             {
-                "exchangeRate": "15097000000000000000000",
-                "amount": "3840038726682134800"
-            },
-            {
-                "exchangeRate": "15229000000000000000000",
-                "amount": "590873225312305000"
-            },
-            ...
+                "price": "1000000000000000000000",
+                "token0Amount": "2000000000000000000"
+            }
         ],
         "buyOrders": [
             {
-                "exchangeRate": "24712000000000000000000",
-                "amount": "4204244406902972000"
+                "price": "1100000000000000000000",
+                "token0Amount": "1000000000000000000"
             },
             {
-                "exchangeRate": "23678000000000000000000",
-                "amount": "4223329673114283"
-            },
-            ...
+                "price": "1000000000000000000000",
+                "token0Amount": "10000000000000000000"
+            }
         ]
     }
 }
@@ -142,13 +137,13 @@ interval is mandatory which must be greater than 300000 miliseconds
 
 ### 4. For Fetching Pairs Orders History
 
-### Route /pair/orders/history/:pairId?chainId
+### Route /v/version/pair/orders/history/:pairId?chainId
 
 ### Expected Input
 
 ```
 Method : Get
-Url : http://localhost:3010/pair/orders/history/:pairId?chainId=421613
+Url : http://localhost:3010/v/1/pair/orders/history/:pairId?chainId=421613
 ```
 
 ### Expected Output
@@ -158,19 +153,19 @@ Url : http://localhost:3010/pair/orders/history/:pairId?chainId=421613
     "status": true,
     "data": [
         {
-            "fillAmount": "326049896735370200",
-            "exchangeRate": "20297000000000000000000",
-            "orderType": 1
+            "fillAmount": "1000000000000000000",
+            "price": "1100000000000000000000",
+            "action": "2"
         },
         {
-            "fillAmount": "338506571519004000",
-            "exchangeRate": "22972000000000000000000",
-            "orderType": 0
+            "fillAmount": "1000000000000000000",
+            "price": "1000000000000000000000",
+            "action": "1"
         },
         {
-            "fillAmount": "87199584212942720",
-            "exchangeRate": "20827000000000000000000",
-            "orderType": 0
+            "fillAmount": "1000000000000000000",
+            "price": "1000000000000000000000",
+            "action": "0"
         },
         ...
     ]
@@ -179,13 +174,13 @@ Url : http://localhost:3010/pair/orders/history/:pairId?chainId=421613
 
 ### 5. For Fetching Pairs Trading Status
 
-### Route /pair/trading/status/:pairId?chainId
+### Route /v/version/pair/trading/status/:pairId?chainId
 
 ### Expected Input
 
 ```
 Method : Get
-Url : http://localhost:3010/pair/trading/status/:pairId?chainId=421613
+Url : http://localhost:3010/v/1/pair/trading/status/:pairId?chainId=421613
 ```
 
 ### Expected Output
@@ -194,30 +189,30 @@ Url : http://localhost:3010/pair/trading/status/:pairId?chainId=421613
 {
     "status": true,
     "data": [
-        {
+         {
             "interval": "_24hr",
-            "changeInER": -32.068965517241374,
-            "volume": 49.858473253676465
+            "changeInER": 0,
+            "volume": 0
         },
         {
             "interval": " _7D",
-            "changeInER": 15.88235294117647,
-            "volume": 52.35347325367647
+            "changeInER": 10,
+            "volume": 20
         },
         {
             "interval": " _30D",
-            "changeInER": 15.88235294117647,
-            "volume": 52.35347325367647
+            "changeInER": 10,
+            "volume": 20
         },
         {
             "interval": "_90D",
-            "changeInER": 15.88235294117647,
-            "volume": 52.35347325367647
+            "changeInER": 10,
+            "volume": 20
         },
         {
             "interval": " _1Yr",
-            "changeInER": 15.88235294117647,
-            "volume": 52.35347325367647
+            "changeInER": 10,
+            "volume": 20
         }
     ]
 }
@@ -225,15 +220,15 @@ Url : http://localhost:3010/pair/trading/status/:pairId?chainId=421613
 
 ### 6. For Fetching Pairs Limit Matched Orders Details
 
-### Route /order/limit/matched/:pairId?exchangeRate&amount&buy&chainId
+### Route /v/version/order/limit/matched/:pairId?price&amount&orderType&chainId
 
 ### Expected Input
 
 ```
 Method : Get
-Url : http://localhost:3010/order/limit/matched/:pairId?exchangeRate=19097000000000000000000&orderType=0&amount=1000000000000000000&chainId=421613
+Url : http://localhost:3010/order/limit/matched/:pairId?price=1000000000000000000000&orderType=0&amount=1000000000000000000&chainId=421613
 all fields are mandatory
-orderType = 0 for buy, 1 for sell, 2 for long, 3 for short
+orderType = 0 for buy, 1 for sell
 amount = value * 10**decimals , i.e 18
 exchangeRate = value * 10**18
 
@@ -245,30 +240,40 @@ exchangeRate = value * 10**18
 {
     "status": true,
     "data": [
-        {
-            "signature": "0xcbd3cbcf0db6484191162024a290073b109eb40726f3d6f8874aad4ff5f0408c0ba9d43c4f8de2aa23aa4c1068d80997ffef6496c615875f57b9f2a3b64739141b",
+         {
+            "signature": "0xc07b6909701f5e7a20c5e6796c1be8f0e36fb0a9dea9f7db94aff75b6dbe918e486658f72cc340440966fb785492f7a3a88096c2ce59de3c4503aae0b39ce2521b",
+            "id": "0xade5f8a4403d419b7595ffe197aa813fdb5c625a04c8604c1b4a15617230b0a7",
             "value": {
-                "maker": "0x186b4b5Da9E6817C21818DEb83BBA02c4c66627F",
-                "token0": "0x2F123F27fC28Eba0101BDb439F32eBf05732d475",
-                "token1": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25792c",
-                "amount": "3840038726682134800",
-                "orderType": 1,
-                "salt": "7442174",
-                "exchangeRate": "15097000000000000000000"
+                "maker": "0x103b62f68da23f20055c572269be67fa7635f2fc",
+                "token0": "0x1fe7250ca569bb07610596d2371f2e83fae3ea2b",
+                "token1": "0x95e3d2540479c67596575971b69b0c3951837359",
+                "token0Amount": "1000000000000000000",
+                "token1Amount": "1000000000000000000000",
+                "leverage": "5",
+                "price": "1000000000000000000000",
+                "expiry": "1677768180",
+                "nonce": "6544098",
+                "action": 1,
+                "position": 0
             }
         },
         {
-            "signature": "0xb668b9fb1efb7b70460d209a3119894444edce60211eab15a21f48acb4372d391041fb7708e0128aac9e7b147ddb8c92c6657c44cc9cc5b2d394101ba7729f021c",
+            "signature": "0xa20d65521de2caa7f1fbc7a5c3f42ae0645922d719624f0f5f682308107de261765b2b45124e0f4614d4dbcc820972f2063e115f5079edaf36a743fc5590173a1c",
+            "id": "0xab3a3156c389dfa095b28d874833e38b092f40c6fd32db8eadcd2e808e5d9d43",
             "value": {
-                "maker": "0x186b4b5Da9E6817C21818DEb83BBA02c4c66627F",
-                "token0": "0x2F123F27fC28Eba0101BDb439F32eBf05732d475",
-                "token1": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25792c",
-                "amount": "590873225312305000",
-                "orderType": 1,
-                "salt": "3346665",
-                "exchangeRate": "15229000000000000000000"
+                "maker": "0x103b62f68da23f20055c572269be67fa7635f2fc",
+                "token0": "0x1fe7250ca569bb07610596d2371f2e83fae3ea2b",
+                "token1": "0x95e3d2540479c67596575971b69b0c3951837359",
+                "token0Amount": "1000000000000000000",
+                "token1Amount": "1000000000000000000000",
+                "leverage": "5",
+                "price": "1000000000000000000000",
+                "expiry": "1677768274",
+                "nonce": "8196953",
+                "action": 1,
+                "position": 0
             }
-        },
+        }
         ...
     ]
 }
@@ -276,13 +281,13 @@ exchangeRate = value * 10**18
 
 ### 7. For Fetching Pairs Market Matched Order Details
 
-### Route /order/market/matched/:pairId?buy&amount&chainId
+### Route /v/version/order/market/matched/:pairId?orderType&amount&chainId
 
 ### Expected Input
 
 ```
 Method : Get
-Url : http://localhost:3010/order/market/matched/:pairId?orderType=0&amount=2000000000&chainId=421613
+Url : http://localhost:3010/v/1/order/market/matched/:pairId?orderType=0&amount=2000000000&chainId=421613
 ```
 
 ### Expected Output
@@ -292,27 +297,37 @@ Url : http://localhost:3010/order/market/matched/:pairId?orderType=0&amount=2000
     "status": true,
     "data": [
         {
-            "signature": "0xcbd3cbcf0db6484191162024a290073b109eb40726f3d6f8874aad4ff5f0408c0ba9d43c4f8de2aa23aa4c1068d80997ffef6496c615875f57b9f2a3b64739141b",
+            "signature": "0x50b53c4c7e888795b8441e45ff4513aca4578da27ea72998dfdc9c26a46d24d769ffa4a1ef74b5a3a4b13f5fe23806cd1f3690f3f967922788939550bcb0ded31b",
+            "id": "0x015f29728d63da305fef87ed66090451d1b303aab31cf96d27cf382eed70e5ee",
             "value": {
-                "maker": "0x186b4b5Da9E6817C21818DEb83BBA02c4c66627F",
-                "token0": "0x2F123F27fC28Eba0101BDb439F32eBf05732d475",
-                "token1": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25792c",
-                "amount": "3840038726682134800",
-                "orderType": 1,
-                "salt": "7442174",
-                "exchangeRate": "15097000000000000000000"
+                "maker": "0x103b62f68da23f20055c572269be67fa7635f2fc",
+                "token0": "0x1fe7250ca569bb07610596d2371f2e83fae3ea2b",
+                "token1": "0x95e3d2540479c67596575971b69b0c3951837359",
+                "token0Amount": "1000000000000000000",
+                "token1Amount": "1000000000000000000000",
+                "leverage": "1",
+                "price": "1100000000000000000000",
+                "expiry": "1677823798",
+                "nonce": "5734547",
+                "action": 2,
+                "position": 0
             }
         },
         {
-            "signature": "0xb668b9fb1efb7b70460d209a3119894444edce60211eab15a21f48acb4372d391041fb7708e0128aac9e7b147ddb8c92c6657c44cc9cc5b2d394101ba7729f021c",
+            "signature": "0x4511b1903c2459c4f6f96477a5be66d05e59846eb6250c8bc8de968a9950f0583cb25047e0f8ede5ac1414cc38223fb86169c0c52cf6daad18fabb33f265eebb1c",
+            "id": "0x0279ca35dc71c930c3df4938906711312c329aadf582f1741d28be131f6713f4",
             "value": {
-                "maker": "0x186b4b5Da9E6817C21818DEb83BBA02c4c66627F",
-                "token0": "0x2F123F27fC28Eba0101BDb439F32eBf05732d475",
-                "token1": "0x930De8B1997a2F4b3B7cc93d7101E2F14b25792c",
-                "amount": "590873225312305000",
-                "orderType": 1,
-                "salt": "3346665",
-                "exchangeRate": "15229000000000000000000"
+                "maker": "0x103b62f68da23f20055c572269be67fa7635f2fc",
+                "token0": "0x1fe7250ca569bb07610596d2371f2e83fae3ea2b",
+                "token1": "0x95e3d2540479c67596575971b69b0c3951837359",
+                "token0Amount": "1000000000000000000",
+                "token1Amount": "1000000000000000000000",
+                "leverage": "1",
+                "price": "1000000000000000000000",
+                "expiry": "1677750957",
+                "nonce": "7476993",
+                "action": 2,
+                "position": 0
             }
         },
         ...
@@ -322,13 +337,13 @@ Url : http://localhost:3010/order/market/matched/:pairId?orderType=0&amount=2000
 
 ### 8. For Fetching All Tokens Details
 
-### Route /tokens?chainId
+### Route /v/version/tokens?chainId
 
 ### Expected Input
 
 ```
 Method : Get
-Url : http://localhost:3010/tokens?chainId=CHAIN_ID
+Url : http://localhost:3010/v/1/tokens?chainId=CHAIN_ID
 ```
 
 ### Expected Output
@@ -355,13 +370,13 @@ Url : http://localhost:3010/tokens?chainId=CHAIN_ID
 
 ### 9. For Fetching Users Inorder Balance
 
-### Route /user/inorder/balance/:maker/token/:token?chainId
+### Route /v/version/user/inorder/balance/:maker/token/:token?chainId
 
 ### Expected Input
 
 ```
 Method : Get
-Url : http://localhost:3010/user/inorder/balance/:maker/token/:token?chainId=421613
+Url : http://localhost:3010/v/1/user/inorder/balance/:maker/token/:token?chainId=421613
 ```
 
 ### Expected Output
@@ -382,13 +397,13 @@ Url : http://localhost:3010/user/inorder/balance/:maker/token/:token?chainId=421
 
 ### 10. For Fetching Users Placed Orders Of Pair
 
-### Route /user/orders/placed/:maker/pair/:pairId?chainId
+### Route /v/version/user/orders/placed/:maker/pair/:pairId?chainId
 
 ### Expected Input
 
 ```
 Method : Get
-Url : http://localhost:3010/user/orders/placed/:maker/pair/:pairId?chainId=421613
+Url : http://localhost:3010/v/1/user/orders/placed/:maker/pair/:pairId?chainId=421613
 maker : user wallet address
 ```
 
@@ -398,24 +413,40 @@ maker : user wallet address
 {
     "status": true,
     "data": [
-        {
-            "id": "0xae7ff72e1c2fb29dcbe0d922be5f1a481a4b97dcf94a6807ae369adc9012b310",
-            "amount": "720429376694885500",
-            "exchangeRate": "21634000000000000000000",
-            "orderType": 0
+         {
+            "signature": "0x50b53c4c7e888795b8441e45ff4513aca4578da27ea72998dfdc9c26a46d24d769ffa4a1ef74b5a3a4b13f5fe23806cd1f3690f3f967922788939550bcb0ded31b",
+            "id": "0x015f29728d63da305fef87ed66090451d1b303aab31cf96d27cf382eed70e5ee",
+            "value": {
+                "maker": "0x103b62f68da23f20055c572269be67fa7635f2fc",
+                "token0": "0x1fe7250ca569bb07610596d2371f2e83fae3ea2b",
+                "token1": "0x95e3d2540479c67596575971b69b0c3951837359",
+                "token0Amount": "1000000000000000000",
+                "token1Amount": "1000000000000000000000",
+                "leverage": "1",
+                "price": "1100000000000000000000",
+                "expiry": "1677823798",
+                "nonce": "5734547",
+                "action": 2,
+                "position": 0
+            }
         },
         {
-            "id": "0x55d8b8381426759a852f0c6f96c22c86e39303f6945ec9e3827e3f9a023e7763",
-            "amount": "174327979987294320",
-            "exchangeRate": "23635000000000000000000",
-            "orderType": 0
+            "signature": "0xa20d65521de2caa7f1fbc7a5c3f42ae0645922d719624f0f5f682308107de261765b2b45124e0f4614d4dbcc820972f2063e115f5079edaf36a743fc5590173a1c",
+            "id": "0xab3a3156c389dfa095b28d874833e38b092f40c6fd32db8eadcd2e808e5d9d43",
+            "value": {
+                "maker": "0x103b62f68da23f20055c572269be67fa7635f2fc",
+                "token0": "0x1fe7250ca569bb07610596d2371f2e83fae3ea2b",
+                "token1": "0x95e3d2540479c67596575971b69b0c3951837359",
+                "token0Amount": "1000000000000000000",
+                "token1Amount": "1000000000000000000000",
+                "leverage": "5",
+                "price": "1000000000000000000000",
+                "expiry": "1677768274",
+                "nonce": "8196953",
+                "action": 1,
+                "position": 0
+            }
         },
-        {
-            "id": "0x90ab70e12e23e313f2f65b95da2fc806b43671bff1762640c8b5fa369e6eb416",
-            "amount": "558142806018918000",
-            "exchangeRate": "17676000000000000000000",
-            "orderType": 0
-        }
         ...
     ]
 }
@@ -423,13 +454,13 @@ maker : user wallet address
 
 ### 11. For Fetching Users Orders History Of Pair
 
-### Route /user/orders/history/:taker/pair/:pairId?chainId
+### Route /v/version/user/orders/history/:taker/pair/:pairId?chainId
 
 ### Expected Input
 
 ```
 Method : Get
-Url : http://localhost:3010/user/orders/history/:taker/pair/:pairId?chainId=421613
+Url : http://localhost:3010/v/1/user/orders/history/:taker/pair/:pairId?chainId=421613
 taker : user wallet address
 ```
 
@@ -441,13 +472,13 @@ taker : user wallet address
     "data": [
         {
             "fillAmount": "87199584212942720",
-            "exchangeRate": "20827000000000000000000",
-            "orderType": 0
+            "price": "20827000000000000000000",
+            "action": 0
         },
         {
             "fillAmount": "436837079722483650",
-            "exchangeRate": "21634000000000000000000",
-            "orderType": 0
+            "price": "21634000000000000000000",
+            "action": 0
         },
         ...
     ]
@@ -456,13 +487,13 @@ taker : user wallet address
 
 ### 12. For Fetching Users Cancelled Orders Of Pair
 
-### Route /user/orders/cancelled/:maker/pair/:pairId?chainId
+### Route /v/version/user/orders/cancelled/:maker/pair/:pairId?chainId
 
 ### Expected Input
 
 ```
 Method : Get
-Url : http://localhost:3010/user/orders/cancelled/:maker/pair/:pairId?chainId=421613
+Url : http://localhost:3010/v/version/user/orders/cancelled/:maker/pair/:pairId?chainId=421613
 ```
 
 ### Expected Output
@@ -472,14 +503,14 @@ Url : http://localhost:3010/user/orders/cancelled/:maker/pair/:pairId?chainId=42
     "status": true,
     "data": [
         {
-            "exchangeRate": "23678000000000000000000",
-            "orderType": 0,
-            "balanceAmount": "463451784551381840"
+            "price": "23678000000000000000000",
+            "action": 0,
+            "amount": "463451784551381840"
         },
         {
-            "exchangeRate": "15363000000000000000000",
-            "orderType": 0,
-            "balanceAmount": "0"
+            "price": "15363000000000000000000",
+            "action": 0,
+            "amount": "1000000000000000000"
         },
         ...
     ]
@@ -505,12 +536,14 @@ Url : http://localhost:3010/order/create
         "maker": "0x103B62f68Da23f20055c572269be67fA7635f2fc",
         "token0": "0x842681C1fA28EF2AA2A4BDE174612e901D2b7827",
         "token1": "0xa50fABf59f2c11fF0F02E7c94A82B442611F37B2",
-        "amount": "1000000000000000000",
-        "orderType": 1,
-        "salt": "12345",
-        "exchangeRate": "18000000000000000000000",
-        "borrowLimit": 0,
-        "loops": 0
+        "token0Amount": "1000000000000000000",
+        "token1Amount": "1000000000000000000",
+        "leverage": 1,
+        "price": "18000000000000000000000",
+        "expiry": "1677762966",
+        "nonce": "12345",
+        "action": 1,
+        "position": 0
     },
     "signature":"0x6de29ba3e7429142040bb55ceb3fb2fc0de6d8c0c02f8ba1a51885b8726d6e1f595833bf10d8bab3a8e65379d8e8159fb20d42ca8c0ff76fa2db3df1017679c21c",
     "chainId": "421613"
