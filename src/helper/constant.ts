@@ -40,4 +40,4 @@ export function getContract(name: string, chainId: any) {
     return new ethers.Contract(getContractAddress(name), abi, provider)
 }
 
-// console.log(getContractAddress("WETH"))
+// console.log(getContractAddress("Spot"))

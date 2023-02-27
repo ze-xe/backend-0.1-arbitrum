@@ -13,19 +13,17 @@ services:
   #     - MONGO_INITDB_ROOT_PASSWORD=password
   # Scorer Node
   api:
-    image: mubashirzebi/zexe-arbitrum:latest
+    image: mubashirzebi/zexe-arbitrum-2.0:latest
     
     # depends_on:
     #   - mongozexe
     ports:
-      - "3010:3010"
+      - "3030:3010"
     environment:
-        # - MONGO_URL=mongodb://root:password@mongozexe:27017/?authMechanism=DEFAULT
-        # - MONGO_URL=mongodb://root:password@mongozexe:27017/?directConnection=true&authSource=admin&replicaSet=replicaset&retryWrites=true
-        - NODE_ENV=dev
+        - NODE_ENV=stage
         # - MONGO_URL=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/prod
-        - MONGO_URL=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/prod
-        - MONGO_URL1=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/prod
+        - MONGO_URL=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/stag
+        - MONGO_URL1=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/stag
         - WEB_3_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweERjZTFjMzYxYzgyNEI1ZjRFMzRGY2ZCNjUxMUYzNjkwNjc5RjhmODYiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njk4OTQyMTQ5NjMsIm5hbWUiOiJ6ZXhlLjAxIn0.YR1oAHiW_tA0lwG29tXz2wrYdTjWdCijto4yP_3uHHg
         - ADMIN_ADD=0x186b4b5Da9E6817C21818DEb83BBA02c4c66627F
         - NETWORK=arbitrumGoerli
@@ -43,5 +41,5 @@ services:
   #     - HOLDINGS_COLLECTION_NAME=${HOLDINGS_COLLECTION_NAME}
   #     - CREDIT_COLLECTION_NAME=${CREDIT_COLLECTION_NAME}
   #     - MASTER_API_KEY=${MASTER_API_KEY}
-    command: npm run prod
+    command: npm run dev
              

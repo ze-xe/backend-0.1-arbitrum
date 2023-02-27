@@ -90,7 +90,7 @@
       "block": "8799755"
     },
     "Spot": {
-      "address": "0x8CE8824810e9ba4C9adBBF464ef8D4d25Ec8C317",
+      "address": "0xC7cfF3e787424b3D307a70dC737574793d9e7339",
       "abi": "Spot",
       "constructorArguments": [
         "poolAddress",
