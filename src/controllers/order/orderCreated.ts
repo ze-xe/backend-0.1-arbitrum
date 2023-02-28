@@ -49,6 +49,8 @@ export async function handleOrderCreated(req: any, res: any) {
         let chainId: string = req.body.chainId;
         let ipfs: boolean | undefined = req.body.ipfs;
         let spotAddress = req.body.spotAddress.toLowerCase();
+        let name = req.body.name;
+        let version = req.body.version;
         let addresses = [data.maker, data.token0, data.token1, spotAddress];
         data.maker = data.maker?.toLowerCase();
         data.token0 = data.token0?.toLowerCase();
@@ -58,20 +60,30 @@ export async function handleOrderCreated(req: any, res: any) {
         for (let i in addresses) {
 
             if (!ethers.utils.isAddress(addresses[i])) {
-                console.log(`${errorMessage.address, addresses[i]}`);
-                return res.status(400).send({ status: false, error: errorMessage.address });
+                console.log(`${errorMessage.ADDRESS_REQUIRED_OR_INVALID, addresses[i]}`);
+                return res.status(400).send({ status: false, error: errorMessage.ADDRESS_REQUIRED_OR_INVALID });
             }
         }
 
         if (Number(data.expiry) < Date.now() / 1e3) {
-            return res.status(400).send({ status: false, error: errorMessage.expiry });
+            return res.status(400).send({ status: false, error: errorMessage.EXPIRY_INVALID });
         }
 
-        let id: string | null = validateSignature(data.maker, signature, data, chainId, spotAddress);
+        if(!name){
+            return res.status(400).send({ status: false, error: errorMessage.NAME_REQUIRED });
+        }
+
+        if(!version){
+            return res.status(400).send({ status: false, error: errorMessage.VERSION_REQUIRED });
+        }
+
+        const domainData = { name: name, spotAddress: spotAddress, version: version };
+
+        let id: string | null = validateSignature(data.maker, signature, data, chainId, domainData);
 
         if (!id) {
-            console.log(errorMessage.signature);
-            return res.status(400).send({ status: false, error: errorMessage.signature });
+            console.log(errorMessage.SIGNATURE_NOT_VERIFIED);
+            return res.status(400).send({ status: false, error: errorMessage.SIGNATURE_NOT_VERIFIED });
         }
 
         const isOrderPresent = await Order.findOne({ id: id, chainId: chainId }).lean();
@@ -79,10 +91,10 @@ export async function handleOrderCreated(req: any, res: any) {
         if (isOrderPresent) {
             return res.status(201).send({ status: true, message: "Order Already Created" });
         }
-
+        
         let pair = await getPairId(data, chainId, spotAddress);
         if (!pair) {
-            return res.status(400).send({ status: false, error: errorMessage.pairId });
+            return res.status(400).send({ status: false, error: errorMessage.PAIR_ID_REQUIRED_OR_INVALID });
         }
 
         // if margin Order
@@ -133,7 +145,9 @@ export async function handleOrderCreated(req: any, res: any) {
             cid: cid,
             action: data.action,
             position: data.position,
-            spot: spotAddress
+            spot: spotAddress,
+            name: name,
+            version: version
         }
         if (!ipfs) {
 
@@ -155,8 +169,8 @@ export async function handleOrderCreated(req: any, res: any) {
         // socket io data
         if (!ipfs) {
             socketService.emit(EVENT_NAME.PAIR_ORDER, {
-                amount: data.amount,
-                price: data.price,
+                amount: data.balanceAmount,
+                price: pair.pairPrice,
                 action: data.action,
                 position: data.position,
                 pair: pair.pair

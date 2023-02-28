@@ -25,7 +25,7 @@ export async function getBar(req: any, res: any) {
         let intervalFromReq = ["5", "15", "30", "60", "240", "1D", "1W"]
 
         if (!intervalFromReq.includes(interval)) {
-            return res.status(400).send({ status: false, error: errorMessage.interval })
+            return res.status(400).send({ status: false, error: errorMessage.INTERVAL_INVALID })
         }
 
         let intervalMap = {
@@ -49,10 +49,10 @@ export async function getBar(req: any, res: any) {
         // }
 
         if (!pairId) {
-            return res.status(400).send({ status: false, error: errorMessage.ticker });
+            return res.status(400).send({ status: false, error: errorMessage.TICKER_NOT_FOUND });
         }
         if (!chainId) {
-            return res.status(400).send({ status: false, error: errorMessage.chainId });
+            return res.status(400).send({ status: false, error: errorMessage.CHAIN_ID_REQUIRED });
         }
 
         let data = await OrderExecuted.find({ pair: pairId, chainId: chainId, blockTimestamp: { $gte: Number(from), $lte: Number(to) } }).sort({ blockTimestamp: 1, createdAt: 1 }).lean();
@@ -62,7 +62,7 @@ export async function getBar(req: any, res: any) {
             let isPairExist = await Pair.findOne({ id: pairId, chainId, active: true }).lean();
 
             if (!isPairExist) {
-                return res.status(404).send({ status: false, error: errorMessage.pairId });
+                return res.status(404).send({ status: false, error: errorMessage.PAIR_ID_REQUIRED_OR_INVALID });
             }
 
             let lastOrder = await OrderExecuted.findOne({ pair: pairId, chainId: chainId, blockTimestamp: { $lt: Number(from) } }).sort({ createdAt: -1 }).lean();
@@ -80,10 +80,10 @@ export async function getBar(req: any, res: any) {
             while (currTimestamp < to) {
                 let temp = {
                     time: currTimestamp,
-                    open: Big(open).div(Big(10).pow(18)).toString(),
-                    high: Big(max).div(Big(10).pow(18)).toString(),
-                    close: Big(close).div(Big(10).pow(18)).toString(),
-                    low: Big(min).div(Big(10).pow(18)).toString(),
+                    open: Big(open).div(1e18).toString(),
+                    high: Big(max).div(1e18).toString(),
+                    close: Big(close).div(1e18).toString(),
+                    low: Big(min).div(1e18).toString(),
                     volume: '0'
                 };
                 exchangeRatesTrend.push(temp);
@@ -143,11 +143,11 @@ export async function getBar(req: any, res: any) {
                     else {
                         let temp = {
                             time: currTimestamp,
-                            open: Big(open).div(Big(10).pow(18)).toString(),
-                            high: Big(max).div(Big(10).pow(18)).toString(),
-                            close: Big(close).div(Big(10).pow(18)).toString(),
-                            low: Big(min).div(Big(10).pow(18)).toString(),
-                            volume: Big(volume).div(Big(10).pow(18)).toString()
+                            open: Big(open).div(1e18).toString(),
+                            high: Big(max).div(1e18).toString(),
+                            close: Big(close).div(1e18).toString(),
+                            low: Big(min).div(1e18).toString(),
+                            volume: Big(volume).div(1e18).toString()
                         };
                         exchangeRatesTrend.push(temp);
                     }
@@ -157,11 +157,11 @@ export async function getBar(req: any, res: any) {
 
                     let temp = {
                         time: currTimestamp,
-                        open: Big(open).div(Big(10).pow(18)).toString(),
-                        high: Big(max).div(Big(10).pow(18)).toString(),
-                        close: Big(close).div(Big(10).pow(18)).toString(),
-                        low: Big(min).div(Big(10).pow(18)).toString(),
-                        volume: Big(volume).div(Big(10).pow(18)).toString()
+                        open: Big(open).div(1e18).toString(),
+                        high: Big(max).div(1e18).toString(),
+                        close: Big(close).div(1e18).toString(),
+                        low: Big(min).div(1e18).toString(),
+                        volume: Big(volume).div(1e18).toString()
                     };
                     exchangeRatesTrend.push(temp);
                     min = close;
@@ -179,11 +179,11 @@ export async function getBar(req: any, res: any) {
                 //if value exceed it will  genrate object regarding upper if block
                 let temp = {
                     time: currTimestamp,
-                    open: Big(open).div(Big(10).pow(18)).toString(),
-                    high: Big(max).div(Big(10).pow(18)).toString(),
-                    close: Big(close).div(Big(10).pow(18)).toString(),
-                    low: Big(min).div(Big(10).pow(18)).toString(),
-                    volume: Big(volume).div(Big(10).pow(18)).toString()
+                    open: Big(open).div(1e18).toString(),
+                    high: Big(max).div(1e18).toString(),
+                    close: Big(close).div(1e18).toString(),
+                    low: Big(min).div(1e18).toString(),
+                    volume: Big(volume).div(1e18).toString()
 
                 };
                 exchangeRatesTrend.push(temp);
@@ -193,10 +193,10 @@ export async function getBar(req: any, res: any) {
                 if (data[i].blockTimestamp > currTimestamp + intervalInMSec) {
                     let temp = {
                         time: currTimestamp,
-                        open: Big(close).div(Big(10).pow(18)).toString(),
-                        high: Big(close).div(Big(10).pow(18)).toString(),
-                        close: Big(close).div(Big(10).pow(18)).toString(),
-                        low: Big(close).div(Big(10).pow(18)).toString(),
+                        open: Big(close).div(1e18).toString(),
+                        high: Big(close).div(1e18).toString(),
+                        close: Big(close).div(1e18).toString(),
+                        low: Big(close).div(1e18).toString(),
                         volume: '0'
                     };
                     exchangeRatesTrend.push(temp);
@@ -231,11 +231,11 @@ export async function getBar(req: any, res: any) {
                     else {
                         let temp = {
                             time: currTimestamp,
-                            open: Big(open).div(Big(10).pow(18)).toString(),
-                            high: Big(max).div(Big(10).pow(18)).toString(),
-                            close: Big(close).div(Big(10).pow(18)).toString(),
-                            low: Big(min).div(Big(10).pow(18)).toString(),
-                            volume: Big(volume).div(Big(10).pow(18)).toString()
+                            open: Big(open).div(1e18).toString(),
+                            high: Big(max).div(1e18).toString(),
+                            close: Big(close).div(1e18).toString(),
+                            low: Big(min).div(1e18).toString(),
+                            volume: Big(volume).div(1e18).toString()
                         };
                         exchangeRatesTrend.push(temp);
                     }
@@ -245,11 +245,11 @@ export async function getBar(req: any, res: any) {
 
                     let temp = {
                         time: currTimestamp,
-                        open: Big(open).div(Big(10).pow(18)).toString(),
-                        high: Big(max).div(Big(10).pow(18)).toString(),
-                        close: Big(close).div(Big(10).pow(18)).toString(),
-                        low: Big(min).div(Big(10).pow(18)).toString(),
-                        volume: Big(volume).div(Big(10).pow(18)).toString()
+                        open: Big(open).div(1e18).toString(),
+                        high: Big(max).div(1e18).toString(),
+                        close: Big(close).div(1e18).toString(),
+                        low: Big(min).div(1e18).toString(),
+                        volume: Big(volume).div(1e18).toString()
                     };
                     exchangeRatesTrend.push(temp);
                     min = close;

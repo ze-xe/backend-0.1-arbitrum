@@ -16,15 +16,15 @@ import { getConfig } from "../helper/constant";
  * @param {*} chainId (string) numeric chainId
  * @returns digest will be id of order, or false
  */
-export function validateSignature(maker: string, signature: string, value: any, chainId: string, spotAddress: string): (string | null) {
+export function validateSignature(maker: string, signature: string, value: any, chainId: string, domainData: any): (string | null) {
     try {
         require("dotenv").config()
        
         const domain = {
-            name: getConfig("name"),
-            version: getVersion(process.env.NODE_ENV!),
+            name: domainData.name,
+            version: domainData.version,
             chainId: chainId,
-            verifyingContract: spotAddress,
+            verifyingContract: domainData.spotAddress,
         };
 
         // The named list of all type definitions

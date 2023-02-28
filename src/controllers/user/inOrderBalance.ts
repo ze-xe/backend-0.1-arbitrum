@@ -13,15 +13,15 @@ export async function getUserInOrderBalance(req: any, res: any) {
         let maker: string = req.params.maker?.toLowerCase();
 
         if (!token) {
-            return res.status(400).send({ status: false, error: errorMessage.token });
+            return res.status(400).send({ status: false, error: errorMessage.TOKEN_REQUIRED });
         }
 
         if (!chainId) {
-            return res.status(400).send({ status: false, error: errorMessage.chainId });
+            return res.status(400).send({ status: false, error: errorMessage.CHAIN_ID_REQUIRED });
         }
 
         if (!maker) {
-            return res.status(400).send({ status: false, error: errorMessage.maker });
+            return res.status(400).send({ status: false, error: errorMessage.MAKER_REQUIRED });
         }
 
         let userInOrder: any[] = await User.find({ token: token, id: maker, chainId: chainId }).select({ _id: 0, __v: 0, createdAt: 0, updatedAt: 0, balance: 0 }).lean();

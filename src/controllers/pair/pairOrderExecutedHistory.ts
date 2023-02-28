@@ -18,11 +18,11 @@ export async function getPairOrderExecutedHistory(req: any, res: any) {
         let chainId: string = req.query.chainId;
 
         if (!pairId) {
-            return res.status(400).send({ status: false, error: errorMessage.pairId });
+            return res.status(400).send({ status: false, error: errorMessage.PAIR_ID_REQUIRED_OR_INVALID });
         }
 
         if (!chainId) {
-            return res.status(400).send({ status: false, error: errorMessage.chainId });
+            return res.status(400).send({ status: false, error: errorMessage.CHAIN_ID_REQUIRED });
         }
 
         let getPairOrderHistory = await OrderExecuted.find({ pair: pairId, chainId }).sort({ blockTimestamp: -1, logIndex: -1 }).select({ pairToken0Amount: 1, pairPrice: 1, action: 1,_id: 0 }).limit(50).lean();

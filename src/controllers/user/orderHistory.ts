@@ -16,15 +16,15 @@ export async function getUserOrderHistory(req: any, res: any) {
         let pairId: string = req.params.pairId?.toLowerCase();
         let chainId: string = req.query.chainId;
         if (!taker) {
-            return res.status(400).send({ status: false, error: errorMessage.taker });
+            return res.status(400).send({ status: false, error: errorMessage.TAKER_REQUIRED });
         }
 
         if (!pairId) {
-            return res.status(400).send({ status: false, error: errorMessage.pairId });
+            return res.status(400).send({ status: false, error: errorMessage.PAIR_ID_REQUIRED_OR_INVALID });
         }
 
         if (!chainId) {
-            return res.status(400).send({ status: false, error: errorMessage.chainId });
+            return res.status(400).send({ status: false, error: errorMessage.CHAIN_ID_REQUIRED });
         }
         const getOrderHistory = await OrderExecuted.find({ taker: taker, pair: pairId, chainId: chainId }).sort({ blockTimestamp: -1, createdAt: -1 }).select({ action: 1, pairPrice: 1, pairToken0Amount: 1, _id: 0 }).limit(50).lean();
 

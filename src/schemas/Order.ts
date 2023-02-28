@@ -23,6 +23,8 @@ const OrderSchema = new mongoose.Schema({
     deleted: { type: Boolean,  default: false },
     active: { type: Boolean, default: true },
     expired: { type: Boolean, default: false },
+    name:{type:String, required: true},
+    version:{type:String, required: true},
     chainId: String,
     cid: String,
 },

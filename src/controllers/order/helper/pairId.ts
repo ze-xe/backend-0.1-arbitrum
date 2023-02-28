@@ -9,9 +9,7 @@ import { Action } from "./marginValidationUserPosition";
 import fs from "fs";
 import path from "path";
 
-let encoder = new ethers.utils.AbiCoder().encode(["address", "address"], ["0x787930d665F7d7d5F73acb701892b59D7a35D03E".toLowerCase(), "0x95e3d2540479c67596575971b69b0c3951837359".toLowerCase()]);
-let id = ethers.utils.keccak256(encoder);
-console.log(id)
+
 
 // export async function getPairId(data: any, chainId: any) {
 //     try {

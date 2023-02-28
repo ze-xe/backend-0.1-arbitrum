@@ -131,17 +131,17 @@ export async function fetchOrders(req: any, res: any) {
         let chainId: string = req.query.chainId;
 
         if (!pairId) {
-            return res.status(400).send({ status: false, error: errorMessage.pairId });
+            return res.status(400).send({ status: false, error: errorMessage.PAIR_ID_REQUIRED_OR_INVALID });
         }
 
         if (!chainId) {
-            return res.status(400).send({ status: false, error: errorMessage.chainId });
+            return res.status(400).send({ status: false, error: errorMessage.CHAIN_ID_REQUIRED });
         }
 
         const isPairIdExist: ifPair | null = await Pair.findOne({ id: pairId, active: true }).lean();
 
         if (!isPairIdExist) {
-            return res.status(404).send({ status: false, error: errorMessage.pairId });
+            return res.status(404).send({ status: false, error: errorMessage.PAIR_ID_REQUIRED_OR_INVALID });
         }
 
         let buyOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token0, chainId: chainId, action: { $in: [0, 2] }, deleted: false, active: true, cancelled: false, expired: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
@@ -229,7 +229,7 @@ export async function fetchOrders(req: any, res: any) {
             let temp = {
 
                 price: buyEntries[i][0],
-                token0Amount: parseEther(buyEntries[i][1]),
+                amount: parseEther(buyEntries[i][1]),
 
             };
             buyOrders.push(temp);
@@ -243,7 +243,7 @@ export async function fetchOrders(req: any, res: any) {
 
             let temp = {
                 price: sellEntries[i][0],
-                token0Amount: parseEther(sellEntries[i][1]),
+                amount: parseEther(sellEntries[i][1]),
             };
             sellOrders.push(temp);
         }

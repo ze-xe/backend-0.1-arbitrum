@@ -45,6 +45,8 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     let amount1 = ethers.utils.parseEther('1100').toString();
     let expiry = ((Date.now() / 1000) + 7 * 24 * 60 * 60).toFixed(0)
     let wethAmount = '';
+    let name = "zexe";
+    let version = "1"
     let userInOrderPre = '0';
     // console.log(weth);
     before(async () => { //Before each test we empty the database   
@@ -86,8 +88,8 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     it(`user1 creates limit order to sell 1 weth @ 20000, check user inOrder Balance`, async () => {
 
         const domain = {
-            name: getConfig("name"),
-            version: getVersion(process.env.NODE_ENV!),
+            name: name,
+            version: version,
             chainId: chainId.toString(),
             verifyingContract: exchange.address,
         };
@@ -159,7 +161,9 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
                     },
                     "signature": storedSignature.toLowerCase(),
                     "chainId": chainId,
-                    spotAddress: exchange.address
+                    spotAddress: exchange.address,
+                    name: name,
+                    version: version
                 }
             );
 
@@ -206,9 +210,9 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         const exTxn = await exchange.connect(user2).execute(
             [orders[0]],
             [signatures[0]],
-            usdc.address,
-            ethers.utils.parseEther('1100'),
             weth.address,
+            ethers.utils.parseEther('1'),
+            usdc.address,
             ethers.constants.HashZero
         );
 

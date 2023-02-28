@@ -58,7 +58,9 @@ async function start(chainId: string, httpServer: any) {
                             chainId: copyOrder[i].chainId.toString(),
                             ipfs: true,
                             data: input,
-                            spotAddress: copyOrder[i].spot
+                            spotAddress: copyOrder[i].spot,
+                            name: copyOrder[i].name,
+                            version: copyOrder[i].version,
                         }
                     });
 

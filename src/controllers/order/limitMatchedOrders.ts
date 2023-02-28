@@ -197,25 +197,25 @@ export async function getLimitMatchedOrders(req: any, res: any) {
 
 
         if (!pairId) {
-            return res.status(400).send({ status: false, error: errorMessage.pairId });
+            return res.status(400).send({ status: false, error: errorMessage.PAIR_ID_REQUIRED_OR_INVALID });
         }
 
         if (!price || isNaN(Number(price))) {
-            return res.status(400).send({ status: false, error: errorMessage.exchangerate });
+            return res.status(400).send({ status: false, error: errorMessage.PRICE_REQUIRED_OR_INVALID });
         }
 
         if (isNaN(orderType) == true) {
-            return res.status(400).send({ status: false, error: errorMessage.orderType });
+            return res.status(400).send({ status: false, error: errorMessage.ORDERTYPE_REQUIRED_OR_INVALID });
         }
 
         if (!amount || isNaN(amount) == true) {
-            return res.status(400).send({ status: false, error: errorMessage.amount });
+            return res.status(400).send({ status: false, error: errorMessage.AMOUNT_REQUIRED_OR_INVALID });
         }
 
         const isPairIdExist: ifPair | null = await Pair.findOne({ id: pairId, chainId: chainId, active: true }).lean();
 
         if (!isPairIdExist) {
-            return res.status(404).send({ status: false, error: errorMessage.pairId });
+            return res.status(404).send({ status: false, error: errorMessage.PAIR_ID_REQUIRED_OR_INVALID });
         }
 
         let getMatchedDoc: ifOrderCreated[] = [];

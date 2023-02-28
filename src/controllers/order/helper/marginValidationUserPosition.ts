@@ -47,13 +47,13 @@ export async function marginValidationAndUserPosition(signature: string, data: a
             let token0CurrentInOrder = Big(findUserPosition0?.inOrderBalance ?? 0).plus(data.token0Amount).toNumber();
 
             if (!ipfs && Number(allowanceToken0) < Number(token0CurrentInOrder)) {
-                console.log(`${errorMessage.allowance} token0`);
-                return { status: false, error: errorMessage.allowance, statusCode: 400 };
+                console.log(`${errorMessage.INSUFFICIENT_ALLOWANCE} token0`);
+                return { status: false, error: errorMessage.INSUFFICIENT_ALLOWANCE, statusCode: 400 };
             }
 
             if (!ipfs && Number(userToken0Balance) < Number(token0CurrentInOrder)) {
-                console.log(`${errorMessage.balance} token0`);
-                return { status: false, error: errorMessage.balance, statusCode: 400 };
+                console.log(`${errorMessage.INSUFFICIENT_BALANCE} token0`);
+                return { status: false, error: errorMessage.INSUFFICIENT_BALANCE, statusCode: 400 };
             }
 
             if (findUserPosition0) {

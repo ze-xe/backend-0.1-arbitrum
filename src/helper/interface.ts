@@ -25,7 +25,9 @@ export interface ifOrderCreated {
     leverage: number
     expiry: string
     nonce:string
-    spot:string
+    spot:string,
+    name:string,
+    version:string
    
 }
 

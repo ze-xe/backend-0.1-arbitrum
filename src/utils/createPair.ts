@@ -10,7 +10,7 @@ import { connect, Pair, Token } from "../DB/db";
 
 
 export async function createPair(chainId: string) {
-    // await connect()
+    await connect()
     const getConfig = JSON.parse(fs.readFileSync(path.join(__dirname + "../../zexe.config.json")).toString())[chainId];
     const spotAddresses = Object.keys(getConfig);
     const spotPairs: any = []
@@ -47,7 +47,8 @@ export async function createPair(chainId: string) {
                         name: token0.name,
                         decimals: token0.decimals,
                         spot: spotAddress,
-                        chainId: chainId
+                        chainId: chainId,
+                        minTokenAmount: token0.minTokenAmount
                     }
                 )
                 console.log(`Token created, ${token0.name}`);
@@ -60,7 +61,8 @@ export async function createPair(chainId: string) {
                         name: token1.name,
                         decimals: token1.decimals,
                         spot: spotAddress,
-                        chainId: chainId
+                        chainId: chainId,
+                        minTokenAmount: token1.minTokenAmount
                     }
                 )
                 console.log(`Token created, ${token1.name}`);
@@ -69,7 +71,7 @@ export async function createPair(chainId: string) {
                 Pair.create({
                     id: pair,
                     priceDecimals: 2,
-                    minToken0Order: "100000000000",
+                    minToken0Order: token0.minTokenAmount,
                     spot: spotAddress,
                     price: '0',
                     priceDiff: '0',
@@ -87,4 +89,4 @@ export async function createPair(chainId: string) {
     return
 }
 
-// createPair("421613")
+createPair("421613")

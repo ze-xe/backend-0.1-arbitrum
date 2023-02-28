@@ -42,13 +42,13 @@ export async function validationAndUserPosition(data: any, chainId: string, ipfs
             let currentInOrderBalance = Big(findUserPosition.inOrderBalance).plus(data.token1Amount).toString();
 
             if (!ipfs && Number(allowance) < Number(currentInOrderBalance)) {
-                console.log(`${errorMessage.allowance, data.token1}`);
-                return { status: false, error: errorMessage.allowance, statusCode: 400 };
+                console.log(`${errorMessage.INSUFFICIENT_ALLOWANCE, data.token1}`);
+                return { status: false, error: errorMessage.INSUFFICIENT_ALLOWANCE, statusCode: 400 };
             }
 
             if (!ipfs && Number(userTokenBalance) < Number(currentInOrderBalance)) {
-                console.log(`${errorMessage.balance, data.token1}`);
-                return { status: false, error: errorMessage.balance, statusCode: 400 };
+                console.log(`${errorMessage.INSUFFICIENT_BALANCE, data.token1}`);
+                return { status: false, error: errorMessage.INSUFFICIENT_BALANCE, statusCode: 400 };
             }
 
             await User.findOneAndUpdate(
@@ -58,13 +58,13 @@ export async function validationAndUserPosition(data: any, chainId: string, ipfs
         } else {
 
             if (!ipfs && Number(allowance) < Number(data.token1Amount)) {
-                console.log(`${errorMessage.allowance, data.token1}`);
-                return { status: false, error: errorMessage.allowance, statusCode: 400 };
+                console.log(`${errorMessage.INSUFFICIENT_ALLOWANCE, data.token1}`);
+                return { status: false, error: errorMessage.INSUFFICIENT_ALLOWANCE, statusCode: 400 };
             }
 
             if (!ipfs && Number(userTokenBalance) < Number(data.token1Amount)) {
-                console.log(`${errorMessage.balance, data.token1}`);
-                return { status: false, error: errorMessage.balance, statusCode: 400 };
+                console.log(`${errorMessage.INSUFFICIENT_BALANCE, data.token1}`);
+                return { status: false, error: errorMessage.INSUFFICIENT_BALANCE, statusCode: 400 };
             }
 
             User.create(
@@ -82,6 +82,6 @@ export async function validationAndUserPosition(data: any, chainId: string, ipfs
     catch (error) {
         sentry.captureException(error)
         console.log(`error @ validationAndUserPosition`)
-        return { status: false, error: errorMessage.server, statusCode: 500 }
+        return { status: false, error: errorMessage.SERVER_ERROR, statusCode: 500 }
     }
 }

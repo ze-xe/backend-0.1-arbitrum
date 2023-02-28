@@ -82,14 +82,14 @@ export async function handleOrderCancelled(data: any) {
 
         socketService.emit(EVENT_NAME.PAIR_ORDER, {
             amount: `-${orderDetails.balanceAmount}`,
-            price: orderDetails.price,
+            price: orderDetails.pairPrice,
             action: orderDetails.action,
             pair: orderDetails.pair
         });
        
         socketService.emit(EVENT_NAME.CANCEL_ORDER, {
             amount: `-${orderDetails.balanceAmount}`,
-            price: orderDetails.price,
+            price: orderDetails.pairPrice,
             action: orderDetails.action,
             pair: orderDetails.pair
         });

@@ -21,7 +21,7 @@ export async function getAllPairDetails(req: any, res: any) {
         let chainId: string = req.query.chainId;
 
         if (!chainId) {
-            return res.status(400).send({ status: false, error: errorMessage.chainId });
+            return res.status(400).send({ status: false, error: errorMessage.CHAIN_ID_REQUIRED });
         }
         let allPairs: ifPair[] = await Pair.find({ chainId: chainId, active: true }).lean();
 

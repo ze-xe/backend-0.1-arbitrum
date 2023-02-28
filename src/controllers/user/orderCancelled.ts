@@ -14,15 +14,15 @@ export async function getOrderCancelled(req: any, res: any) {
         let chainId: string = req.query.chainId;
 
         if (!maker) {
-            return res.status(400).send({ status: false, error: errorMessage.maker });
+            return res.status(400).send({ status: false, error: errorMessage.MAKER_REQUIRED });
         }
 
         if (!pairId) {
-            return res.status(400).send({ status: false, error: errorMessage.pairId });
+            return res.status(400).send({ status: false, error: errorMessage.PAIR_ID_REQUIRED_OR_INVALID });
         }
 
         if (!chainId) {
-            return res.status(400).send({ status: false, error: errorMessage.chainId });
+            return res.status(400).send({ status: false, error: errorMessage.CHAIN_ID_REQUIRED });
         }
         const getOrderCancelledDoc = await Order.find({ maker: maker, pair: pairId, chainId, cancelled: true }).sort({ createdAt: -1 }).select({ balanceAmount: 1, pairPrice: 1, action: 1, _id: 0 }).lean();
 
