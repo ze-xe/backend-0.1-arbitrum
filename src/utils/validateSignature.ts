@@ -1,7 +1,7 @@
 
 
 import { ethers } from "ethers";
-import { getExchangeAddress, getVersion } from "../helper/chain";
+import { getVersion } from "../helper/chain";
 import { getConfig } from "../helper/constant";
 
 
@@ -16,7 +16,7 @@ import { getConfig } from "../helper/constant";
  * @param {*} chainId (string) numeric chainId
  * @returns digest will be id of order, or false
  */
-export function validateSignature(maker: string, signature: string, value: any, chainId: string): (string | null) {
+export function validateSignature(maker: string, signature: string, value: any, chainId: string, spotAddress: string): (string | null) {
     try {
         require("dotenv").config()
        
@@ -24,7 +24,7 @@ export function validateSignature(maker: string, signature: string, value: any, 
             name: getConfig("name"),
             version: getVersion(process.env.NODE_ENV!),
             chainId: chainId,
-            verifyingContract: getExchangeAddress(chainId),
+            verifyingContract: spotAddress,
         };
 
         // The named list of all type definitions

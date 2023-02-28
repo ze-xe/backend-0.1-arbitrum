@@ -79,7 +79,7 @@ export async function handleOrderExecuted(data: any, argument: any) {
 
         await Pair.findOneAndUpdate(
             { _id: getPairDetails._id.toString() },
-            { $set: { price: getOrderDetails.pairPrice, priceDiff: priceDiff, priceDecimals: argument.priceDecimals } }
+            { $set: { price: getOrderDetails.pairPrice, priceDiff: priceDiff, priceDecimals: argument.priceDecimals.toString() } }
         );
         // updating userPosition
         if (Number(getOrderDetails.action) == Action.LIMIT) {

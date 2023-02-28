@@ -6,6 +6,7 @@ import { Decimals } from "../../helper/constant";
 import { errorMessage } from "../../helper/errorMessage"
 import * as sentry from "@sentry/node";
 import { ethers } from "ethers";
+import { parseEther } from "../../utils/utils";
 
 
 
@@ -143,10 +144,10 @@ export async function fetchOrders(req: any, res: any) {
             return res.status(404).send({ status: false, error: errorMessage.pairId });
         }
 
-        let buyOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token0, chainId: chainId, action: { $in: [0, 2] }, deleted: false, active: true, cancelled: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
-        let sellOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token1, chainId: chainId, action: { $in: [0, 2] }, deleted: false, active: true, cancelled: false }).sort({ pairPrice: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
-        let buyOrder1: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token1, chainId: chainId, action: 1, deleted: false, active: true, cancelled: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
-        let sellOrder1: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token0, chainId: chainId, action: 1, deleted: false, active: true, cancelled: false }).sort({ pairPrice: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+        let buyOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token0, chainId: chainId, action: { $in: [0, 2] }, deleted: false, active: true, cancelled: false, expired: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+        let sellOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token1, chainId: chainId, action: { $in: [0, 2] }, deleted: false, active: true, cancelled: false, expired: false }).sort({ pairPrice: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+        let buyOrder1: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token1, chainId: chainId, action: 1, deleted: false, active: true, cancelled: false, expired: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+        let sellOrder1: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token0, chainId: chainId, action: 1, deleted: false, active: true, cancelled: false, expired: false }).sort({ pairPrice: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
 
         let promise = await Promise.all([buyOrder, sellOrder, buyOrder1, sellOrder1]);
         buyOrder = promise[0];
@@ -159,7 +160,7 @@ export async function fetchOrders(req: any, res: any) {
         // action limit and open
         for (let i = 0; i < buyOrder.length; i++) {
 
-            buyOrder[i].pairPrice = ethers.utils.parseEther(`${Number(buyOrder[i].pairPrice) / 1e18}`).toString();
+            buyOrder[i].pairPrice = parseEther(buyOrder[i].pairPrice);
 
             if (!mapBuy[`${buyOrder[i].pairPrice}`]) {
 
@@ -174,7 +175,7 @@ export async function fetchOrders(req: any, res: any) {
 
         for (let i in sellOrder) {
 
-            sellOrder[i].pairPrice = ethers.utils.parseEther(`${Number(sellOrder[i].pairPrice) / 1e18}`).toString();
+            sellOrder[i].pairPrice = parseEther(sellOrder[i].pairPrice);
 
             if (!mapSell[`${sellOrder[i].pairPrice}`]) {
 
@@ -188,8 +189,8 @@ export async function fetchOrders(req: any, res: any) {
         }
         // action close
         for (let i = 0; i < buyOrder1.length; i++) {
-            
-            buyOrder1[i].pairPrice = ethers.utils.parseEther(`${Number(buyOrder1[i].pairPrice) / 1e18}`).toString();
+
+            buyOrder1[i].pairPrice = parseEther(buyOrder1[i].pairPrice);
 
             if (!mapBuy[`${buyOrder1[i].pairPrice}`]) {
 
@@ -204,7 +205,7 @@ export async function fetchOrders(req: any, res: any) {
 
         for (let i in sellOrder1) {
 
-            sellOrder1[i].pairPrice = ethers.utils.parseEther(`${Number(sellOrder1[i].pairPrice) / 1e18}`).toString();
+            sellOrder1[i].pairPrice = parseEther(sellOrder1[i].pairPrice);
 
             if (!mapSell[`${sellOrder1[i].pairPrice}`]) {
 
@@ -228,7 +229,7 @@ export async function fetchOrders(req: any, res: any) {
             let temp = {
 
                 price: buyEntries[i][0],
-                token0Amount: ethers.utils.parseEther(`${Number(buyEntries[i][1])/1e18}`).toString(),
+                token0Amount: parseEther(buyEntries[i][1]),
 
             };
             buyOrders.push(temp);
@@ -242,7 +243,7 @@ export async function fetchOrders(req: any, res: any) {
 
             let temp = {
                 price: sellEntries[i][0],
-                token0Amount: ethers.utils.parseEther(`${Number(sellEntries[i][1])/1e18}`).toString(),
+                token0Amount: parseEther(sellEntries[i][1]),
             };
             sellOrders.push(temp);
         }

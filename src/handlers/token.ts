@@ -37,7 +37,7 @@ async function handleToken(token: string, chainId: string) {
         Token.create(temp);
 
         console.log("Token Added", token, chainId, symbol);
-        return { symbol: symbol, marginEnabled: false, minToken0Amount: "10000000000" }
+        return { symbol: symbol, marginEnabled: true, minToken0Amount: "10000000000" }
     }
     catch (error) {
         sentry.captureException(error)

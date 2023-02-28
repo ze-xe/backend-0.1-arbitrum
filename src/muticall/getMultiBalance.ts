@@ -12,9 +12,6 @@ import { Action } from "../controllers/order/helper/marginValidationUserPosition
 
 
 
-
-
-
 /**
  * @dev this function is used to check weather the fetched order is still active or not
  * @notice its check if maker has sufficeint token or not, and remove invalid data, update as inActive in DB
@@ -57,7 +54,7 @@ export async function getMultiBalance(token: string, addresses: string[], data: 
                 let userPosition: ifUserPosition = await User.findOne({ token: token, id: addresses[i], chainId: chainId }).lean();
                 let inOrderBalance = Big(userPosition.inOrderBalance);
                 let amounts = data[i].balanceAmount;
-                if (Number(balance) < Number(inOrderBalance) || Date.now()/1e3 >= Number(data[i].expiry)) {
+                if (Number(balance) < Number(inOrderBalance) || Date.now() / 1e3 >= Number(data[i].expiry)) {
                     inActiveIds.push(data[i]._id);
 
                     if (data[i].action != Action.CLOSE) {
@@ -70,26 +67,32 @@ export async function getMultiBalance(token: string, addresses: string[], data: 
 
                             let currentInOrderBalance = Big(inOrderBalance).minus(amounts).toString();
 
-                             await User.findOneAndUpdate({ token: token, id: addresses[i], chainId: chainId }, { $set: { inOrderBalance: currentInOrderBalance } });
+                            await User.findOneAndUpdate({ token: token, id: addresses[i], chainId: chainId }, { $set: { inOrderBalance: currentInOrderBalance } });
 
                         }
-                        else if (data[i].action == Action.OPEN ) {
+                        else if (data[i].action == Action.OPEN) {
                             let token0Amount = data[i].balanceAmount;
                             if (pairToken0 != data[i].token0) {
                                 token0Amount = Big(data[i].balanceAmount).div(data[i].price).mul(1e18).toString();
                             }
                             let token0InOrder = Big(inOrderBalance).minus(Big(token0Amount).div(Big(Number(data[i].leverage) - 1)));
-                             await User.findOneAndUpdate({ token: token, id: addresses[i], chainId: chainId }, { $set: { inOrderBalance: token0InOrder } });
-
+                            await User.findOneAndUpdate({ token: token, id: addresses[i], chainId: chainId }, { $set: { inOrderBalance: token0InOrder } });
                         }
+                    }
 
+                    let temp: any = {
+                        active: false
+                    }
 
+                    if (Date.now() / 1e3 >= Number(data[i].expiry)) {
+                        temp = {
+                            active: false,
+                            expired: true
+                        }
                     }
                     console.log("Order Deactivate from getMultiBalance", data[i].id)
-                     await Order.findOneAndUpdate({ _id: data[i]._id }, { $set: { active: false } });
-                    // await Promise.all([updateUserPosition, deleteOrder]);
+                    await Order.findOneAndUpdate({ _id: data[i]._id }, { $set: temp });
                 }
-
             }
 
             let res: any[] = [];
@@ -115,13 +118,11 @@ export async function getMultiBalance(token: string, addresses: string[], data: 
                             nonce: data[i].nonce,
                             action: data[i].action,
                             position: data[i].position,
-                            
+
                         }
                     });
-
                 }
             }
-           
             return res;
         } catch (error) {
             sentry.captureException(error);

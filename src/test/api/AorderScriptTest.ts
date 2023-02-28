@@ -89,7 +89,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
             name: getConfig("name"),
             version: getVersion(process.env.NODE_ENV!),
             chainId: chainId.toString(),
-            verifyingContract: getExchangeAddress(chainId),
+            verifyingContract: exchange.address,
         };
 
 
@@ -158,7 +158,8 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
                         position: 0 // for cross
                     },
                     "signature": storedSignature.toLowerCase(),
-                    "chainId": chainId
+                    "chainId": chainId,
+                    spotAddress: exchange.address
                 }
             );
 
@@ -182,7 +183,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     //     orderId = data.id
     // })
 
-    
+
     it(`user2 buy user1s 1 weth order`, async () => {
         // balances
         // let user1wethBalancePre = weth.balanceOf(user1.address);
@@ -275,7 +276,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     //         signatures[0]
     //     )
     // })
-    
+
     /*
     it(`find executed Order, check inOrderBalance`, async () => {
         // console.log("txnId=",txnId, "orderId", orderId)

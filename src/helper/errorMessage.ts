@@ -18,7 +18,8 @@ export const errorMessage = {
     ticker: "ticker is not found",
     market: "market not approve",
     borrowLimit: "Borrow Limit not valid borrowLimit = <0.75 or > 0.05 ",
-    server: "internal Server error"
+    server: "internal Server error",
+    expiry:"expiry must be greater than current time"
 
 };
 

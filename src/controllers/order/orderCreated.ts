@@ -48,7 +48,8 @@ export async function handleOrderCreated(req: any, res: any) {
         let data = req.body.data;
         let chainId: string = req.body.chainId;
         let ipfs: boolean | undefined = req.body.ipfs;
-        let addresses = [data.maker, data.token0, data.token1];
+        let spotAddress = req.body.spotAddress.toLowerCase();
+        let addresses = [data.maker, data.token0, data.token1, spotAddress];
         data.maker = data.maker?.toLowerCase();
         data.token0 = data.token0?.toLowerCase();
         data.token1 = data.token1?.toLowerCase();
@@ -62,7 +63,11 @@ export async function handleOrderCreated(req: any, res: any) {
             }
         }
 
-        let id: string | null = validateSignature(data.maker, signature, data, chainId);
+        if (Number(data.expiry) < Date.now() / 1e3) {
+            return res.status(400).send({ status: false, error: errorMessage.expiry });
+        }
+
+        let id: string | null = validateSignature(data.maker, signature, data, chainId, spotAddress);
 
         if (!id) {
             console.log(errorMessage.signature);
@@ -73,6 +78,11 @@ export async function handleOrderCreated(req: any, res: any) {
 
         if (isOrderPresent) {
             return res.status(201).send({ status: true, message: "Order Already Created" });
+        }
+
+        let pair = await getPairId(data, chainId, spotAddress);
+        if (!pair) {
+            return res.status(400).send({ status: false, error: errorMessage.pairId });
         }
 
         // if margin Order
@@ -89,11 +99,6 @@ export async function handleOrderCreated(req: any, res: any) {
             if (response.status == false) {
                 return res.status(response.statusCode).send({ status: false, error: response.error })
             }
-        }
-
-        let pair = await getPairId(data, chainId);
-        if (!pair) {
-            return res.status(500).send({ status: false, error: errorMessage.server });
         }
 
         // geting exchangeRate decimal
@@ -128,6 +133,7 @@ export async function handleOrderCreated(req: any, res: any) {
             cid: cid,
             action: data.action,
             position: data.position,
+            spot: spotAddress
         }
         if (!ipfs) {
 
@@ -144,7 +150,7 @@ export async function handleOrderCreated(req: any, res: any) {
             OrderCreatedBackup.create(orderCreate);
         }
 
-        await Order.create(orderCreate);
+        Order.create(orderCreate);
 
         // socket io data
         if (!ipfs) {

@@ -22,13 +22,10 @@ import * as sentry from "@sentry/node";
 export async function validationAndUserPosition(data: any, chainId: string, ipfs: boolean | undefined) {
     try {
 
-       
         let multicallData: number[] | null;
         let userTokenBalance = 0;
         let allowance = 0;
-        // let token = data.token1;
-        // let amount = data.token1Amount;
-
+        
         let findUserPosition = await User.findOne({ id: data.maker, token: data.token1, chainId: chainId }).lean();
         if (!ipfs) {
             multicallData = await multicall(data.token1, data.maker, chainId)
@@ -80,10 +77,7 @@ export async function validationAndUserPosition(data: any, chainId: string, ipfs
             );
 
         }
-
         return { status: true }
-
-
     }
     catch (error) {
         sentry.captureException(error)

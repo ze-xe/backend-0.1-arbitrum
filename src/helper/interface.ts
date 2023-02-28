@@ -25,10 +25,8 @@ export interface ifOrderCreated {
     leverage: number
     expiry: string
     nonce:string
-    // fillAmount: string
-    // lastInOrderToken0: string
-    // lastInOrderToken1: string
-
+    spot:string
+   
 }
 
 export interface ifUserPosition {

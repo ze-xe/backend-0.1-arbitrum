@@ -221,8 +221,8 @@ export async function getLimitMatchedOrders(req: any, res: any) {
         let getMatchedDoc: ifOrderCreated[] = [];
 
         if (orderType == ORDER_TYPE.BUY) {
-            let sellOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token1,"$expr" : {"$lte" : [{"$toDouble" :"$pairPrice"} , price]}, chainId: chainId, action: { $in: [0, 2] }, deleted: false, active: true, cancelled: false }).sort({ pairPrice: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
-            let sellOrder1: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token0,"$expr" : {"$lte" : [{"$toDouble" :"$pairPrice"} , price]}, chainId: chainId, action: 1, deleted: false, active: true, cancelled: false }).sort({ pairPrice: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+            let sellOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token1,"$expr" : {"$lte" : [{"$toDouble" :"$pairPrice"} , price]}, chainId: chainId, action: { $in: [0, 2] }, deleted: false, active: true, cancelled: false, expired: false }).sort({ pairPrice: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+            let sellOrder1: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token0,"$expr" : {"$lte" : [{"$toDouble" :"$pairPrice"} , price]}, chainId: chainId, action: 1, deleted: false, active: true, cancelled: false, expired: false }).sort({ pairPrice: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
 
             let promise = await Promise.all([sellOrder, sellOrder1]);
 
@@ -234,9 +234,9 @@ export async function getLimitMatchedOrders(req: any, res: any) {
         // {"$expr" : {"$gt" : [{"$toInt" :"$diskSizeGb"} , 200]}}
         else if (orderType == ORDER_TYPE.SELL) {
             // let buyOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token0, pairPrice: { $gte: Number(price) }, chainId: chainId, action: { $in: [0, 2] }, deleted: false, active: true, cancelled: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
-            let buyOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token0,"$expr" : {"$gte" : [{"$toDouble" :"$pairPrice"} , price]}, chainId: chainId, action: { $in: [0, 2] }, deleted: false, active: true, cancelled: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+            let buyOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token0,"$expr" : {"$gte" : [{"$toDouble" :"$pairPrice"} , price]}, chainId: chainId, action: { $in: [0, 2] }, deleted: false, active: true, cancelled: false, expired: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
             // let buyOrder1: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token1, pairPrice: { $gte: Number(price) }, chainId: chainId, action: 1, deleted: false, active: true, cancelled: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
-            let buyOrder1: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token1, "$expr" : {"$gte" : [{"$toDouble" :"$pairPrice"} , price]}, chainId: chainId, action: 1, deleted: false, active: true, cancelled: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+            let buyOrder1: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token1, "$expr" : {"$gte" : [{"$toDouble" :"$pairPrice"} , price]}, chainId: chainId, action: 1, deleted: false, active: true, cancelled: false, expired: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
             let promise = await Promise.all([buyOrder, buyOrder1]);
             buyOrder = promise[0];
             buyOrder1 = promise[1];

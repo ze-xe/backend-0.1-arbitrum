@@ -36,6 +36,16 @@ export function getProvider(chainId: string): ethers.providers.JsonRpcProvider {
     return provider;
 }
 
+export function getspotAddress(chainId: string): string[] {
+    let spot = JSON.parse(fs.readFileSync(path.join(__dirname+"../../zexe.config.json" )).toString())[chainId];
+
+    return Object.keys(spot);
+}
+
+// console.log(getspotAddress("421613"))
+
+
+
 
 
 
