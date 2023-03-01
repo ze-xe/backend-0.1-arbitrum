@@ -5,7 +5,7 @@ const UserSchema = new mongoose.Schema({
     id: { type: String, required: true },
     token: { type: String, required: true },
     inOrderBalance: { type: String, default: '0' },
-    chainId: String
+    chainId: { type: String, required: true }
 
 },
     { timestamps: true }

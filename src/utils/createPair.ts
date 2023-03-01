@@ -1,9 +1,12 @@
-import fs from "fs";
+import { promises as fs } from "fs";
 import path from "path";
 import { connect, Pair, Token } from "../DB/db";
 
 
-
+// (async function a (){
+//     let b = (await fs.readFile(path.join(__dirname + "../../zexe.config.json"),"utf-8")).toString()
+//     console.log(b)
+// })()
 
 
 
@@ -11,7 +14,7 @@ import { connect, Pair, Token } from "../DB/db";
 
 export async function createPair(chainId: string) {
     await connect()
-    const getConfig = JSON.parse(fs.readFileSync(path.join(__dirname + "../../zexe.config.json")).toString())[chainId];
+    const getConfig = await (JSON.parse((await fs.readFile(path.join(__dirname + "../../zexe.config.json"))).toString())[chainId]);
     const spotAddresses = Object.keys(getConfig);
     const spotPairs: any = []
     for (let i in spotAddresses) {
@@ -89,4 +92,4 @@ export async function createPair(chainId: string) {
     return
 }
 
-createPair("421613")
+// createPair("421613")

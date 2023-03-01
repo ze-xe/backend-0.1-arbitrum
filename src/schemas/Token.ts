@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 
 const TokenSchema = new mongoose.Schema({
 
-    id: String,
-    name: String,
-    symbol: String,
+    id: {type:String,required: true},
+    name: {type:String,required: true},
+    symbol:{type:String,required: true},
     price: Number,
-    decimals: Number,
-    chainId: String,
-    spot: String,
+    decimals:{type:String,required: true},
+    chainId: {type:String,required: true},
+    spot: {type:String,required: true},
     marginEnabled: { type: Boolean, default: true },
     cId: String,
     minTokenAmount: { type: String, default: "10000000000" },

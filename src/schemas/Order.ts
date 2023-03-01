@@ -11,7 +11,7 @@ const OrderSchema = new mongoose.Schema({
     nonce: { type: String, required: true, trim: true },
     token0Amount: { type: String, required: true, trim: true },
     token1Amount: { type: String, default: "0" },
-    leverage: { type: String, default: "0" },
+    leverage: { type: String, default: "1" },
     price: { type: String, required: true, trim: true },
     pairPrice: { type: String, required: true, trim: true },
     priceDecimals: { type: String, required: true, trim: true },
@@ -25,7 +25,7 @@ const OrderSchema = new mongoose.Schema({
     expired: { type: Boolean, default: false },
     name:{type:String, required: true},
     version:{type:String, required: true},
-    chainId: String,
+    chainId: {type:String, required: true},
     cid: String,
 },
     { timestamps: true }
