@@ -18,7 +18,7 @@ services:
     # depends_on:
     #   - mongozexe
     ports:
-      - "3030:3010"
+      - "3040:3010"
     environment:
         - NODE_ENV=stage
         # - MONGO_URL=mongodb+srv://g-2-project-1:AzVr1gDMWsMc1lAN@cluster0.j1yrl.mongodb.net/prod
