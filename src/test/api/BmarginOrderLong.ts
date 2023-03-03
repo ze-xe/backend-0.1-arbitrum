@@ -31,6 +31,7 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
     let spot = getContract("Spot", chainId)
     let weth = getContract("WETH", chainId)
     let usdc = getContract("USDC", chainId)
+    let aave = getContract("DAI", chainId)
     let pool = new ethers.Contract("0xd4282DdAC1A8686695e00Ea9BB6cF542A3271CA4", getABI("IPool"), provider);
     // let pool = new ethers.Contract(await spot.POOL(), getABI("IPool"), provider);
     let user1 = new ethers.Wallet(process.env.PRIVATE_KEY1! as string).connect(provider); //2
@@ -46,7 +47,8 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
     let amount0 = ethers.utils.parseEther('1').toString();
     let amount1 = ethers.utils.parseEther('1000').toString();
     let expiry = ((Date.now() / 1000) + 7 * 24 * 60 * 60).toFixed(0)
-
+    let name = "zexe";
+    let version = "1"
 
     before(async () => {
 
@@ -80,9 +82,9 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
         // expect(user1wethBalancePost).to.equal(parseEther(Big(ethers.utils.parseEther('1').toString()).plus(user1wethBalancePre).toString()));
         // expect(user2wethBalancePost).to.equal(parseEther(Big(ethers.utils.parseEther('10').toString()).plus(user2wethBalancePre).toString()));
  
-    });*/
+    });
 
-    /*
+    
     it("make market liquid", async () => {
  
         const wethAmount = ethers.utils.parseEther('1000');
@@ -109,11 +111,11 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
  
     })*/
 
-    // it('create cross position', async () => {
-    //     await spot.connect(user1).createPosition([weth.address, usdc.address]);
-    //     // require(await spot.totalPositions(user1.address)).to.equal('1');
-    //     // require(await spot.position(user1.address, 0)).to.not.equal(ethers.constants.AddressZero);
-    // })
+    it('create cross position', async () => {
+        await spot.connect(user1).createPosition([aave.address, usdc.address]);
+        // require(await spot.totalPositions(user1.address)).to.equal('1');
+        // require(await spot.position(user1.address, 0)).to.not.equal(ethers.constants.AddressZero);
+    })
     
     it('user1 longs 1 eth with 5x leverage', async () => {
 
@@ -204,35 +206,35 @@ describe("Margin Order Long => Mint token, create order, execute order, cancel o
         // expect(userPositionPost?.inOrderBalance).to.equal(Big(userInOrder).plus(amount0).toString())
     })
 
-    // it('user2 sells 5 eth for 5000 usdt', async () => {
-    //     const amount = ethers.utils.parseEther('5000');
+    it('user2 sells 5 eth for 5000 usdt', async () => {
+        const amount = ethers.utils.parseEther('2000');
 
-    //     await spot.connect(user2).execute(
-    //         orders,
-    //         signatures,
-    //         usdc.address,
-    //         amount,
-    //         weth.address,
-    //         ethers.constants.HashZero
-    //     );
+        await spot.connect(user2).execute(
+            orders,
+            signatures,
+            usdc.address,
+            amount,
+            weth.address,
+            ethers.constants.HashZero
+        );
 
-    //     // expect(await WETH.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('1'));
-    //     // expect(await USDT.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('9000'));
-    //     // expect(await WETH.balanceOf(user1.address)).to.equal(ethers.utils.parseEther('0'));
-    //     // console.log(await WETH.balanceOf(user2.address))
-    //     // console.log(await USDT.balanceOf(user2.address))
-    //     // console.log(await WETH.balanceOf(user1.address))
-    //     // console.log(await USDT.balanceOf(user1.address))
-    //     // console.log('________');
-    // });
+        // expect(await WETH.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('1'));
+        // expect(await USDT.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('9000'));
+        // expect(await WETH.balanceOf(user1.address)).to.equal(ethers.utils.parseEther('0'));
+        // console.log(await WETH.balanceOf(user2.address))
+        // console.log(await USDT.balanceOf(user2.address))
+        // console.log(await WETH.balanceOf(user1.address))
+        // console.log(await USDT.balanceOf(user1.address))
+        // console.log('________');
+    });
 
-    it("cancel Order", async ()=>{
+    // it("cancel Order", async ()=>{
 
-        await spot.connect(user1).cancelOrder(
-            orders[0],
-            signatures[0]
-        )
-    })
+    //     await spot.connect(user1).cancelOrder(
+    //         orders[0],
+    //         signatures[0]
+    //     )
+    // })
     /*
     it('user1 close 1 eth with 3eth leverage', async () => {
 

@@ -44,6 +44,8 @@ export interface ifPair {
     id: string
     token0: string
     token1: string
+    price0:string
+    price1:string
     priceDecimals: string
     minToken0Order: string
     price: string

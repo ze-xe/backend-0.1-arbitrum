@@ -10,7 +10,7 @@ import path from "path";
 
 export function getABI(name: any) {
     const Deployments = JSON.parse((fs.readFileSync(path.join(__dirname, '..', 'deployments', 'deployments.json'))).toString())["sources"];
-    let abis = ["Lever", "TestERC20", "Multicall2", "Spot", "MockToken", "IPool"]
+    let abis = ["Lever", "TestERC20", "Multicall2", "Spot", "MockToken", "IPool", "AToken", "VToken", "AaveOracle", "PoolAddressesProvider"]
     if (name == "Exchange") {
         return Deployments[`Exchange_${getConfig("latest")}`];
     }

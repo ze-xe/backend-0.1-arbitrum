@@ -1,6 +1,6 @@
 {
     "421613": {
-        "0x8ce8824810e9ba4c9adbbf464ef8d4d25ec8c317": { 
+        "0xf8b9315d2fc02b4bbc696d0f7c322700ae3c5c34": { 
             "0xda509e348e9ba4dfd5606a2913c80347f7bee1bc2a5ba42ded50a3bc158f5078": [
                 {
                     "address": "0x1fe7250ca569bb07610596d2371f2e83fae3ea2b",
@@ -66,5 +66,11 @@
                 }
             ]
         }
+    },
+    "poolAddress":{
+        "0xf8b9315d2fc02b4bbc696d0f7c322700ae3c5c34": "0xd4282DdAC1A8686695e00Ea9BB6cF542A3271CA4"
+    },
+    "priceOracle":{
+        "0xf8b9315d2fc02b4bbc696d0f7c322700ae3c5c34": "0x57Ce66E2C1a618f848707d6FA408B4fAe066cc62"
     }
 }

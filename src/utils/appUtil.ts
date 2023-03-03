@@ -10,6 +10,7 @@ import { socketService } from "../socketIo/socket.io";
 import { getVersion } from "../helper/chain";
 import * as sentry from "@sentry/node";
 import { createPair } from "./createPair";
+import { getOraclePrice } from "./oraclePrice";
 require("dotenv").config();
 
 
@@ -31,7 +32,7 @@ async function start(chainId: string, httpServer: any) {
             await copy();
             async function copy() {
                 console.log(page, "Page No");
-                await createPair(chainId);
+                
                 let copyOrder: ifOrderCreated[] = await OrderCreatedBackup.find({ chainId: chainId }, { _id: 0, __v: 0 }).skip(page * _limit).limit(20).lean();
 
                 for (let i in copyOrder) {
@@ -74,12 +75,14 @@ async function start(chainId: string, httpServer: any) {
 
             }
         }
+        await createPair(chainId);
         ExchangeConfig(chainId).forEach(async (x)=>{
            await historicEventListner(x)
         })
         // await historicEventListner(ExchangeConfig(chainId));
         socketService.init(httpServer)
         startOrderStatus(chainId)
+        getOraclePrice(chainId)
     }
     catch (error) {
         sentry.captureException(error)

@@ -46,6 +46,8 @@ export async function getAllPairDetails(req: any, res: any) {
 
                 id: allPairs[i].id,
                 price: allPairs[i].price,
+                price0: allPairs[i].price0,
+                price1: allPairs[i].price1,
                 priceDecimals: allPairs[i].priceDecimals,
                 priceDiff: allPairs[i].priceDiff,
                 marginEnabeled: allPairs[i].marginEnabled,

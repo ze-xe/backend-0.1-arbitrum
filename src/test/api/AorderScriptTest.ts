@@ -37,12 +37,12 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
     let user2 = new ethers.Wallet(process.env.PRIVATE_KEY2! as string).connect(provider); //1
     let signatures: any[] = [];
     let orders: any[] = [];
-    let price = ethers.utils.parseEther('1100').toString();
+    let price = ethers.utils.parseEther('0.001').toString();
     let txnId = "";
     let orderId = "";
     let nonce = Math.floor(Math.random() * 9000000);
-    let amount0 = ethers.utils.parseEther('1').toString();
-    let amount1 = ethers.utils.parseEther('1100').toString();
+    let amount0 = ethers.utils.parseEther('1000').toString();
+    let amount1 = ethers.utils.parseEther('1').toString();
     let expiry = ((Date.now() / 1000) + 7 * 24 * 60 * 60).toFixed(0)
     let wethAmount = '';
     let name = "zexe";
@@ -83,7 +83,11 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
 
     // });
-
+    // it('create cross position', async () => {
+    //     await exchange.connect(user1).createPosition([usdc.address, weth.address]);
+    //     // require(await spot.totalPositions(user1.address)).to.equal('1');
+    //     // require(await spot.position(user1.address, 0)).to.not.equal(ethers.constants.AddressZero);
+    // })
 
     it(`user1 creates limit order to sell 1 weth @ 20000, check user inOrder Balance`, async () => {
 
@@ -114,15 +118,15 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         // The data to sign
         const value = {
             maker: user1.address.toLowerCase(),
-            token0: weth.address.toLowerCase(),
-            token1: usdc.address.toLowerCase(),
+            token0: usdc.address.toLowerCase(),
+            token1: weth.address.toLowerCase(),
             token0Amount: amount0,
             token1Amount: amount1,
-            leverage: 1,
+            leverage: 5,
             price: price,
             expiry: expiry,
             nonce: nonce,
-            action: 2,  // 2 for limit, 0 for open, 1 for close
+            action: 0,  // 2 for limit, 0 for open, 1 for close
             position: 0 // for cross
         };
 
@@ -148,15 +152,15 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
                 {
                     "data": {
                         maker: user1.address.toLowerCase(),
-                        token0: weth.address.toLowerCase(),
-                        token1: usdc.address.toLowerCase(),
+                        token0: usdc.address.toLowerCase(),
+                        token1: weth.address.toLowerCase(),
                         token0Amount: amount0,
                         token1Amount: amount1,
-                        leverage: 1,
+                        leverage: 5,
                         price: price,
                         expiry: expiry,
                         nonce: nonce,
-                        action: 2,  // 2 for limit, 0 for open, 1 for close
+                        action: 0,  // 2 for limit, 0 for open, 1 for close
                         position: 0 // for cross
                     },
                     "signature": storedSignature.toLowerCase(),
@@ -204,15 +208,15 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         // let userPositionPre = await User.findOne({ token: weth.address.toLowerCase(), id: user1.address.toLowerCase() }).lean();
 
         // userInOrderPre = userPositionPre?.inOrderBalance ?? '0';
-
+        await usdc.connect(user2).increaseAllowance(exchange.address, (ethers.utils.parseEther('9200')));
         wethAmount = ethers.utils.parseEther(`1`).toString();
-        console.log(orders[0], signatures[0])
+        // console.log(orders[0], signatures[0])
         const exTxn = await exchange.connect(user2).execute(
             [orders[0]],
             [signatures[0]],
-            weth.address,
-            ethers.utils.parseEther('1'),
             usdc.address,
+            ethers.utils.parseEther('5000'),
+            weth.address,
             ethers.constants.HashZero
         );
 

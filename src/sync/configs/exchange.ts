@@ -8,6 +8,7 @@ import { handleOrderCancelled } from "../../handlers/orderCancelled";
 import { handleMarginEnabled } from "../../handlers/marginEnabled";
 import fs from "fs";
 import path from "path";
+import { handleUserPosition } from "../../handlers/positionHandler";
 
 
 
@@ -22,6 +23,7 @@ function ExchangeConfig(chainId: string) {
                 "ClosePosition": handleOrderExecuted,
                 "LimitOrderFilled": handleOrderExecuted,
                 "OrderCancelled": handleOrderCancelled,
+                "UserPosition": handleUserPosition,
             },
             chainId: chainId
         }

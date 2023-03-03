@@ -138,6 +138,6 @@ export async function startOrderStatus(chainId: string) {
         console.log("order status done updating");
     }, 1000 * 60 * 30);
 }
-// startOrderStatus("421613")
+
 
 
