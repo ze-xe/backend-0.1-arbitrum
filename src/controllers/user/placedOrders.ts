@@ -10,15 +10,15 @@ export async function getUserPlacedOrders(req: any, res: any) {
         let pairId: string = req.params.pairId?.toLowerCase();
         let chainId: string = req.query.chainId;
         if (!maker) {
-            return res.status(400).send({ status: false, error: errorMessage.maker });
+            return res.status(400).send({ status: false, error: errorMessage.MAKER_REQUIRED });
         }
 
         if (!pairId) {
-            return res.status(400).send({ status: false, error: errorMessage.pairId });
+            return res.status(400).send({ status: false, error: errorMessage.PAIR_ID_REQUIRED_OR_INVALID });
         }
 
         if (!chainId) {
-            return res.status(400).send({ status: false, error: errorMessage.chainId });
+            return res.status(400).send({ status: false, error: errorMessage.CHAIN_ID_REQUIRED });
         }
 
         const getMakerOrders = await Order.find({ maker: maker, pair: pairId, deleted: false, cancelled: false, active: true, chainId: chainId }).sort({ blockTimestamp: -1, createdAt: -1 }).lean();

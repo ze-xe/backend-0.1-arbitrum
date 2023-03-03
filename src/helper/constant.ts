@@ -5,11 +5,6 @@ import path from "path";
 import { getABI, getProvider } from "../utils/utils";
 
 
-
-
-
-
-
 export const Decimals = {
     token: 18,
     amount: 18
@@ -20,12 +15,10 @@ export function getConfig(name: any) {
     return Config[name]
 }
 
-
 export function getContractAddress(name: string) {
     let Deployments = JSON.parse((fs.readFileSync(path.join(__dirname, '..', 'deployments', 'deployments.json'))).toString());
     return Deployments["contracts"][name]["address"].toLowerCase()
 }
-
 
 export function getContract(name: string, chainId: any) {
 

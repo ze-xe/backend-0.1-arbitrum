@@ -11,12 +11,12 @@ const OrderExecutedSchema = new mongoose.Schema({
     pair: { type: String, required: true, trim: true },
     pairPrice: { type: String, required: true, trim: true },
     price: { type: String, required: true, trim: true },
-    priceDecimals: { type: Number, required: true, trim: true },
+    priceDecimals: { type: Number, required: true},
     action: { type: String, required: true },
-    position:{type: String,required: true},
-    leverage: { type: String,required: true},
-    chainId: String,
-    logIndex: Number
+    position: { type: String, required: true },
+    leverage: { type: String, required: true },
+    chainId: { type: String, required: true },
+    logIndex:  { type: Number, required: true}
 
 },
     { timestamps: true }

@@ -63,7 +63,7 @@ async function eventListner({ contractAddress, abi, handlers, chainId }: ifEvent
                 await handlers[events[i]](result.args, argument);
 
                 await Sync.findOneAndUpdate(
-                    { chainId: chainId },
+                    { chainId: chainId, spot: contractAddress },
                     { blockNumberExchange: fromBlock },
                     { upsert: true }
                 );
@@ -101,7 +101,7 @@ async function historicEventListner({ contractAddress, abi, handlers, chainId }:
         let fromBlock: number = 0;
         try {
 
-            let syncDetails: ifSync | null = await Sync.findOne({ chainId: chainId });
+            let syncDetails: ifSync | null = await Sync.findOne({ chainId: chainId, spot: contractAddress });
 
             if (syncDetails) {
                 fromBlock = syncDetails.blockNumberExchange ?? 0;
@@ -145,7 +145,7 @@ async function historicEventListner({ contractAddress, abi, handlers, chainId }:
 
             }
             await Sync.findOneAndUpdate(
-                { chainId: chainId },
+                { chainId: chainId, spot: contractAddress },
                 { blockNumberExchange: fromBlock },
                 { upsert: true }
             );
@@ -157,7 +157,7 @@ async function historicEventListner({ contractAddress, abi, handlers, chainId }:
         catch (error) {
             if (errorCount < 5) {
                 await Sync.findOneAndUpdate(
-                    {},
+                    { chainId: chainId, spot: contractAddress},
                     { blockNumberExchange: fromBlock },
                     { upsert: true }
                 );

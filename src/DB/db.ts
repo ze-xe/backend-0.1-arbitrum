@@ -8,6 +8,7 @@ import OrderExecutedSchema from "../schemas/OrderFilled";
 import TokenSchema from "../schemas/Token";
 import UserSchema from "../schemas/User";
 import { getVersion } from "../helper/chain";
+import UserPositionSchema from "../schemas/UserPosition"
 
 // require("dotenv").config({ path: path.resolve(process.cwd(), process.env.NODE_ENV?.includes('test') ? ".env.test" : ".env") });
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') })
@@ -25,6 +26,7 @@ const Order = mongoose.model("Order", OrderSchema);
 const OrderExecuted = mongoose.model("OrderExecuted", OrderExecutedSchema);
 const Token = mongoose.model("Token", TokenSchema);
 const User = mongoose.model("User", UserSchema);
+const UserPosition = mongoose.model("UserPosition", UserPositionSchema);
 
 
 
@@ -48,4 +50,4 @@ async function connect() {
 
 
 
-export { Sync, connect, Pair, Order, OrderExecuted, Token, User, OrderCreatedBackup };
+export { Sync, connect, Pair, Order, OrderExecuted, Token, User, OrderCreatedBackup, UserPosition };

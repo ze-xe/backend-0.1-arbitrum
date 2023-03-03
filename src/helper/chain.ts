@@ -7,8 +7,8 @@ export function getRpcLink(chainId: string): string {
 
     let map: any = {
         "1666700000": "https://api.s0.b.hmny.io/",
-        "421613": "https://arbitrum-goerli.infura.io/v3/bb621c9372d048979f8677ba78fe41d7",
-        // "421613": "https://nd-389-970-162.p2pify.com/17b0fbe8312c9ff963057d537b9c7864",
+        // "421613": "https://arbitrum-goerli.infura.io/v3/bb621c9372d048979f8677ba78fe41d7",
+        "421613": "https://nd-389-970-162.p2pify.com/17b0fbe8312c9ff963057d537b9c7864",
         // "421613": "https://arb-goerli.g.alchemy.com/v2/HyNaane88yHFsK8Yrn4gf2OOzHkd6GAJ",
         "1313161555": "https://testnet.aurora.dev",
         "31337": "http://localhost:8545"

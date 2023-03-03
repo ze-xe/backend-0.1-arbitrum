@@ -9,7 +9,7 @@ export async function getAllTokens(req: any, res: any) {
     try {
         let chainId = req.query.chainId;
         if (!chainId) {
-            return res.status(400).send({ status: false, error: errorMessage.chainId });
+            return res.status(400).send({ status: false, error: errorMessage.CHAIN_ID_REQUIRED });
         }
         const getAllTokens = await Token.find({ chainId: chainId, active: true }).select({ _id: 0, name: 1, symbol: 1, decimals: 1, id: 1 }).lean();
 

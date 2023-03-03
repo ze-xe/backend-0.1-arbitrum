@@ -96,29 +96,29 @@ async function orderStatus(chainId: string) {
                     let inOrderBalance = Big(getUserPos.inOrderBalance);
 
                     if (Number(inOrderBalance) > Number(balance) || Date.now() / 1e3 >= Number(getOrderCreated[i].expiry)) {
+                        let temp: any = { active: false };
+                        if (Date.now() / 1e3 >= Number(getOrderCreated[i].expiry)) temp = { active: false, expired: true };
                         let currentInOrderBalance = Big(inOrderBalance).minus(amount).toString();
                         // updating inOrderBalance and active
                         await Promise.all([
-                            Order.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: false } }),
+                            Order.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: temp }),
                             User.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: currentInOrderBalance } })
                         ]);
                         console.log("inactive", getOrderCreated[i].id, getUserPos.id);
                     }
                 }
-                else if (getOrderCreated[i].active == false) {
+                else if (getOrderCreated[i].active == false && Date.now() / 1e3 < Number(getOrderCreated[i].expiry)) {
 
                     const getUserPos: ifUserPosition = await User.findOne({ token: token, id: getOrderCreated[i].maker, chainId: getOrderCreated[i].chainId }).lean();
 
                     let inOrderBalance = Big(getUserPos.inOrderBalance).plus(amount).toString();
 
-                    if (Number(inOrderBalance) < Number(balance) && Date.now() / 1e3 < Number(getOrderCreated[i].expiry)) {
+                    await Promise.all([
+                        Order.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: true } }),
+                        User.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: inOrderBalance } })
+                    ]);
+                    console.log("active", getOrderCreated[i].id, getUserPos.id);
 
-                        await Promise.all([
-                            Order.findOneAndUpdate({ _id: getOrderCreated[i]._id }, { $set: { active: true } }),
-                            User.findOneAndUpdate({ _id: getUserPos._id }, { $set: { inOrderBalance: inOrderBalance } })
-                        ]);
-                        console.log("active", getOrderCreated[i].id, getUserPos.id);
-                    }
                 }
             }
 
@@ -138,6 +138,6 @@ export async function startOrderStatus(chainId: string) {
         console.log("order status done updating");
     }, 1000 * 60 * 30);
 }
-// startOrderStatus("421613")
+
 
 

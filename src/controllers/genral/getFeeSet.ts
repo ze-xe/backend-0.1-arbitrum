@@ -10,7 +10,7 @@ export async function getFeeSet(req: any, res: any) {
     try {
         let chainId = req.query.chainId;
         if (!chainId) {
-            return res.status(400).send({ status: false, error: errorMessage.chainId });
+            return res.status(400).send({ status: false, error: errorMessage.CHAIN_ID_REQUIRED });
         }
         const getFee = await Sync.find({ chainId: chainId }).select({ _id: 0, makerFee: 1, takerFee: 1 }).lean();
 

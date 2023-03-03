@@ -79,7 +79,7 @@ export async function handleOrderExecuted(data: any, argument: any) {
 
         await Pair.findOneAndUpdate(
             { _id: getPairDetails._id.toString() },
-            { $set: { price: getOrderDetails.pairPrice, priceDiff: priceDiff, priceDecimals: argument.priceDecimals } }
+            { $set: { price: getOrderDetails.pairPrice, priceDiff: priceDiff, priceDecimals: argument.priceDecimals.toString() } }
         );
         // updating userPosition
         if (Number(getOrderDetails.action) == Action.LIMIT) {
@@ -94,8 +94,8 @@ export async function handleOrderExecuted(data: any, argument: any) {
         // updating pair orders
 
         socketService.emit(EVENT_NAME.PAIR_ORDER, {
-            amount: `-${fillAmount}`,
-            price: getOrderDetails.price,
+            amount: `-${argument.pairToken0Amount}`,
+            price: getOrderDetails.pairPrice,
             action: getOrderDetails.action,
             position: getOrderDetails.position,
             pair: getOrderDetails.pair
@@ -103,8 +103,8 @@ export async function handleOrderExecuted(data: any, argument: any) {
 
         // updating pair history
         socketService.emit(EVENT_NAME.PAIR_HISTORY, {
-            amount: fillAmount,
-            price: getOrderDetails.price,
+            amount: argument.pairToken0Amount,
+            price: getOrderDetails.pairPrice,
             action: getOrderDetails.action,
             position: getOrderDetails.position,
             pair: getOrderDetails.pair

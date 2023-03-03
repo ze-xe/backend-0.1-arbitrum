@@ -13,7 +13,7 @@ export async function getSymbol(req: any, res: any) {
         let symbolDetails = await Pair.findOne({ symbol: symbol, active: true }).lean();
 
         if (!symbolDetails) {
-            return res.status(404).send({ status: false, data: errorMessage.symbol })
+            return res.status(404).send({ status: false, data: errorMessage.SYMBOL_NOT_FOUND })
         }
 
         let data = {

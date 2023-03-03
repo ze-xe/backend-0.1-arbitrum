@@ -121,28 +121,28 @@ export async function getMatchedMarketOrders(req: any, res: any) {
 
 
         if (!pairId) {
-            return res.status(400).send({ status: false, error: errorMessage.pairId });
+            return res.status(400).send({ status: false, error: errorMessage.PAIR_ID_REQUIRED_OR_INVALID });
         }
 
         if (isNaN(orderType) == true) {
-            return res.status(400).send({ status: false, error: errorMessage.orderType });
+            return res.status(400).send({ status: false, error: errorMessage.ORDERTYPE_REQUIRED_OR_INVALID });
         }
 
         if (!amount || isNaN(amount) == true) {
-            return res.status(400).send({ status: false, error: errorMessage.amount });
+            return res.status(400).send({ status: false, error: errorMessage.AMOUNT_REQUIRED_OR_INVALID });
         }
 
         const isPairIdExist: ifPair | null = await Pair.findOne({ id: pairId, chainId: chainId, active: true }).lean();
 
         if (!isPairIdExist) {
-            return res.status(404).send({ status: false, error: errorMessage.pairId });
+            return res.status(404).send({ status: false, error: errorMessage.PAIR_ID_REQUIRED_OR_INVALID });
         }
 
         let getMatchedDoc: ifOrderCreated[] = [];
 
         if (orderType == ORDER_TYPE.BUY) {
-            let sellOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token1, chainId: chainId, action: { $in: [0, 2] }, deleted: false, active: true, cancelled: false }).sort({ pairPrice: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
-            let sellOrder1: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token0, chainId: chainId, action: 1, deleted: false, active: true, cancelled: false }).sort({ pairPrice: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+            let sellOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token1, chainId: chainId, action: { $in: [0, 2] }, deleted: false, active: true, cancelled: false, expired: false }).sort({ pairPrice: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+            let sellOrder1: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token0, chainId: chainId, action: 1, deleted: false, active: true, cancelled: false, expired: false }).sort({ pairPrice: 1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
 
             let promise = await Promise.all([sellOrder, sellOrder1]);
 
@@ -151,8 +151,8 @@ export async function getMatchedMarketOrders(req: any, res: any) {
             getMatchedDoc = [...sellOrder, ...sellOrder1].sort((a, b) => a.pairPrice - b.pairPrice);
         }
         else if (orderType == ORDER_TYPE.SELL) {
-            let buyOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token0, chainId: chainId, action: { $in: [0, 2] }, deleted: false, active: true, cancelled: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
-            let buyOrder1: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token1, chainId: chainId, action: 1, deleted: false, active: true, cancelled: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+            let buyOrder: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token0, chainId: chainId, action: { $in: [0, 2] }, deleted: false, active: true, cancelled: false, expired: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
+            let buyOrder1: any | ifOrderCreated[] = Order.find({ pair: pairId, token0: isPairIdExist.token1, chainId: chainId, action: 1, deleted: false, active: true, cancelled: false, expired: false }).sort({ pairPrice: -1 }).collation({ locale: "en_US", numericOrdering: true }).lean();
             let promise = await Promise.all([buyOrder, buyOrder1]);
             buyOrder = promise[0];
             buyOrder1 = promise[1];

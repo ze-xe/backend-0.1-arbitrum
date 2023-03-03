@@ -9,7 +9,7 @@ import * as sentry from "@sentry/node";
 
 export async function multicallFor2Tokens(token0: string, token1: string, maker: string, chainId: string): Promise<number[] | null> {
     try {
-        console.log("Multicall from fun", getMulticallAddress(chainId))
+        // console.log("Multicall from fun", getMulticallAddress(chainId))
         const multicall = new ethers.Contract(
             getMulticallAddress(chainId),
             getABI("Multicall2"),
