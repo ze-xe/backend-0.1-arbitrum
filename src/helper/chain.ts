@@ -29,6 +29,7 @@ export function getExchangeAddress(chainId: string): string {
 export function getVersion(env: string): string {
     let map: any = {
         "dev": getConfig("version"),
+        "stage": getConfig("version"),
         "test": getTestConfig("version")
     }
     return map[env]
@@ -37,6 +38,7 @@ export function getVersion(env: string): string {
 export function getLatest(env: string) {
     let map: any = {
         "dev": getConfig("latest"),
+        "stage": getConfig("latest"),
         "test": getTestConfig("latest")
     }
     return map[env]

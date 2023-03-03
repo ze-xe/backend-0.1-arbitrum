@@ -55,39 +55,38 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
         await connect()
     });
 
-    // it('mint 10 weth to user1, 200000 usdt to user2, approve exchange contract', async () => {
+    it('mint 10 weth to user1, 200000 usdt to user2, approve exchange contract', async () => {
 
-    //     // let user1wethBalancePre = (await weth.balanceOf(user1.address)).toString();
-    //     // let user2UsdcBalancePre = (await usdc.balanceOf(user2.address)).toString();
+        let user1wethBalancePre = (await weth.balanceOf(user1.address)).toString();
+        let user2UsdcBalancePre = (await usdc.balanceOf(user2.address)).toString();
 
-    //     // const wethAmount = ethers.utils.parseEther('10').toString();
-    //     // let tx1 = await weth.connect(user1).mint(user1.address, wethAmount);
-    //     // let tx2 = await weth.connect(user2).mint(user2.address, wethAmount);
+        const wethAmount = ethers.utils.parseEther('10').toString();
+        let tx1 = await weth.connect(user1).mint(user1.address, wethAmount);
+        let tx2 = await weth.connect(user2).mint(user2.address, wethAmount);
 
-    //     // approve for exchange
-    //     // let approve = await weth.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
-    //     // await weth.connect(user2).approve(exchange.address, ethers.constants.MaxUint256)
+        // approve for exchange
+        let approve = await weth.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
+        await weth.connect(user2).approve(exchange.address, ethers.constants.MaxUint256)
 
-    //     // const usdcAmount = ethers.utils.parseEther('200000').toString();
-    //     // let tx3 = await usdc.connect(user2).mint(user2.address, usdcAmount);
-    //     // await usdc.connect(user1).mint(user1.address, usdcAmount);
-    //     // // approve for exchange
-    //     let approve1 = await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256);
-    //     await usdc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
-    //     await approve1.wait(1)
-    //     let user1wethBalancePost = (await weth.balanceOf(user1.address)).toString();
-    //     let user2UsdcBalancePost = (await usdc.balanceOf(user2.address)).toString();
+        const usdcAmount = ethers.utils.parseEther('200000').toString();
+        let tx3 = await usdc.connect(user2).mint(user2.address, usdcAmount);
+        await usdc.connect(user1).mint(user1.address, usdcAmount);
+        // approve for exchange
+        let approve1 = await usdc.connect(user2).approve(exchange.address, ethers.constants.MaxUint256);
+        await usdc.connect(user1).approve(exchange.address, ethers.constants.MaxUint256);
+        await approve1.wait(1)
+        let user1wethBalancePost = (await weth.balanceOf(user1.address)).toString();
+        let user2UsdcBalancePost = (await usdc.balanceOf(user2.address)).toString();
 
-    //     // expect(user1wethBalancePost).to.equal(parseEther(Big(wethAmount).plus(user1wethBalancePre).toString()));
-    //     // expect(user2UsdcBalancePost).to.equal(parseEther(Big(usdcAmount).plus(user2UsdcBalancePre).toString()));
-
-
+        // expect(user1wethBalancePost).to.equal(parseEther(Big(wethAmount).plus(user1wethBalancePre).toString()));
+        // expect(user2UsdcBalancePost).to.equal(parseEther(Big(usdcAmount).plus(user2UsdcBalancePre).toString()));
     // });
     // it('create cross position', async () => {
     //     await exchange.connect(user1).createPosition([usdc.address, weth.address]);
     //     // require(await spot.totalPositions(user1.address)).to.equal('1');
     //     // require(await spot.position(user1.address, 0)).to.not.equal(ethers.constants.AddressZero);
     // })
+
 
     it(`user1 creates limit order to sell 1 weth @ 20000, check user inOrder Balance`, async () => {
 
@@ -146,7 +145,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
 
         let userInOrder = userPositionPre?.inOrderBalance ?? '0';
 
-        let res = await request("http://localhost:3010")
+        let res = await request("http://localhost:3030")
             .post(`/v/${getVersion(process.env.NODE_ENV!)}/order/create`)
             .send(
                 {
@@ -275,7 +274,7 @@ describe("Limit Order => Mint token, create order, execute order, cancel order",
             txnId = resp.transactionHash
 
         })
-    });
+    });*/
 
     // it("cancel Order", async ()=>{
 
