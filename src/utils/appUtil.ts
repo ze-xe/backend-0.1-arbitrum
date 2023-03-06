@@ -80,9 +80,11 @@ async function start(chainId: string, httpServer: any) {
            await historicEventListner(x)
         })
         // await historicEventListner(ExchangeConfig(chainId));
+        createPair(chainId);
         socketService.init(httpServer)
         startOrderStatus(chainId)
-        getOraclePrice(chainId)
+        getOraclePrice(chainId);
+        
     }
     catch (error) {
         sentry.captureException(error)
