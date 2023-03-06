@@ -2,7 +2,7 @@
     "chainId": {
         "421613": {
             "spotAddresses": {
-                "0xf8b9315d2fc02b4bbc696d0f7c322700ae3c5c34": {
+                "0xd8507b349d120627a0263533e0a241e6bcd3cf7e": {
                     "addressProvider": "0x4464b0331deA4D9480a90573149400417249E4F0",
                     "OracleAddress": "0x57Ce66E2C1a618f848707d6FA408B4fAe066cc62",
                     "poolAddress": "0xd4282DdAC1A8686695e00Ea9BB6cF542A3271CA4",
