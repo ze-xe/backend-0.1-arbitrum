@@ -198,7 +198,7 @@ export async function getPairId(data: any, chainId: any, spotAddress: string) {
         let id = ethers.utils.keccak256(encoder);
         let idR = ethers.utils.keccak256(encoderReverse); // reverse id
         let pairId: string = id;
-        let pairs = JSON.parse(fs.readFileSync(path.join(__dirname+"../../../../zexe.config.json")).toString())[chainId][spotAddress];
+        let pairs = JSON.parse(fs.readFileSync(path.join(__dirname+"../../../../zexe.config.json")).toString())["chainId"][chainId]["spotAddresses"][spotAddress]["pair"]["pairIdAndToken"];
         let isPairExist = pairs[id]
         if (!isPairExist) {
             isPairExist = pairs[idR]

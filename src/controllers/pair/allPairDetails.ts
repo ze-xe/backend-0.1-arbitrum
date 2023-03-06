@@ -45,6 +45,7 @@ export async function getAllPairDetails(req: any, res: any) {
             let temp = {
 
                 id: allPairs[i].id,
+                spot:allPairs[i].spot,
                 price: allPairs[i].price,
                 price0: allPairs[i].price0,
                 price1: allPairs[i].price1,

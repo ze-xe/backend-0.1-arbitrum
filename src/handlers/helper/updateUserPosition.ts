@@ -23,7 +23,7 @@ export async function updateUserPosition(getOrderDetails: any, getPairDetails: a
             return console.log(`user position not found for token0 ${token}, maker ${getOrderDetails.maker}`)
         }
 
-        let currentInOrderBalance = new Big(getUserPosition.inOrderBalance).minus(token1Amount).toString();
+        let currentInOrderBalance = Big(getUserPosition.inOrderBalance).minus(token1Amount).toString();
 
         await User.findOneAndUpdate(
             { _id: getUserPosition._id },
@@ -33,7 +33,7 @@ export async function updateUserPosition(getOrderDetails: any, getPairDetails: a
         if (getPairDetails.token0 == getOrderDetails.token1){
             fillAmount = token1Amount;
         }
-        let currentBalanceAmount = new Big(getOrderDetails.balanceAmount).minus(fillAmount);
+        let currentBalanceAmount = Big(getOrderDetails.balanceAmount).minus(fillAmount);
 
         if (Number(currentBalanceAmount) <= Number(getPairDetails.minToken0Order)) {
             await Order.findOneAndUpdate(

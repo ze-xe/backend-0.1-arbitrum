@@ -42,6 +42,7 @@ export interface ifUserPosition {
 
 export interface ifPair {
     id: string
+    spot:string
     token0: string
     token1: string
     price0:string
