@@ -113,7 +113,7 @@ import { connect, Pair, Token } from "../DB/db";
 
 export async function createPair(chainId: string) {
     
-    const getConfig = JSON.parse((fs.readFileSync(path.join(__dirname + "../../zexe.config1.json"))).toString());
+    const getConfig = JSON.parse((fs.readFileSync(path.join(__dirname + "../../zexe.config.json"))).toString());
 
     // geting all the spot address
     const spotAddresses = Object.keys(getConfig["chainId"][chainId]["spotAddresses"]);

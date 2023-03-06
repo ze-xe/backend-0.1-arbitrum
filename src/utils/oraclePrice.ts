@@ -11,7 +11,7 @@ import { connect, Pair } from "../DB/db";
  */
 async function _getOraclePrice(chainId: string) {
     try {
-        const getConfig = (JSON.parse((await fs.readFile(path.join(__dirname + "../../zexe.config1.json"))).toString()))["chainId"][chainId]["spotAddresses"];
+        const getConfig = (JSON.parse((await fs.readFile(path.join(__dirname + "../../zexe.config.json"))).toString()))["chainId"][chainId]["spotAddresses"];
         const spotAddresses = Object.keys(getConfig)
         let provider = getProvider(chainId);
         for (let i in spotAddresses) {

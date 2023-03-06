@@ -21,6 +21,7 @@ Url : http://localhost:3010/v/1/pair/allpairs?chainId=421613
     "data": [
         {
             "id": "0xda509e348e9ba4dfd5606a2913c80347f7bee1bc2a5ba42ded50a3bc158f5078",
+            "spot": "0xf8b9315d2fc02b4bbc696d0f7c322700ae3c5c34",
             "price": "1100000000000000000000",
             "priceDecimals": "2",
             "priceDiff": "100000000000000000000",
@@ -516,8 +517,75 @@ Url : http://localhost:3010/v/version/user/orders/cancelled/:maker/pair/:pairId?
     ]
 }
 ```
+### 13. For Fetching Users Positions in Pool
 
-### 13. For Order Creation
+### Route /v/version/user/position/:maker?chainId
+
+### Expected Input
+
+```
+Method : Get
+Url : http://localhost:3010/v/1/user/position/:maker?chainId=421613
+```
+
+### Expected Output
+
+```
+{
+   "status": true,
+    "data": [
+        {
+            "0": "0x3fbb5ae9d8423c3b6a89a73ec514fd32a5e774e4",
+            "1": "0x53562e05c042eb8aba7cdfc2dc19d2cd42333366",
+            "2": "0xfdc7fba53d052ad8bd87482650aaff52ca2e0941",
+            "3": "0x72d82c543c84f32ecfa1df9e440c69faa6e3b742"
+        }
+    ]
+}
+```
+### 14. For Fetching Users pool balance of chain
+
+### Route /v/version/user/pool/balance/:maker?chainId
+
+### Expected Input
+
+```
+Method : Get
+Url : http://localhost:3010/v/1/user/pool/balance/:maker?chainId=421613
+```
+
+### Expected Output
+
+```
+{
+    "status": true,
+    "data": {
+        "chainId": "421613",
+        "maker": "0x103b62f68da23f20055c572269be67fa7635f2fc",
+        "0x1fe7250ca569bb07610596d2371f2e83fae3ea2b": [
+            "11241932115353504103",
+            "6000044685490302342"
+        ],
+        "0x95e3d2540479c67596575971b69b0c3951837359": [
+            "7.494600787428960676708e+21",
+            "9.000002225687616303215e+21"
+        ],
+        "0x37b4def7971d452d872fd521a724030beba0e22a": [
+            "0",
+            "0"
+        ],
+        "0xbad407aa6ea2fc182c14df5dbcbc725b5a778669": [
+            "0",
+            "0"
+        ],
+        "0x787930d665f7d7d5f73acb701892b59d7a35d03e": [
+            "0",
+            "0"
+        ]
+    }
+}
+```
+### 15. For Order Creation
 
 ### Route /order/create
 
@@ -546,7 +614,11 @@ Url : http://localhost:3010/order/create
         "position": 0
     },
     "signature":"0x6de29ba3e7429142040bb55ceb3fb2fc0de6d8c0c02f8ba1a51885b8726d6e1f595833bf10d8bab3a8e65379d8e8159fb20d42ca8c0ff76fa2db3df1017679c21c",
-    "chainId": "421613"
+    "chainId": "421613",
+    "spotAddress": "0xf8b9315d2fc02b4bbc696d0f7c322700ae3c5c34",
+    "name": "zexe",
+    "version": "1",
+
 }
 ```
 

@@ -1,76 +1,81 @@
 {
-    "421613": {
-        "0xf8b9315d2fc02b4bbc696d0f7c322700ae3c5c34": { 
-            "0xda509e348e9ba4dfd5606a2913c80347f7bee1bc2a5ba42ded50a3bc158f5078": [
-                {
-                    "address": "0x1fe7250ca569bb07610596d2371f2e83fae3ea2b",
-                    "name": "Wrapped Ethereum",
-                    "symbol": "WETH",
-                    "decimals": 18,
-                    "minTokenAmount":"10000000000000000"
-                },
-                {
-                    "address": "0x95e3d2540479c67596575971b69b0c3951837359",
-                    "name": "USDC Coin",
-                    "symbol": "USDC",
-                    "decimals": 18,
-                    "minTokenAmount":"10000000000000000000"
+    "chainId": {
+        "421613": {
+            "spotAddresses": {
+                "0xf8b9315d2fc02b4bbc696d0f7c322700ae3c5c34": {
+                    "addressProvider": "0x4464b0331deA4D9480a90573149400417249E4F0",
+                    "OracleAddress": "0x57Ce66E2C1a618f848707d6FA408B4fAe066cc62",
+                    "poolAddress": "0xd4282DdAC1A8686695e00Ea9BB6cF542A3271CA4",
+                    "pair": {
+                        "pairIdAndToken": {
+                            "0xda509e348e9ba4dfd5606a2913c80347f7bee1bc2a5ba42ded50a3bc158f5078": [
+                                {
+                                    "address": "0x1fe7250ca569bb07610596d2371f2e83fae3ea2b",
+                                    "name": "Wrapped Ethereum",
+                                    "symbol": "WETH",
+                                    "decimals": 18,
+                                    "minTokenAmount": "10000000000000000"
+                                },
+                                {
+                                    "address": "0x95e3d2540479c67596575971b69b0c3951837359",
+                                    "name": "USDC Coin",
+                                    "symbol": "USDC",
+                                    "decimals": 18,
+                                    "minTokenAmount": "10000000000000000000"
+                                }
+                            ],
+                            "0xddd093175cd72b2865f16a65c903cb6c4fd912faea5f2339fd52027e8c8d6bdc": [
+                                {
+                                    "address": "0x37b4DEF7971d452D872FD521A724030BEBA0e22a",
+                                    "name": "ChainLink",
+                                    "symbol": "LINK",
+                                    "decimals": 18,
+                                    "minTokenAmount": "1000000000000000000"
+                                },
+                                {
+                                    "address": "0x95e3d2540479c67596575971b69b0c3951837359",
+                                    "name": "USDC Coin",
+                                    "symbol": "USDC",
+                                    "decimals": 18,
+                                    "minTokenAmount": "10000000000000000000"
+                                }
+                            ],
+                            "0xcd6af93d7a1776f461ce045f4cded19fe815a57bee2da6213bb63807f39ffc00": [
+                                {
+                                    "address": "0xBaD407aa6ea2fc182c14df5DBCbC725b5a778669",
+                                    "name": "AAVE",
+                                    "symbol": "AAVE",
+                                    "decimals": 18,
+                                    "minTokenAmount": "100000000000000000"
+                                },
+                                {
+                                    "address": "0x95e3d2540479c67596575971b69b0c3951837359",
+                                    "name": "USDC Coin",
+                                    "symbol": "USDC",
+                                    "decimals": 18,
+                                    "minTokenAmount": "10000000000000000000"
+                                }
+                            ],
+                            "0xccc494a9b1102fda57b29d9f225dff49085151799f10cc56d72d28bb08d1cc40": [
+                                {
+                                    "address": "0x787930d665F7d7d5F73acb701892b59D7a35D03E",
+                                    "name": "DAI Stablecoin",
+                                    "symbol": "DAI",
+                                    "decimals": 18,
+                                    "minTokenAmount": "10000000000000000000"
+                                },
+                                {
+                                    "address": "0x95e3d2540479c67596575971b69b0c3951837359",
+                                    "name": "USDC Coin",
+                                    "symbol": "USDC",
+                                    "decimals": 18,
+                                    "minTokenAmount": "10000000000000000000"
+                                }
+                            ]
+                        }
+                    }
                 }
-            ],
-            "0xddd093175cd72b2865f16a65c903cb6c4fd912faea5f2339fd52027e8c8d6bdc": [
-                {
-                    "address": "0x37b4DEF7971d452D872FD521A724030BEBA0e22a",
-                    "name": "ChainLink",
-                    "symbol": "LINK",
-                    "decimals": 18,
-                    "minTokenAmount":"1000000000000000000"
-                },
-                {
-                    "address": "0x95e3d2540479c67596575971b69b0c3951837359",
-                    "name": "USDC Coin",
-                    "symbol": "USDC",
-                    "decimals": 18,
-                    "minTokenAmount":"10000000000000000000"
-                }
-            ],
-            "0xcd6af93d7a1776f461ce045f4cded19fe815a57bee2da6213bb63807f39ffc00": [
-                {
-                    "address": "0xBaD407aa6ea2fc182c14df5DBCbC725b5a778669",
-                    "name": "AAVE",
-                    "symbol": "AAVE",
-                    "decimals": 18,
-                    "minTokenAmount":"100000000000000000"
-                },
-                {
-                    "address": "0x95e3d2540479c67596575971b69b0c3951837359",
-                    "name": "USDC Coin",
-                    "symbol": "USDC",
-                    "decimals": 18,
-                    "minTokenAmount":"10000000000000000000"
-                }
-            ],
-            "0xccc494a9b1102fda57b29d9f225dff49085151799f10cc56d72d28bb08d1cc40": [
-                {
-                    "address": "0x787930d665F7d7d5F73acb701892b59D7a35D03E",
-                    "name": "DAI Stablecoin",
-                    "symbol": "DAI",
-                    "decimals": 18,
-                    "minTokenAmount":"10000000000000000000"
-                },
-                {
-                    "address": "0x95e3d2540479c67596575971b69b0c3951837359",
-                    "name": "USDC Coin",
-                    "symbol": "USDC",
-                    "decimals": 18,
-                    "minTokenAmount":"10000000000000000000"
-                }
-            ]
+            }
         }
-    },
-    "poolAddress":{
-        "0xf8b9315d2fc02b4bbc696d0f7c322700ae3c5c34": "0xd4282DdAC1A8686695e00Ea9BB6cF542A3271CA4"
-    },
-    "priceOracle":{
-        "0xf8b9315d2fc02b4bbc696d0f7c322700ae3c5c34": "0x57Ce66E2C1a618f848707d6FA408B4fAe066cc62"
     }
 }
